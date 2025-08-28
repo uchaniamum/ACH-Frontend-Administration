@@ -36,13 +36,13 @@
 
 <script setup lang="ts">
 import { useChannels } from '~/componsables/useChannels';
-const {
-    fetchChannels 
-} = useChannels();
+// const {
+//     fetchChannels 
+// } = useChannels();
 
-function testClick(){
-  fetchChannels()
-}
+// function testClick(){
+//   fetchChannels()
+// }
 const router = useRouter();
 const actionItems = [
     {
