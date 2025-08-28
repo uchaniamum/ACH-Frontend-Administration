@@ -2,7 +2,7 @@
     <div>
         <XHeader title="Administracion de Canales" >
             <template #description>
-                <p>Texto descriptivo del flujo.</p>
+                <p>Gestiona los canales modificando el centro de procesamiento, las rutas asociadas, los certificados correspondientes y realiza un seguimiento a través del historial de cambios.</p>
             </template>
         </XHeader>
         <div class="pt-12 flex flex-col gap-20">
@@ -14,20 +14,18 @@
             </div>
 
             <DataTable :value="canales" paginator :rows="10"  tableStyle="min-width: 50rem">
-                <Column field="codigo" header="Codigo" style="width: 160px"></Column>
-                <Column field="nombres" header="Nombre" style="width: 380px"></Column>
-                <Column field="siglas" header="Sigla" style="width: 140px "></Column>
-                <Column field="alias" header="Alias CPD" style="width: 140px "></Column>
-                <Column field="ultimaModificacion" header="Última modificación" style="width: 140px "></Column>
-                <Column field="accion" header="Acción" style="width: 140px ">
-                    <template #body="{ data }" >
+                <Column field="codigo" header="Codigo"></Column>
+                <Column field="nombres" header="Nombre"></Column>
+                <Column field="siglas" header="Sigla"></Column>
+                <Column field="alias" header="Alias CPD"></Column>
+                <Column field="ultimaModificacion" header="Última modificación"></Column>
+                <Column field="accion" header="Acción">
+                    <template #body>
                         <div class="flex gap-4">
                             <XButton variant="outlined" icon="edit-pencil" @click="navigateToEditChannel" />
-                            <SplitButton 
-                                label="Ver" 
-                                :model="actionItems" 
-                                @click="() => handleMainAction(data)"
-                            />
+                            <XButton variant="outlined" icon="user" @click="actionItems[0].command" />
+                            <!-- <XButton variant="outlined" icon="privacy-policy" @click="actionItems[1].command" /> -->
+                             <XButton variant="outlined" icon="privacy-policy" @click="testClick()" />
                         </div> 
                     </template>
                 </Column>
@@ -37,8 +35,15 @@
 </template>
 
 <script setup lang="ts">
-const router = useRouter();
+import { useChannels } from '~/componsables/useChannels';
+const {
+    fetchChannels 
+} = useChannels();
 
+function testClick(){
+  fetchChannels()
+}
+const router = useRouter();
 const actionItems = [
     {
         label: 'Historial participante',

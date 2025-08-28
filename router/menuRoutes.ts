@@ -19,6 +19,10 @@ const menuConfigACH: MenuBarAdminConfig = {
                     label: 'Participantes',
                     to: '/admin/configuration/participantes',
                 },
+                {
+                    label: 'Horarios',
+                    to: '/admin/configuration/horarios'
+                }
             ]
         },
         {

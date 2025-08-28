@@ -1,296 +1,172 @@
 <template>
+  <Toast position="top-right" />
+  <XConfirmDialog
+    v-model="visible"
+    icon="x:info-empty"
+    icon-color="text-blue-600"
+    title="Confirmar cambio de CPD">
+    <template #message>
+        <div class="space-y-2">
+            <p>
+              <span class="font-medium text-gray-700">¿Estás seguro de cambiar del </span>
+              <span class="font-semibold"> {{ canalSeleccionado.cpd.label }} a {{ canalAntiguo.cpd.label }}</span>
+              <span class="font-medium text-gray-700"> con ruta </span>
+              <span>{{ canalAntiguo.ruta }}</span>
+            </p>
+        </div>
+    </template>
+    <template #buttons>
+            <div class="flex gap-3">
+                <XButton label="Cancelar" severity="secondary" outlined @click="visible=false"/>
+                <XButton label="Confirmar" @click="saveConfirm" />
+            </div>
+    </template>  
+  </XConfirmDialog>
+  <XDialog 
+    v-model:visible="visibleDialogCertificate" 
+    maximizable 
+    modal 
+    header="Title dialog" 
+    :style="{ width: '50rem' }" 
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+  >
+    <template #maximizeicon="{ maximized, class: iconClass }">
+      <Icon 
+        :name="maximized ? 'x:collapse' : 'x:expand'" 
+        :class="[iconClass, 'w-12 h-12']"
+      />
+    </template>
+  
+    <p class="m-0">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </p>
+  </XDialog>
     <div>
         <div class="flex flex-col gap-8">
-            <XHeader  title="Editar Canal" />
+            <XHeader  title="Editar canal - Administradora de Cámaras de Compensación" />
             <span class="text-normal font-normal">Esta sección te permite modificar el centro de procesamiento, asegúrate de contar con los certificados y respaldos correspondientes.</span>
         </div>
-
         <div class="pt-12 flex flex-col gap-20">
-            <XCard class="bg-secondary-50 gap-2">
-                <template #header>
-                    <div class="font-semibold text-[20px] text-primary-400">Administradora de Cámaras de compensación</div>
-                </template>
-                <template #content>
-                    <div class="flex gap-24 items-center">
-                        <div class="flex gap-4 w-[200px]">
-                            <span class="font-semibold  text-gray-800">Código:</span>
-                            <span class="text-gray-600 font-medium">1426</span>
-                        </div>
-                        <div class="flex gap-4 w-[200px]">
-                            <span class="font-semibold  text-gray-800 pl-9">Sigla:</span>
-                            <span class="text-gray-600 font-medium">ACCL</span>
-                        </div>  
-                    </div>
-                </template>
-            </XCard>
-            <div class="flex justify-end  gap-4">
-                <XButton label="Registrar certificado público" icon="think-plus" @click="visible = true" />
-                            <XDialog 
-                v-model:visible="visible" 
-                modal
-                :closable="false"
-                header="Registrar certificado público" 
-                :style="{ width: '50rem' }" 
-                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-            > 
-                <div class="flex flex-col gap-8">
-                    <p class="m-0">
-                        Ingresa el archivo del certificado público para cargarlo y verificar sus datos
-                    </p>
-                    
-                    <XFileUpload
-                        ref="fileupload"
-                        name="demo[]"
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                        :maxFileSize="1000000"
-                        @select="onFileSelect"
-                        :showUploadButton="false"
-                        :showCancelButton="false"
-                        chooseLabel="Elegir archivo"
-                        :auto="false"
-                    >   
-                        <template #empty>
-                            <div class="mb-6 mt-4 px-[1.714rem]">
-                                <span class="text-normal font-normal">Arrastra y suelta archivos aquí para subirlos.</span>
-                            </div>
-                        </template>
-                        
-                        <template #content="{ files, removeFileCallback }">
-                            <div class="p-fileupload-file-list">
-                                <div 
-                                    v-for="(file, index) in files" 
-                                    :key="index" 
-                                    class="p-fileupload-file"
-                                >
-                                    <div class="p-fileupload-file-thumbnail custom-thumbnail">
-                                        <Icon name="x:page" class="text-[48px] text-gray-200"/>
-                                    </div>
-
-                                    <div class="p-fileupload-file-info">
-                                        <div class="p-fileupload-file-name">{{ file.name }}</div>
-                                        <span class="p-fileupload-file-size">{{ formatFileSize(file.size) }}</span>
-                                        
-                                        <!-- Mostrar "Cargando..." mientras se procesa -->
-                                        <div v-if="!file.isLoaded" class="loading-text">
-                                            <span class="text-xs text-gray-500">Cargando...</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Mostrar "Carga completa" cuando termine -->
-                                    <span 
-                                        v-if="file.isLoaded" 
-                                        class="p-badge p-component p-badge-success p-fileupload-file-badge"
-                                    >
-                                        Carga Completa
-                                    </span>
-
-                                    <div class="p-fileupload-file-actions">
-                                        <button 
-                                            class="p-button p-component p-button-icon-only p-button-danger p-button-rounded p-button-text p-fileupload-file-remove-button" 
-                                            @click="removeFileCallback(index)"
-                                            type="button"
-                                        >
-                                            <span class="p-button-icon p-c">
-                                                <Icon name="x:cancel"></Icon>
-                                            </span>
-                                        </button>
-                                    </div>
-
-                                    <div v-if="file.isLoaded" class="verify-button-container">
-                                        <XButton 
-                                            label="Verificar certificado"
-                                            class="!w-[160px] mt-2"  
-                                            @click="verifyCertificate(file)"
-                                            size="small"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </XFileUpload>
-
-                    <XDivider />
-                    
-                    <div class="flex justify-end gap-4">
-                        <XButton 
-                            label="Cancelar"
-                            variant="text"
-                            class="!w-[130px]" 
-                            @click="visible = false"
-                        />
-                        <XButton 
-                            label="Registrar"
-                            class="!w-[130px]"  
-                            type="submit"
-                            :disabled="!hasFilesLoaded"
-                        />
-                    </div>
+            <div class="px-[calc((210/14)*1rem)] flex flex-col gap-12 ">
+              <div class="flex justify-end">
+                <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="visibleDialogCertificate = true"/>
+              </div>
+              <!-- DataTable -->
+              <DataTable :value="rutas" class="w-full">
+                  <Column field="ruta" header="Ruta" />
+                  <Column field="cpd" header="CPD">
+                      <template #body="{ data, index }">
+                          <div class="flex flex-row gap-4">
+                          <RadioButton name="canal" v-model="canal" :value="data.cpd.label" :inputId="`canal-${ index }`"/>
+                          <Xlabel :for="`canal-${ index }`">{{ data.cpd.label }}</Xlabel>
+                          </div>
+                      </template>
+                  </Column>
+              </DataTable>
+              <!-- Card Rutas -->
+               <XCard v-if="visibleRutes" class="border border-secondary-400">
+                  <template #content>
+                      <div class="flex flex-row gap-6 border-gray-500">
+                          <p class="font-bold text-gray-400">
+                              Rutas:
+                          </p>
+                          <div class="flex flex-col">
+                            <p class="text-gray-400 font-medium" 
+                                v-for="(ruta,index) in canalSeleccionado.rutasIntegradas" :key="index">
+                                <span> {{ ruta.name }}</span>
+                            </p>
+                          </div>
+                      </div>
+                  </template>
+               </XCard>
+               <!-- Actions -->
+               <div v-if="visibleRutes" class="flex flex-col">
+                <XDivider class="mb-16"/>
+                <div class="w-full flex flex-row justify-end gap-6">
+                    <XButton variant="outlined" label="Cancelar"/>
+                    <XButton label="Guardar" @click="visible=true"/>
                 </div>
-            </XDialog>
+               </div>
             </div>
-            <XDialog 
-                v-model:visible="visible" 
-                modal
-                :closable="false"
-                header="Registrar certificado público" 
-                :style="{ width: '50rem' }" 
-                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-            > 
-                <div class="flex flex-col gap-8">
-                    <p class="text-gray-700">Ingresa el archivo del certificado público para cargarlo y verificar sus datos</p>
-                    <XFileUpload
-                        ref="fileupload"
-                        name="demo[]"
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                        :maxFileSize="1000000"
-                        @select="onFileSelect"
-                        :showUploadButton="false"
-                        :showCancelButton="false"
-                        chooseLabel="Elegir archivo"
-                        :auto="false"
-                    >   
-                        <template #empty>
-                            <div class="mb-6 mt-4 px-[1.714rem]">
-                                <span class="text-normal font-normal">Arrastra y suelta archivos aquí para subirlos.</span>
-                            </div>
-                        </template>
-                        
-                        <template #content="{ files, removeFileCallback }">
-                            <div class="p-fileupload-file-list">
-                                <div 
-                                    v-for="(file, index) in files" 
-                                    :key="index" 
-                                    class="p-fileupload-file"
-                                >
-                                    <div class="p-fileupload-file-thumbnail custom-thumbnail">
-                                        <Icon name="x:page" class="text-[48px] text-gray-200"/>
-                                    </div>
-
-                                    <div class="p-fileupload-file-info">
-                                        <div class="p-fileupload-file-name">{{ file.name }}</div>
-                                        <span class="p-fileupload-file-size">{{ formatFileSize(file.size) }}</span>
-                                    </div>
-
-                                    <!-- Estado de carga -->
-                                    <span 
-                                        v-if="getFileStatus(file).isLoaded" 
-                                        class="p-badge p-component p-badge-success p-fileupload-file-badge px-4"
-                                    >
-                                        Carga Completa
-                                    </span>
-                                    <span 
-                                        v-else 
-                                        class="p-badge p-component p-badge-warn p-fileupload-file-badge px-4"
-                                    >
-                                        Cargando archivo
-                                    </span>
-
-                                    <div class="p-fileupload-file-actions">
-                                        <button 
-                                            class="p-button p-component p-button-icon-only p-button-danger p-button-rounded p-button-text p-fileupload-file-remove-button" 
-                                            @click="removeFileCallback(index)"
-                                            type="button"
-                                        >
-                                            <span class="p-button-icon p-c">
-                                                <Icon name="x:cancel"></Icon>
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div v-if="hasFilesLoaded" >
-                                    <XDivider v-if="!isVerified"/>
-                                    <div class="flex flex-col items-center pt-12 px-12" v-if="!isVerifying && !isVerified">
-                                        <!-- Botón Verificar -->
-                                        <XButton 
-                                            v-if="!isVerifying && !isVerified"
-                                            label="Verificar certificado"
-                                            class="w-[160px]"  
-                                            @click="verifyCertificate(files)"
-                                            :disabled="!hasFilesLoaded"
-                                        />
-                                    </div>
-                                    <div v-if="isVerifying" class="w-full">
-                                        <div class="flex items-center justify-center gap-3 mb-3">
-                                            <Icon name="x:loader" class="text-primary-500 animate-spin text-xl"/>
-                                            <span class="text-gray-700">Verificando certificado...</span>
-                                        </div>
-                                        <ProgressSpinner 
-                                            :value="verificationProgress" 
-                                            style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </XFileUpload>
-
-                    <div v-if="isVerified" class="flex flex-col gap-8">
-                        <p class="text-gray-700">Asegúrate que los datos del certificado son correctos para registrarlo.</p>
-                        <DataTable :value="certificado">
-                            <Column field="nroserie" header="Nro. Serie" style="width: 218px"></Column>
-                            <Column field="validodesde" header="Válido desde" style="width: 218px"></Column>
-                            <Column field="validohasta" header="Válido hasta" style="width: 218px"></Column>
-                        </DataTable>
-
-                        <XTextarea label="Justificación" label-required  placeholder="Ingrese un motivo" name="textarea"/>
-                    </div>
-
-                    <XDivider />
-                    <div class="flex justify-end gap-4">
-                        <XButton 
-                            label="Cancelar"
-                            variant="text"
-                            class="!w-[130px]" 
-                            @click="visible = false"
-                        />
-                        <XButton 
-                            label="Registrar"
-                            class="!w-[130px]"  
-                            type="submit"
-                            disabled
-                        />
-                    </div>
-                </div>
-            </XDialog>
-
-            <DataTable :value="editarCanal" tableStyle="min-width: 50rem">
-                <Column field="rutaCanal" header="Ruta" style="width: 456.5px"></Column>
-                <Column field="aliasCPD" header="Alias CPD" style="width: 456.5px "></Column>
-                <Column field="ultimamodificacion" header="Ultima Modificación" style="width: 207px ">
-                    <template #body="{ data }">
-                        <XRadioButton v-model="data.ultimamodificacion" :binary="true"/>
-                    </template>
-                </Column>
-            </DataTable>
-
-            <XCard class="border border-secondary-400">
-                <template #content>
-                    <div class="flex flex-row gap-6 border-gray-500">
-                        <p class="font-bold text-gray-400 pl-[19px]">
-                            Rutas:
-                        </p>
-                        <p class="text-gray-400 font-medium">
-                            https://admicamACCLcam/Servicio de mensajería
-                            <br>https://admicamACCLcam/Servicio de consulta</br>
-                            <br>https://admicamACCLcam/Servicio de certificado</br>
-                        </p>
-                    </div>
-                </template>
-            </XCard>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ProgressSpinner } from '#components'
+import { ProgressSpinner, Title } from '#components'
 import { ref, computed, watch, reactive } from 'vue'
+import { useToast } from 'primevue/usetoast';
 
-const editarCanal = ref([
-    { rutaCanal: 'https://admicamACCLcam... ', aliasCPD: 'COD001', ultimamodificacion: true},
-    { rutaCanal: 'https://admicamACCLcam...', aliasCPD: 'COD002', ultimamodificacion: false},
-])
+const toast = useToast();
+const visibleDialogCertificate = ref(false)
+const saveConfirm = async () => {
+  console.log('hola')
+  visible.value = false;
+  await nextTick();
+  toast.add({ 
+      severity: 'success', 
+    //   summary: 'Éxito', 
+      detail: 'Nuevo CPD SCZ asignado correctamente', 
+      life: 3000 
+  });
+}
+
+const rutas = [
+    { 
+        ruta: 'https://admicamACCLcamcvdsvdsva', 
+        cpd:{ label: 'LPZ', value: false},
+        rutasIntegradas: [
+            {name: 'https://admicamACCLcam/Servicio de mensajería', value: '12121'},
+            {name: 'https://admicamACCLcam/Servicio de consulta', value: '22222'},
+            {name: 'https://admicamACCLcam/Servicio de certificado', value: '3333'},
+        ]
+    },
+    { 
+        ruta: 'https://admicamACCLcamcvdsvdsvavsvdsvdsvs', 
+        cpd:{ label: 'SCZ', value: true},
+        rutasIntegradas: [
+            {name: 'https://admicamACCLcam/Servicio de mensajería 1', value: '4444'},
+            {name: 'https://admicamACCLcam/Servicio de consulta 2', value: '5555'},
+            {name: 'https://admicamACCLcam/Servicio de certificado  3', value: '6666'},
+        ]
+    },
+    // { ruta: 'https://admicamACCLcamcvdsvdsvavs', cpd:{ label: 'CBBA', value: true} },
+    // { ruta: 'https://admicamACCLcamcvdsv', cpd:{ label: 'ASF', value: false} }
+]
+
+const canal = ref(null)
+const canalSeleccionado = ref()
+const canalAntiguo = ref()
+let visibleRutes = ref(false)
+watch(canal,(newCanal:any, oldCanal:any) => {
+    console.log('new value',newCanal)
+    console.log('old value',oldCanal)
+    canalAntiguo.value = oldCanal
+    if(oldCanal != null) visibleRutes.value =true
+    rutas.forEach(element => {
+        if(element.cpd.label == newCanal) canalSeleccionado.value = element
+    });
+    rutas.forEach(element => {
+        if(element.cpd.label == oldCanal) canalAntiguo.value = element
+    });
+    console.log(canalSeleccionado.value.ruta)
+})
+
+onMounted(() => {
+  console.log(canal.value)
+  const seleccionado = rutas.find(r => r.cpd.value === true)
+  if (seleccionado) canal.value = seleccionado.cpd.label
+})
+// const editarCanal = ref([
+//     { rutaCanal: 'https://admicamACCLcam... ', aliasCPD: 'COD001', ultimamodificacion: true},
+//     { rutaCanal: 'https://admicamACCLcam...', aliasCPD: 'COD002', ultimamodificacion: false},
+// ])
 
 const visible = ref(false)
+
+
+
 const fileStates = reactive(new Map())
 const isVerifying = ref(false)
 const isVerified = ref(false)
