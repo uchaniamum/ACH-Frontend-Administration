@@ -1,5 +1,5 @@
 import type { ParameterDetailResponse, ParameterModalData, ParameterRequest } from "~/features/parameters/types"
-import type { ModalMode, ServiceError } from "~/features/users/types"
+
 import { parametersService } from "~/services/parametersService"
 
 export function useParameterService() {
