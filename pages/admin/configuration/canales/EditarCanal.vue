@@ -4,6 +4,7 @@
     v-model="visible"
     icon="x:info-empty"
     icon-color="text-blue-600"
+    :closable="false"
     title="Confirmar cambio de CPD">
     <template #message>
         <div class="space-y-2">
