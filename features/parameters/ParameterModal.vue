@@ -54,6 +54,7 @@
         </div>
         </XForm>
     </div>
+    <XToast position="top-right" />
         
     </XDialog>
     </div>

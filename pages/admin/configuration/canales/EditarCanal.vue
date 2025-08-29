@@ -4,6 +4,7 @@
     v-model="visible"
     icon="x:info-empty"
     icon-color="text-blue-600"
+    :closable="false"
     title="Confirmar cambio de CPD">
     <template #message>
         <div class="space-y-2">
@@ -22,12 +23,30 @@
             </div>
     </template>  
   </XConfirmDialog>
+  <XConfirmDialog
+    v-model="visibleDialogCertificateRegister"
+    icon="x:warning-circle"
+    icon-color="text-yellow-500"
+    title="Certificado ya registrado">
+    <template #message>
+        <div class="space-y-2">
+            <p>
+              <span class="font-medium text-gray-700">Ya se cuenta con un certificado registrado, ¿Deseas continuar en el cargado de un nuevo certificado?</span>
+            </p>
+        </div>
+    </template>
+    <template #buttons>
+            <div class="flex gap-3">
+                <XButton label="Cancelar" severity="secondary" outlined @click="visibleDialogCertificateRegister=false"/>
+                <XButton label="Confirmar" @click="visibleDialogCertificate = true; visibleDialogCertificateRegister = false" />
+            </div>
+    </template>  
+  </XConfirmDialog>
   <XDialog 
     v-model:visible="visibleDialogCertificate" 
-    maximizable 
     modal 
-    header="Title dialog" 
-    :style="{ width: '50rem' }" 
+    header="Registrar certificado público" 
+    class="w-[calc((740/14)*1rem)]"
     :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
   >
     <template #maximizeicon="{ maximized, class: iconClass }">
@@ -36,11 +55,105 @@
         :class="[iconClass, 'w-12 h-12']"
       />
     </template>
-  
-    <p class="m-0">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </p>
+      <div class="flex flex-col gap-8">
+        <span class="text-gray-700">Ingresa el archivo del certificado público para cargarlo y verificar sus datos</span>
+          <XFileUpload
+              ref="fileupload"
+              name="demo[]"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              :maxFileSize="1000000"
+              @select="onFileSelect"
+              :showUploadButton="false"
+              :showCancelButton="false"
+              chooseLabel="Elegir archivo"
+              :auto="false"
+          >   
+          <template #empty>
+              <div class="mb-6 mt-4 px-[1.714rem]">
+                  <span class="text-normal font-normal">Arrastra y suelta archivos aquí para subirlos.</span>
+              </div>
+          </template> 
+          <template #content="{ files, removeFileCallback }">
+              <div class="p-fileupload-file-list">
+                  <div 
+                      v-for="(file, index) in files" 
+                      :key="index" 
+                      class="p-fileupload-file"
+                  >
+                      <div class="p-fileupload-file-thumbnail custom-thumbnail">
+                          <Icon name="x:page" class="text-[48px] text-gray-200"/>
+                      </div>
+                      <div class="p-fileupload-file-info">
+                          <div class="p-fileupload-file-name">{{ file.name }}</div>
+                          <span class="p-fileupload-file-size">{{ formatFileSize(file.size) }}</span>
+                      </div>
+                      <!-- Estado de carga -->
+                      <span 
+                          v-if="getFileStatus(file).isLoaded" 
+                          class="p-badge p-component p-badge-success p-fileupload-file-badge px-4"
+                      >
+                          Carga Completa
+                      </span>
+                      <span 
+                          v-else 
+                          class="p-badge p-component p-badge-warn p-fileupload-file-badge px-4"
+                      >
+                          Cargando archivo
+                      </span>
+                      <div class="p-fileupload-file-actions">
+                          <button 
+                              class="p-button p-component p-button-icon-only p-button-danger p-button-rounded p-button-text p-fileupload-file-remove-button" 
+                              @click="removeFileCallback(index)"
+                              type="button"
+                          >
+                              <span class="p-button-icon p-c">
+                                  <Icon name="x:cancel"></Icon>
+                              </span>
+                          </button>
+                      </div>
+                  </div>
+                  <div v-if="hasFilesLoaded" >
+                      <XDivider v-if="!isVerified"/>
+                      <div class="flex flex-col items-center pt-12 px-12" v-if="!isVerifying && !isVerified">
+                          <!-- Botón Verificar -->
+                          <XButton 
+                              v-if="!isVerifying && !isVerified"
+                              label="Verificar certificado"
+                              class="w-[160px]"  
+                              @click="verifyCertificate(files)"
+                              :disabled="!hasFilesLoaded"
+                          />
+                      </div>
+                      <div v-if="isVerifying" class="w-full">
+                          <div class="flex items-center justify-center gap-3 mb-3">
+                              <Icon name="x:loader" class="text-primary-500 animate-spin text-xl"/>
+                              <span class="text-gray-700">Verificando certificado...</span>
+                          </div>
+                          <ProgressSpinner 
+                              class="flex justify-center"
+                              :value="verificationProgress" 
+                              style="width: 50px; height: 50px" strokeWidth="8" fill="transparent"
+                          />
+                      </div>
+                  </div>
+              </div>
+          </template>
+        </XFileUpload>
+        <div v-if="isVerified" class="flex flex-col gap-8">
+          <span class="text-gray-700">Asegúrate que los datos del certificado son correctos para registrarlo.</span>
+          <DataTable :value="listVerifiaction">
+            <Column field="nroSerie" header="Nro. de serie"></Column>
+            <Column field="validacionInicio" header="Válido desde"></Column>
+            <Column field="validacionFin" header="Válido hasta"></Column>
+          </DataTable>
+          <XTextarea name="justification" v-model="justification" label="Justificación" label-required placeholder="Ingresar motivo"/>
+        </div>
+        <XDivider />
+        <div class="flex flex-row justify-end gap-4">
+          <XButton @click="visibleDialogCertificate = false" variant="outlined" label="Cancelar" />
+          <XButton @click="saveConfirmRegister()" label="Registrar"/> 
+        </div>
+      </div>
   </XDialog>
     <div>
         <div class="flex flex-col gap-8">
@@ -50,7 +163,8 @@
         <div class="pt-12 flex flex-col gap-20">
             <div class="px-[calc((210/14)*1rem)] flex flex-col gap-12 ">
               <div class="flex justify-end">
-                <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="visibleDialogCertificate = true"/>
+                <!-- <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="visibleDialogCertificate = true"  canalSeleccionado/> -->
+                <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="canalSeleccionado.certificado ? visibleDialogCertificateRegister = true : visibleDialogCertificate = true"   />
               </div>
               <!-- DataTable -->
               <DataTable :value="rutas" class="w-full">
@@ -98,23 +212,50 @@ import { ProgressSpinner, Title } from '#components'
 import { ref, computed, watch, reactive } from 'vue'
 import { useToast } from 'primevue/usetoast';
 
+const justification = ref()
+
+const listVerifiaction = ref([
+  {
+    nroSerie: '10A5DS100F567JWEE',
+    validacionInicio: '12/05/2025',
+    validacionFin: '12/05/2026'
+  }
+])
+
+const testFetch = async() => {
+  return await fetch('')
+}
+
 const toast = useToast();
 const visibleDialogCertificate = ref(false)
+const visibleDialogCertificateRegister = ref(false)
 const saveConfirm = async () => {
-  console.log('hola')
   visible.value = false;
   await nextTick();
   toast.add({ 
       severity: 'success', 
-    //   summary: 'Éxito', 
       detail: 'Nuevo CPD SCZ asignado correctamente', 
       life: 3000 
   });
+}
+const saveConfirmRegister = async () => {
+  visibleDialogCertificate.value = false;
+  await nextTick();
+  toast.add({ 
+      severity: 'success', 
+      detail: 'Certificado publico registrado', 
+      life: 3000 
+  });
+}
+
+function onAdvancedUpload(e: unknown) {
+  console.log(e);
 }
 
 const rutas = [
     { 
         ruta: 'https://admicamACCLcamcvdsvdsva', 
+        certificado: true,
         cpd:{ label: 'LPZ', value: false},
         rutasIntegradas: [
             {name: 'https://admicamACCLcam/Servicio de mensajería', value: '12121'},
@@ -125,6 +266,7 @@ const rutas = [
     { 
         ruta: 'https://admicamACCLcamcvdsvdsvavsvdsvdsvs', 
         cpd:{ label: 'SCZ', value: true},
+        certificado: false,
         rutasIntegradas: [
             {name: 'https://admicamACCLcam/Servicio de mensajería 1', value: '4444'},
             {name: 'https://admicamACCLcam/Servicio de consulta 2', value: '5555'},
@@ -275,6 +417,7 @@ const simulateVerification = () => {
       isVerified.value = true
       
       console.log('Certificado verificado exitosamente')
+
     }
   }, 300) // Simular 3 segundos de verificación
 }
