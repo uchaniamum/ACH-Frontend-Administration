@@ -429,7 +429,7 @@ const loadContingency = async (): Promise<void> => {
     loading.value = true;
     try {
         const response = await contingencyService.getBanks();
-        contingencyData.value = response; // Directamente la respuesta, no response.banks
+        contingencyData.value = response.data; // Directamente la respuesta, no response.banks
     } catch (error) {
         console.error('Error loading contingency:', error);
         const serviceError = error as ServiceError;

@@ -135,7 +135,7 @@
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
-                                    :severity="data.isActive ? 'success' : 'danger'"
+                                    :severity="data.isActive ? 'danger' : 'success'"
                                 />
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
