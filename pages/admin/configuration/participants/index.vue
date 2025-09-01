@@ -32,6 +32,7 @@
                 </div>
                 <div class="self-center">
                     <XButton 
+                        @click="navigateToNewParticipant"
                         label="Nuevo Participante" 
                         icon="think-plus" 
                         size="large" />
@@ -44,6 +45,7 @@
                 }"
                 mode="externalParticipants"
                 :loading="loading"
+                @participantSelected="participantCode =  $event"
             />
             
             <Paginator 
@@ -69,6 +71,14 @@ import { participantsService } from '~/services/participantsService';
 
 const router = useRouter();
 
+const participantCode = ref()
+watch(participantCode, (newCode) => {
+    if (newCode) {
+        // console.log(newCode)
+        router.push(`/admin/configuration/participants/${newCode}`);
+    }
+});
+
 const participants = ref<ParticipantsList>({
     ownParticipants: [],
     externalParticipants: []
@@ -88,6 +98,7 @@ const itemsBreadParticipants = ref([
 // Computed: Participantes externos filtrados por búsqueda
 const filteredExternalParticipants = computed(() => {
     if (!searchTermExternal.value) {
+        console.log(participants.value.externalParticipants)
         return participants.value.externalParticipants || [];
     }
     
@@ -122,7 +133,7 @@ const loadParticipants = async (): Promise<void> => {
         const response = await participantsService.getParticipants({
             search: ''
         });
-        participants.value = response;
+        participants.value = response.data;
     } catch (error) {
         console.error('Error loading participants:', error)
         const serviceError = error as ServiceError
@@ -142,4 +153,5 @@ onMounted(() => {
 const navigateToNewParticipant = () => {
     router.push('/admin/configuration/participants/NewParticipant');
 };
+
 </script>

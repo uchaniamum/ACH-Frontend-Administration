@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!loading && currentParticipants?.length">
+    <div v-if="!loading && currentParticipants?.length" class="flex flex-col gap-12">
         <XCard 
             v-for="participant in currentParticipants"
             :key="participant.code"
@@ -27,7 +27,7 @@
                 <div class="grid grid-cols-3 mt-12">
                     <div class="flex-col gap-2">
                         <p class="font-sm text-gray-600">Código</p>
-                        <span class="font-lg font-semi bold">{{ participant.code }}</span>
+                        <span class="font-lg font-semi bold">{{ participant.participantCode }}</span>
                     </div>
                     <div class="flex-col gap-2">
                         <p class="font-sm text-gray-600">Siglas</p>
@@ -43,8 +43,8 @@
             </template>
             <template #footer>
             <div class="mt-6  flex justify-end">
-                <XButton label="Ver canales"  variant="outlined" class="w-65"/>
-                </div>
+                <XButton label="Ver canales"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
+            </div>
             </template>
         </XCard>
     </div>
@@ -68,6 +68,14 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     loading: false,
 });
+
+const checkCanales = (participant: string) => {
+    emit('participantSelected', participant.participantCode);
+};
+
+const emit = defineEmits<{
+    'participantSelected': [participant: ParticipantsDetail],
+}>();
 
 const currentParticipants = computed(() => {
     return props.participants[props.mode];

@@ -7,20 +7,39 @@ export interface ParticipantsList{
 }
 
 export interface ParticipantsDetail{
-    paymentSystemAcronym: PaymentSystemAcronym;
-    paymentGatewayCode: string;
-    code: string;
-    name: string;
-    acronym: string;
-    isSelf: boolean;
-    statusCode: StatusCode;
-    urlIcon: string;
+    name: string,
+    acronym: string,
+    code: string,
+    isSelf: boolean,
+    urlIcon: string,
     paymentSystems?: PaymentSystems[];
-    publicCertificates?: string[];
-    privateCertificates?: string[];
+    references: string[];
 }
 
 export interface PaymentSystems{
-    code: string;
-    paymentSystemAcronym: string;
+   code:string,
+   paymentGatewayCode: string,
+   publicCertificate: {
+     base64Content: string
+   },
+   privateCertificate: {
+     base64Content: string,
+     password: string
+   },
+   isPrimary: boolean
+}
+
+export interface CertificatePublicParticipantVerificationRequest {
+  participantCode: string,
+  paymentGatewayCode: string,
+  reason: string,
+  publicCertificate: {
+    base64Content: string
+  }
+}
+
+export interface CertificateVerificationRequest {
+    publicCertificate: {
+    base64Content: string
+  }
 }

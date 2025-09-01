@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { ParticipantsList } from "~/features/participants/types";
+import type { CertificatePublicParticipantVerificationRequest, CertificateVerificationRequest, ParticipantsDetail, ParticipantsList } from "~/features/participants/types";
 
 class ParticipantsService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -35,6 +35,35 @@ class ParticipantsService {
             endpoint += `?${params.toString()}`
         }
         return this.request<ParticipantsList[]>(endpoint);
+    }
+
+    async registerCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
+        return this.request<void>('participants/public-certificates', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async getParticipantByCode(code: string): Promise<any> {
+        if (!code) {
+            throw new Error('participant code is required')
+        }
+        return this.request<any>(`participants/${code}`)
+    }
+
+    // Actualizar certificado publico
+    async updateCertificatePublicParticipant(data: CertificatePublicParticipantVerificationRequest): Promise<void> {
+        return this.request<void>('participants/public-certificate', {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async registerNewParticipant(data: ParticipantsDetail): Promise<void> {
+    return this.request<void>('participants', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
     }
 
 }
