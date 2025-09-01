@@ -3,10 +3,6 @@ import { optionsService } from "~/services/optionsService"
 
 export function useOptions() {
     // State
-    // const roleOptions = ref([])
-    // const statusOptions = ref([])
-    // const roleFilterOptions = ref([])
-    // const statusFilterOptions = ref([])
     const roleOptions = ref<{ label: string; value: string }[]>([])
     const roleFilterOptions = ref<{ label: string; value: string }[]>([])
 
@@ -24,7 +20,7 @@ export function useOptions() {
 
             const roles = await optionsService.getUserRoles()
             roleOptions.value = optionsService.mapRolesToSelectOptions(roles)
-
+            console.log('sss',roles)
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar los roles'

@@ -242,66 +242,27 @@ const itemsBreadContingency = ref([
 
 const transformContingencyData = (banks: PaymentGatewayBankList): ContingencyTableRow[] => {
     return banks.map(bank => {
-        // Función auxiliar para buscar transacciones de manera segura
-        const findTransaction = (options: {
-            incoming?: boolean;
-            contains?: string;
-            exact?: string;
-            excludes?: string[];
-        }) => {
+        const findTransactionByCode = (targetCode: string) => {
             return bank.Transactions.find(transaction => {
-                // Filtrar por dirección (entrante/saliente)
-                if (options.incoming !== undefined && transaction.incoming !== options.incoming) {
-                    return false;
-                }
+                // Extraer solo los números del transactionCode
+                const codeMatch = transaction.transactionCode.match(/(\d+)/);
+                if (!codeMatch) return false;
                 
-                // Filtrar por texto contenido
-                if (options.contains && !transaction.transactionDescription.toLowerCase().includes(options.contains.toLowerCase())) {
-                    return false;
-                }
-                
-                // Filtrar por texto exacto (opcional)
-                if (options.exact && transaction.transactionDescription.toLowerCase() !== options.exact.toLowerCase()) {
-                    return false;
-                }
-                
-                // Excluir textos específicos
-                if (options.excludes && options.excludes.some(exclude => 
-                    transaction.transactionDescription.toLowerCase().includes(exclude.toLowerCase())
-                )) {
-                    return false;
-                }
-                
-                return true;
+                const numericCode = codeMatch[1];
+                return numericCode === targetCode;
             });
         };
 
-        // Búsqueda más específica para evitar falsos positivos
-        const envioRegular = findTransaction({
-            incoming: false,
-            contains: 'Regular',
-            excludes: ['QR', 'qr', 'Qr'] 
-        });
-
-        const envioQR = findTransaction({
-            incoming: false,
-            contains: 'QR'
-        });
-
-        const recepcionRegular = findTransaction({
-            incoming: true,
-            contains: 'Regular',
-            excludes: ['QR', 'qr', 'Qr']
-        });
-
-        const recepcionQR = findTransaction({
-            incoming: true,
-            contains: 'QR'
-        });
+        // Buscar cada tipo de transacción por su código numérico
+        const envioRegular = findTransactionByCode('22');
+        const envioQR = findTransactionByCode('62');  
+        const recepcionRegular = findTransactionByCode('220');
+        const recepcionQR = findTransactionByCode('620');
 
         // Función para calcular contingencia
         const calculateContingency = (transaction: any) => {
             if (!transaction) return false;
+            // Una contingencia está activa si el canal principal está deshabilitado O el secundario está habilitado
             return !transaction.mainPaymentGatewayEnabled || transaction.secondaryPaymentGatewayEnabled;
         };
 
@@ -460,17 +421,26 @@ const handleChannelChange = (type: 'channel' | 'contingency') => {
             console.log('Navegando con:', selectedBank.participantName);
             router.push({
                 path: `/admin/configuration/contingency/ChannelContingency/${selectedBank.participantCode}`,
-                query: { type }
+                query: { 
+                    type,
+                    bankName: selectedBank.participantName,
+                    participantCode: selectedBank.participantCode
+                }
             });
         }
     } else if (selectedBanks.value.length > 1) {
         // Múltiples bancos
+        const selectedBankNames = transformedContingency.value
+            .filter(bank => selectedBanks.value.includes(bank.participantCode))
+            .map(bank => bank.participantName.trim());
+            console.log(selectedBankNames);
         console.log('Múltiples bancos seleccionados:', selectedBanks.value);
         router.push({
             path: '/admin/configuration/contingency/ChannelContingency/multiple',
             query: { 
                 type,
-                codes: selectedBanks.value.join(',')
+                codes: selectedBanks.value.join(','),
+                bankNames: selectedBankNames.join(', ') 
             }
         });
     }

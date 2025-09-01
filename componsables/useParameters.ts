@@ -13,8 +13,7 @@ export function useParameterService() {
         try {
             const response = await parametersService.getParameterByCode(parameterCode)
             console.log('Data Parameters: ',response.data);
-            return response.data.parameters
-            //return await parametersService.getParameterByCode(parameterCode)
+            return response.data
         } catch (error) {
             console.error('Error loading user details:', error)
             const serviceError = error as ServiceError

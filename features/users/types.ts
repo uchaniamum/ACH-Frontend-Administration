@@ -88,8 +88,9 @@ export interface ServiceError {
 }
 
 // Opciones para usuarios
-export interface UserRole {
+export interface UserRoleOp {
     code: string;
+    displayName:string;
     description: string;
     group: string;
     order: number;
@@ -99,8 +100,9 @@ export interface UserRole {
     metadata: any | null;
 }
 
-export interface UserStatus {
+export interface UserStatusOp {
     code: string;
+    displayName:string;
     description: string;
     group: string;
     order: number;
@@ -118,8 +120,8 @@ export interface ApiResponse<T> {
 }
 
 export interface UsersData {
-    userRoles: UserRole[];
-    UserStatuses: UserStatus[];
+    userRoles: UserRoleOp[];
+    userStatuses: UserStatusOp[];
 }
 
 export interface SelectOptionUser {

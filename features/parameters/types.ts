@@ -37,9 +37,7 @@ export interface ParameterDetailResponse {
 
 
 export interface ParameterDetailListResponse {
-    data: {
-        parameters: ParameterDetailResponse[]
-    }
+    data:  ParameterDetailResponse[]
     success: boolean
     errorResponse: string | null
     httpStatusCode: number

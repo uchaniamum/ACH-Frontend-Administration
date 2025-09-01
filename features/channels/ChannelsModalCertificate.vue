@@ -277,26 +277,6 @@ const hasFilesLoaded = computed(() => {
   return Array.from(fileStates.values()).some(state => state.isLoaded)
 })
 
-const hasFileValidationSize= () => {
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-  if (file.size > MAX_FILE_SIZE) {
-    // Mostrar snackbar de error
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'El tamaño máximo de carga de archivos es 5 MB.',
-      life: 5000
-    });
-    
-    // Limpiar el file upload
-    if (fileupload.value) {
-      fileupload.value.clear();
-    }
-    return;
-  }
-}
-
-// FUNCIONES DE ARCHIVOS (sin cambios)
 const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -417,11 +397,6 @@ const formatDate = (dateString: string) => {
   });
 }
 
-// Función para cerrar el modal de error
-const closeErrorDialog = () => {
-  showErrorDialog.value = false
-}
-
 // Función de verificación actualizada
 const verifyCertificate = async () => {
   if (!selectedFile.value || !fileBase64.value || !props.channelCode) {
@@ -442,7 +417,7 @@ const verifyCertificate = async () => {
 
     const response = await channelsService.checkCertificatePublic(verificationPayload)
     
-    console.log('Response success:', response.success);
+    console.log('Response success:', response.success, response.data);
     
     // Verificar si la respuesta es exitosa
     if (response.success) {
@@ -510,11 +485,10 @@ const registerCertificate = async () => {
   try {
     const responseRegisterCertificate = await channelsService.registerCertificatePublic(certificatePayload)
     
-    console.log('Respuesta registro:', responseRegisterCertificate)
-    if(responseRegisterCertificate.success){
+    console.log('Respuesta registro:', responseRegisterCertificate.succes, responseRegisterCertificate.data)
+    if(responseRegisterCertificate.succes){
       setTimeout(() => {
         close()
-        // Mostrar toast de éxito inmediatamente al recibir la respuesta
         toast.add({ 
           severity: 'success', 
           summary: 'Éxito',
@@ -522,6 +496,14 @@ const registerCertificate = async () => {
           life: 5000 
         })
       }, 1000)
+    }else{
+        close()
+        toast.add({ 
+          severity: 'error', 
+          summary: 'Error',
+          detail: 'Certificado publico NO registrado', 
+          life: 5000 
+        })
     }
   
   } catch (error: any) {

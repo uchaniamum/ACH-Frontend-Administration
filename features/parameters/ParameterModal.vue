@@ -16,8 +16,8 @@
             </template>
             <template #content>
                 <div class="flex flex-col">
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span>{{ parameterDetails?.dataType }}</div>
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span>{{ parameterDetails?.description }}</div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span>{{ props.parameterData?.dataType }}</div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span>{{ props.parameterData?.description }}</div>
                 </div>
             </template>
         </XCard>
@@ -94,10 +94,6 @@ const formData = ref<ParameterRequest>({
     value: ''
 })
 
-const showToast = (message: any) => {
-    toast.add(message)
-}
-
 const { loadParameterDetails } = useParameterService()
 
 // Computed para validar si el formulario es válido
@@ -118,6 +114,8 @@ const requiredRule = (value) => {
         : 'El campo es requerido'
 }
 
+console.log(props.parameterData?.dataType);
+
 watch(() => props.modelValue, async (newValue) => {
     if (newValue) {
         modalParameter.value = true
@@ -126,12 +124,11 @@ watch(() => props.modelValue, async (newValue) => {
             await loadFullParameterDetails(props.parameterData.code)
         } else if (props.parameterData) {
             // Usar datos proporcionados si no hay código para cargar
-            parameterDetails.value = props.parameterData as ParameterDetailResponse
+            parameterDetails.value = props.parameterData
             formData.value = {
                 code: props.parameterData.code || '',
                 value: props.parameterData.value || ''
             }
-            // ¡IMPORTANTE! Guardar el valor original
             originalValue.value = props.parameterData.value || ''
         }
     } else {
@@ -150,10 +147,13 @@ const loadFullParameterDetails = async (code: string): Promise<void> => {
     try {
         const parameterDetail = await loadParameterDetails(code);
 
-        if (parameterDetail && parameterDetail.length > 0) {
-        const detail = parameterDetail[0]
+        
 
-            parameterDetails.value = detail
+        if (parameterDetail) {
+        const detail = parameterDetail
+
+        console.log('hoal pdetai: ',parameterDetail.value );
+
             formData.value = {
                 code: detail.code,
                 value: detail.value

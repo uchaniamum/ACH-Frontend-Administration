@@ -344,13 +344,6 @@ const channelCodeMap = {
     'UNILINK': '995'
 };
 
-// MAPEO DE CHECKBOXES A CÓDIGOS DE TRANSACCIONES REALES
-const transactionCodeMap = {
-    transInterbancaria: 'TRX022', // Transferencia interbancaria Regular (outgoing)
-    qrInterbancaria: 'TRX062',    // Transferencia interbancaria QR (outgoing)  
-    transRecepcion: 'TRX220',     // Recepción transferencia interbancaria Regular (incoming)
-    qrRecepcion: 'TRX620'         // Recepción transferencia interbancaria QR (incoming)
-};
 
 // Configuración de canales
 const channelOptions = ref([
@@ -370,33 +363,6 @@ const isChannelChange = computed(() => {
 const isContingency = computed(() => {
     return route.query.type === 'contingency' || route.path.includes('contingency');
 });
-
-// // OBTENER CÓDIGOS DE PARTICIPANTES - MEJORADO PARA MANEJAR AMBOS CASOS
-// const participantCodes = computed(() => {
-//     console.log('Route debug:', {
-//         path: route.path,
-//         params: route.params,
-//         query: route.query
-//     });
-
-//     // Caso 1: Múltiples códigos desde query parameters (desde la tabla)
-//     if (route.query.codes) {
-//         const codes = (route.query.codes as string).split(',').filter(Boolean);
-//         console.log('Múltiples códigos desde query:', codes);
-//         return codes;
-//     }
-    
-//     // Caso 2: Un solo código desde route parameters
-//     const singleCode = route.params.participantCode as string;
-//     if (singleCode && singleCode !== 'ChannelContingency') {
-//         console.log('Un solo código desde params:', singleCode);
-//         return [singleCode];
-//     }
-    
-//     // Caso 3: Navegación directa sin parámetros
-//     console.log('Sin códigos encontrados');
-//     return [];
-// });
 
 // OBTENER CÓDIGOS DE PARTICIPANTES - VERSIÓN CORREGIDA
 const participantCodes = computed(() => {
@@ -460,11 +426,7 @@ const isMultipleBanks = computed(() => {
 // TÍTULOS Y DESCRIPCIONES DINÁMICOS - MEJORADOS
 const pageTitle = computed(() => {
     const action = isChannelChange.value ? 'Cambiar canal' : 'Establecer contingencia';
-    
-    if (loading.value) {
-        return `${action} - Cargando...`;
-    }
-    
+
     if (isMultipleBanks.value) {
         return `${action} - ${getBankNames.value}`;
     }
@@ -472,12 +434,6 @@ const pageTitle = computed(() => {
     return `${action} - ${getBankNames.value}`;
 });
 
-// // TÍTULOS Y DESCRIPCIONES DINÁMICOS
-// const pageTitle = computed(() => {
-//     const action = isChannelChange.value ? 'Cambiar canal' : 'Establecer contingencia';
-//     const bankNames = getBankNames.value;
-//     return `${action} - ${bankNames}`;
-// });
 
 const pageDescription = computed(() => {
     return isChannelChange.value 
@@ -487,11 +443,21 @@ const pageDescription = computed(() => {
 
 // COMPUTED PARA NOMBRES DE BANCOS
 const getBankNames = computed(() => {
+        // Primero intentar obtener desde query parameters (desde navegación)
+    if (route.query.bankName && typeof route.query.bankName === 'string') {
+        return route.query.bankName;
+    }
+    
+    if (route.query.bankNames && typeof route.query.bankNames === 'string') {
+        return route.query.bankNames; // Ya viene separado por comas
+    }
+    
+    // Fallback: obtener desde datos cargados (comportamiento original)
     if (!contingencyData.value?.length) return 'Cargando...';
     
     return contingencyData.value
         .map(bank => bank.participantName || bank.name)
-        .join(', ');
+        .join(',');
 });
 
 // COMPUTED PARA ETIQUETA DEL CANAL SELECCIONADO

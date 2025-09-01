@@ -1,6 +1,6 @@
 // services/optionsService.ts
 import { API_CONFIG } from '~/config/api'
-import type { ApiResponse, UsersData, UserRole, UserStatus } from '~/types/api'
+import type { ApiResponse, UserRequest, UserRoleOp, UsersData, UserStatusOp } from '~/features/users/types'
 
 class OptionsService {
     private baseUrl = API_CONFIG.BASE_URL
@@ -62,7 +62,7 @@ class OptionsService {
         }
     }
 
-    async getUserRoles(): Promise<UserRole[]> {
+    async getUserRoles(): Promise<UserRoleOp[]> {
         try {
             const response = await this.getOptions()
 
@@ -77,11 +77,11 @@ class OptionsService {
         }
     }
 
-    async getUserStatuses(): Promise<UserStatus[]> {
+    async getUserStatuses(): Promise<UserStatusOp[]> {
         try {
             const response = await this.getOptions()
 
-            if (response.success && response.data?.users?.UserStatuses) {
+            if (response.success && response.data?.users?.serStatuses) {
                 return response.data.users.UserStatuses.filter(status => status.isActive)
             }
 
@@ -92,42 +92,44 @@ class OptionsService {
         }
     }
 
-    mapRolesToSelectOptions(roles: UserRole[]) {
+    mapRolesToSelectOptions(roles: UserRoleOp[]) {
         return roles
             .sort((a, b) => a.order - b.order)
             .map(role => ({
-                label: this.formatCodeToLabel(role.code),
-                value: this.formatCodeToLabel(role.code), // Usar el código original, no formateado
+                // label: this.formatCodeToLabel(role.code),
+                label: role.displayName,
+                value: this.formatCodeToLabel(role.code),
             }))
 
 
     }
 
-    mapStatusesToSelectOptions(statuses: UserStatus[]) {
+    mapStatusesToSelectOptions(statuses: UserStatusOp[]) {
         return statuses
             .sort((a, b) => a.order - b.order)
             .map(status => ({
-                label: this.formatCodeToLabel(status.code),
+                // label: this.formatCodeToLabel(status.code),
+                label: role.displayName,
                 value: this.formatCodeToLabel(status.code),
             }))
     }
 
 
-    mapRolesToFilterOptions(roles: UserRole[]) {
+    mapRolesToFilterOptions(roles: UserRoleOp[]) {
         return roles
             .sort((a, b) => a.order - b.order)
             .map(role => ({
-                label: this.formatCodeToLabel(role.code),
-                //value: this.getKeyFromMapping(role.code, OptionsService.ROLE_MAPPING) // Usar la clave numérica para el value
-            value: this.formatCodeToLabel(role.code),
+                label: role.displayName,
+                value: this.formatCodeToLabel(role.code),
             }))
     }
 
-    mapStatusesToFilterOptions(statuses: UserStatus[]) {
+    mapStatusesToFilterOptions(statuses: UserStatusOp[]) {
         return statuses
             .sort((a, b) => a.order - b.order)
             .map(status => ({
-                label: this.formatCodeToLabel(status.code),
+                // label: this.formatCodeToLabel(status.code),
+                label: role.displayName,
                 value: this.formatCodeToLabel(status.code),// Usar la clave numérica para el value
             }))
     }
@@ -149,5 +151,4 @@ class OptionsService {
 }
 
 export const optionsService = new OptionsService()
-
 
