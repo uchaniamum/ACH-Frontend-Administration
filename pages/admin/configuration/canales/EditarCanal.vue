@@ -199,11 +199,12 @@
                 <XDivider class="mb-16"/>
                 <div class="w-full flex flex-row justify-end gap-6">
                     <XButton variant="outlined" label="Cancelar"/>
-                    <XButton label="Guardar" @click="visible=true"/>
+                    <XButton label="Guardar test" @click="visible=true"/>
                 </div>
                </div>
             </div>
         </div>
+      <XButton label="Guardar test" @click="testFetch()"/>
     </div>
 </template>
 
@@ -223,7 +224,8 @@ const listVerifiaction = ref([
 ])
 
 const testFetch = async() => {
-  return await fetch('')
+  return await fetch('http://10.240.208.143/interbank-core-cortex-api/api/participants')
+  .then(res => res.json())
 }
 
 const toast = useToast();
