@@ -15,6 +15,20 @@ export default defineNuxtConfig({
   //   }
   // }
 
+  icon: {
+    customCollections: [
+      {
+        prefix: "x",
+        dir: "./assets/icons"
+      }
+    ],
+    clientBundle: {
+      scan: true,
+      includeCustomCollections: false,
+      sizeLimitKb: 5000
+    }
+  },
+
   nitro: {
     routeRules: {
       // Usa un prefix específico para tu API

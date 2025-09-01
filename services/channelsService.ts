@@ -53,6 +53,13 @@ class ChannelsService {
         });
     }
 
+    async checkCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
+        return this.request<void>('payment-gateways/public-certificates-checks', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
     async registerCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
         return this.request<void>('payment-gateways/public-certificates', {
             method: 'POST',

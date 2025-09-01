@@ -231,7 +231,7 @@ const loadParameters = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await parametersService.getParameters()
-        parameters.value = response.parameters
+        parameters.value = response.data.parameters
     } catch (error) {
         console.error('Error loading parameters:', error)
         const serviceError = error as ServiceError

@@ -150,17 +150,17 @@ const loadFullParameterDetails = async (code: string): Promise<void> => {
     try {
         const parameterDetail = await loadParameterDetails(code);
 
-        if (parameterDetail) {
-            parameterDetails.value = parameterDetail
-            
-            // Actualizar formData con los valores cargados
+        if (parameterDetail && parameterDetail.length > 0) {
+        const detail = parameterDetail[0]
+
+            parameterDetails.value = detail
             formData.value = {
-                code: parameterDetail.code,
-                value: parameterDetail.value
+                code: detail.code,
+                value: detail.value
             }
-            // ¡IMPORTANTE! Guardar el valor original
-            originalValue.value = parameterDetail.value
+            originalValue.value = detail.value
         }
+
     } catch (error) {
         console.error('Error loading parameter details:', error)
         showToast({
@@ -179,7 +179,7 @@ const handleSubmit = async (): Promise<void> => {
     try {
         const response = await parametersService.updateParameter(formData.value)
         console.log('Response: ', response);
-        if (response.wasSaved) {
+        if (response.success) {
             emit('save', formData.value)
             handleCancel()
         } 

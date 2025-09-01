@@ -16,6 +16,10 @@ const menuConfigACH: MenuBarAdminConfig = {
                     to: '/admin/configuration/canales',
                 },
                 {
+                    label: 'Contingencia',
+                    to: '/admin/configuration/contingency',
+                },
+                {
                     label: 'Participantes',
                     to: '/admin/configuration/participants',
                 },

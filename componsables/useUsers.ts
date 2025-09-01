@@ -82,7 +82,7 @@ export function useUserModal() {
         // Methods
         openModal,
         closeModal,
-        loadUserData, // ← Esta función faltaba en el return
+        loadUserData, 
         resetForm
     }
 }
@@ -96,10 +96,13 @@ export function useUserService() {
 
     const loadUserDetails = async (code: string): Promise<UserDetailResponse | null> => {
         try {
-            return await userService.getUserByCode(code)
+            const response = await userService.getUserByCode(code)
+            console.log(response.data);
+            return response.data
+
         } catch (error) {
             console.error('Error loading user details:', error)
-            const serviceError = error as ServiceError
+            const serviceError = error as ServiceError            
             showToast({
                 severity: 'error',
                 summary: 'Error',
@@ -127,9 +130,9 @@ export function useUserService() {
 
             if (isEdit) {
                 const response = await userService.updateUser(apiPayload)
-
+                console.log('hola', response.success);
                 // Verificar si la operación fue exitosa según la estructura de tu respuesta
-                if (response.wasSaved) {
+                if (response.success) {
                     showToast({
                         severity: 'success',
                         summary: 'Cambios guardados',
@@ -141,16 +144,16 @@ export function useUserService() {
                     showToast({
                         severity: 'error',
                         summary: 'Error',
-                        detail: response.message || response.description || 'No se pudo actualizar el usuario',
+                        detail: response.errorResponse.detail || 'No se pudo actualizar el usuario',
                         life: 8000
                     })
                     return false
                 }
             } else {
                 const response = await userService.createUser(apiPayload)
-
+console.log('hola', response.success);
                 // Verificar si la operación fue exitosa según la estructura de tu respuesta
-                if (response.wasSaved) {
+                if (response.success) {
                     showToast({
                         severity: 'success',
                         summary: 'Nuevo usuario',
@@ -162,7 +165,7 @@ export function useUserService() {
                     showToast({
                         severity: 'error',
                         summary: 'Error',
-                        detail: response.message || response.description || 'No se pudo crear el usuario',
+                        detail: response.errorResponse.detail || 'No se pudo crear el usuario',
                         life: 5000
                     })
                     return false
@@ -184,8 +187,8 @@ export function useUserService() {
     const saveResetPassword = async (code: string): Promise<boolean> => {
         try {
             const response = await userService.resetPasswordUser(code)
-
-            if (response.wasSaved) {
+            
+            if (response.success) {
                 showToast({
                     severity: 'success',
                     summary: 'Contraseña reseteada',
@@ -197,7 +200,7 @@ export function useUserService() {
                 showToast({
                     severity: 'error',
                     summary: 'Error',
-                    detail: response.message || response.description || 'No se pudo resetear la contraseña',
+                    detail: response.errorResponse.detail || 'No se pudo resetear la contraseña',
                     life: 8000
                 })
                 return false

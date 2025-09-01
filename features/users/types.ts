@@ -86,3 +86,43 @@ export interface ServiceError {
     code?: string
     traceId?: string
 }
+
+// Opciones para usuarios
+export interface UserRole {
+    code: string;
+    description: string;
+    group: string;
+    order: number;
+    isActive: boolean;
+    icon: string | null;
+    tooltip: string | null;
+    metadata: any | null;
+}
+
+export interface UserStatus {
+    code: string;
+    description: string;
+    group: string;
+    order: number;
+    isActive: boolean;
+    icon: string | null;
+    tooltip: string | null;
+    metadata: any | null;
+}
+
+export interface ApiResponse<T> {
+    data: T;
+    success: boolean;
+    errorResponse: any | null;
+    httpStatusCode: number;
+}
+
+export interface UsersData {
+    userRoles: UserRole[];
+    UserStatuses: UserStatus[];
+}
+
+export interface SelectOptionUser {
+    label: string;
+    value: string;
+}

@@ -9,7 +9,8 @@ export interface ChannelsListItem {
 export interface ChannelsRoutes{
     alias?: string
     isActive?: boolean
-    urls?: string[]   
+    urls?: string[] 
+    target?:number  
 }
 
 export interface ChannelsResponse{
@@ -30,8 +31,9 @@ export interface ChannelsSaveResponse{
 }
 
 export interface CertificateVerificationRequest {
-  paymentGatewayCode: string
+  paymentGatewayCode?: string
   publicCertificate: {
     base64Content: string
   }
+  changeReason?: string
 }

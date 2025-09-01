@@ -100,7 +100,7 @@ const loadFullUserDetails = async (code: string): Promise<void> => {
     
     try {
         const userDetail = await loadUserDetails(code)
-        
+        console.log('Data: ',userDetails.value);
         if (userDetail) {
             userDetails.value = {
                 code: userDetail.code,
@@ -123,7 +123,7 @@ const handleSubmit = async (formData: UserFormData): Promise<void> => {
     try {
         
         const success = await saveUser(formData, isEditMode.value)
-        
+        console.log('ts', success);
         if (success) {
             emit('save', formData)
             handleCancel()

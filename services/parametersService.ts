@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { ParameterDetailResponse, ParameterListItem, ParameterSaveResponse } from "~/features/parameters/types";
+import type { ParameterDetailListResponse, ParameterDetailResponse, ParameterListItem, ParameterSaveResponse } from "~/features/parameters/types";
 
 class ParameterService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -38,11 +38,11 @@ class ParameterService {
         return this.request<ParameterListItem[]>(endpoint);
     }
 
-    async getParameterByCode(code: string): Promise<ParameterDetailResponse> {
+    async getParameterByCode(code: string): Promise<ParameterDetailListResponse> {
         if (!code) {
-            throw new Error('User code is required')
+            throw new Error('Parameter code is required')
         }
-        return this.request<ParameterDetailResponse>(`parameters/${code}`)
+        return this.request<ParameterDetailListResponse>(`parameters/${code}`)
     }
 
     async updateParameter(parameterData: { code: string; value: string }): Promise<ParameterSaveResponse> {

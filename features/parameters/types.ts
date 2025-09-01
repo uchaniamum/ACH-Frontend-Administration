@@ -35,6 +35,16 @@ export interface ParameterDetailResponse {
     updatedByUserId: number;
 }
 
+
+export interface ParameterDetailListResponse {
+    data: {
+        parameters: ParameterDetailResponse[]
+    }
+    success: boolean
+    errorResponse: string | null
+    httpStatusCode: number
+}
+
 export interface ParameterSaveResponse {
     wasSaved: boolean
     wasNew: boolean
