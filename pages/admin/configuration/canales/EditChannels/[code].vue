@@ -80,7 +80,8 @@
       :current-selection="selectedRouteData"
       :previous-selection="previousRouteData"
       @confirm="handleConfirmChange"
-      @cancel="confirmModalVisible = false"
+      @cancel="handleCloseCertificateModal"
+      
     />
 
     <ChannelsModalCertificate
@@ -118,7 +119,7 @@ import { ref, computed, watch } from 'vue'
 import { useToast } from 'primevue/usetoast';
 import { channelsService } from '~/services/channelsService';
 import type { ChannelsResponse } from '~/features/channels/type';
-import ChannelsModalConfirm from '~/features/channels/ChannelsModalConfirm.vue';
+import ChannelsModalConfirm, { type RouteSelection } from '~/features/channels/ChannelsModalConfirm.vue';
 import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertificate.vue';
 
 const route = useRoute();
@@ -146,21 +147,33 @@ const processedRoutes = computed(() => {
   return channelData.value.routes
 })
 
-const selectedRouteData = computed(() => {
-  if (!channelData.value || !selectedRouteAlias.value) return null
-  return channelData.value.routes.find(r => r.alias === selectedRouteAlias.value)
+const selectedRouteData = computed<RouteSelection | undefined>(() => {
+  if (!channelData.value || !selectedRouteAlias.value) return undefined
+  const found = channelData.value.routes?.find(r => r.alias === selectedRouteAlias.value)
+  return found
+    ? {
+        alias: found.alias ?? '',
+        isActive: found.isActive ?? false,
+        urls: found.urls ?? [],
+      }
+    : undefined
 })
 
-const previousRouteData = computed(() => {
-  if (!channelData.value || !originalSelectedRoute.value) return null
-  return channelData.value.routes.find(r => r.alias === originalSelectedRoute.value)
+const previousRouteData = computed<RouteSelection | undefined>(() => {
+  if (!channelData.value || !originalSelectedRoute.value) return undefined
+  const found = channelData.value.routes?.find(r => r.alias === originalSelectedRoute.value)
+  return found
+    ? {
+        alias: found.alias ?? '',
+        isActive: found.isActive ?? false,
+        urls: found.urls ?? [],
+      }
+    : undefined
 })
 
 const hasRouteChanged = computed(() => {
   return selectedRouteAlias.value !== originalSelectedRoute.value
 })
-
-
 
 const loadChannelData = async () => {
     try {
@@ -168,19 +181,20 @@ const loadChannelData = async () => {
         error.value = null
         
         const response = await channelsService.getChannelsByCode(channelCode.value)
-        if(response.success){
-          channelData.value = response.data
+        if(response){
+          channelData.value = response
           
-          // Encontrar la ruta activa actual
-          const activeRoute = channelData.value.routes.find(r => r.isActive)
-          if (activeRoute) {
-              selectedRouteAlias.value = activeRoute.alias
-              originalSelectedRoute.value = activeRoute.alias
-          } else if (channelData.value.routes.length > 0) {
-              selectedRouteAlias.value = channelData.value.routes[0].alias
-              originalSelectedRoute.value = channelData.value.routes[0].alias
-          } 
+          if (channelData.value.routes && channelData.value.routes.length > 0) {
+            const activeRoute = channelData.value.routes.find(r => r.isActive)
+            if (activeRoute?.alias) {
+                selectedRouteAlias.value = activeRoute.alias
+                originalSelectedRoute.value = activeRoute.alias
+            } else if (channelData.value.routes.length > 0) {
+                selectedRouteAlias.value = ''
+                originalSelectedRoute.value = ''
+            }
         }
+      }
     } catch (err: any) {
         console.error('Error loading channel data:', err)
         error.value = err.message || 'Error al cargar la información del canal'
@@ -214,7 +228,7 @@ const handleConfirmChange = async () => {
       code: channelData.value.code,
       name: channelData.value.name,
       acronym: channelData.value.acronym,
-      routes: channelData.value.routes.map(route => ({
+      routes: channelData.value.routes?.map(route => ({
         alias: route.alias,
         isActive: route.alias === selectedRouteAlias.value,
         urls: route.urls,
@@ -227,7 +241,7 @@ const handleConfirmChange = async () => {
     const response = await channelsService.updateChannels(updateData);
     console.log('Response Channels: ', response);
     
-    if (response.success) {
+    if (response) {
       console.log('Operación exitosa');
       
       originalSelectedRoute.value = selectedRouteAlias.value;
@@ -247,7 +261,7 @@ const handleConfirmChange = async () => {
       showToast({ 
         severity: 'error', 
         summary: 'Error',
-        detail: response.message || 'Error al procesar la solicitud', 
+        detail: 'Error al procesar la solicitud', 
         life: 3000 
       });
     }
@@ -273,17 +287,19 @@ const resetSelection = () => {
 //Cambiar certificado
 const handleCertificateRegistered = () => {
   if(channelData.value?.certificateRegistered){
-    // visibleDialogCertificate.value = false;
-    // visibleDialogCertificateRegister.value = true;
     visibleDialogCertificate.value = false;
     visibleDialogCertificateRegister.value = true;
   }else{
-    // visibleDialogCertificate.value = true;
-    // visibleDialogCertificateRegister.value = false;
 
     visibleDialogCertificate.value = true;
   }
 }
+
+const handleCloseCertificateModal = async () => {
+  visibleDialogCertificate.value = false
+  await loadChannelData()
+}
+
 
 // Lifecycle
 onMounted(() => {

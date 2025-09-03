@@ -6,7 +6,7 @@
             </template>
         </XHeader>
         <div class="flex flex-col gap-16">
-            <div v-if="!hasUsers && !loading" class="flex flex-col items-center justify-center pt-[184px] text-center">
+            <div v-if="!hasUsers && !loading" class="flex flex-col items-center justify-center pt-[100px] text-center">
                 <div class="mb-6">
                     <div class="flex items-center justify-center">
                         <Icon name="x:user-pro" class="text-[115px]"></Icon>
@@ -135,7 +135,7 @@
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
-                                    :severity="data.isActive ? 'danger' : 'success'"
+                                    :severity="data.isActive ? 'success' : 'danger'"
                                 />
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
@@ -196,12 +196,19 @@
             :userData="modalStateRevert.userData"
             @save="handlePasswordReset"
         />
+
+        <ConfirmDialogWrapper
+            v-model="confirmDialog.visible"
+            :options="confirmDialog.options"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core';
+import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { useOptions } from '~/componsables/useOptions';
+import { useUserService } from '~/componsables/useUsers';
 import type { ModalMode, ServiceError, UserListItem, UserModalData } from '~/features/users/types';
 import UserModal from '~/features/users/UserModal.vue';
 import UserModalReset from '~/features/users/UserModalReset.vue';
@@ -217,6 +224,7 @@ const {
     loadAllOptions 
 } = useOptions()
 
+const { saveResetPassword } = useUserService()
 // State
 const users = ref<UserListItem[]>([]);
 const loading = ref(false)
@@ -264,6 +272,33 @@ const modalStateRevert = ref<{
     userData: undefined
 })
 
+// State para el modal de confirmación de reseteo de contraseña
+const confirmDialog = ref({
+    visible: false,
+    options: {
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    }
+})
+
+const openRevertPassModal = (userData: UserModalData): void => {
+    confirmDialog.value = {
+        visible: true,
+        options: {
+            title: 'Reseteo de contraseña',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            message: `¿Estás seguro de resetear la contraseña de ${userData.fullname}? 
+                        Se enviará la nueva contraseña a su correo electrónico 
+                        <span class="font-semibold">${userData.email}</span>`,
+            onConfirm: async () => {
+                await saveResetPassword(userData.code)
+            }
+        }
+    }
+}
+
 // Computed para verificar si hay usuarios
 const hasUsers = computed(() => {
     return users.value && users.value.length > 0
@@ -274,8 +309,8 @@ const loadUsers = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await userService.getUsers()
-        if(response.success){
-            users.value = response.data.users
+        if(response){
+            users.value = response.users
         }
     } catch (error) {
         console.error('Error loading users:', error)
@@ -302,7 +337,7 @@ const handleSearch = async (): Promise<void> => {
                 search: searchTerm.value.trim() 
             })
             
-            users.value = response.data.users
+            users.value = response.users
         } catch (error) {
             console.error('Error searching users:', error)
             const serviceError = error as ServiceError
@@ -346,20 +381,6 @@ const openEditModal = (userData: UserModalData): void => {
 
 const handleUserSaved = (): void => {
     loadUsers()
-}
-
-const openRevertPassModal = (userData: UserModalData): void => {
-    modalStateRevert.value = {
-        showModal: true,
-        userData: {
-            code: userData.code,
-            fullname: userData.fullname,
-            email: userData.email,
-            alias: userData.alias,
-            roleCode: userData.roleCode,
-            isActive: userData.isActive
-        }
-    }
 }
 
 const handlePasswordReset = (userData?: UserModalData): void => {

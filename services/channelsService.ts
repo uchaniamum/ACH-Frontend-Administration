@@ -1,5 +1,6 @@
 import { API_CONFIG } from "~/config/api";
-import type { CertificateVerificationRequest, ChannelsListItem, ChannelsResponse, ChannelsSaveResponse } from "~/features/channels/type";
+import type { CertificateVerificationRequest, CertificateVerificationResponse, ChannelsListItemResponse, ChannelsResponse, ChannelsSaveResponse } from "~/features/channels/type";
+import type { UserSaveResponse } from "~/features/users/types";
 
 class ChannelsService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -11,13 +12,13 @@ class ChannelsService {
             const response = await fetch(url, {
                 ...options,
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', 
                     ...options.headers
                 }
             });
 
             if (!response.ok) {
-                throw new Error(`Error: ${response.status} ${response.statusText}`);
+                throw new Error(`Error: ${response.status} ${response.statusText}`); 
             }
 
             const data = await response.json();
@@ -28,14 +29,14 @@ class ChannelsService {
         }
     }
 
-    async getChannels(filters?: { search?: string }): Promise<ChannelsListItem[]> {
+    async getChannels(filters?: { search?: string }): Promise<ChannelsListItemResponse> {
         let endpoint = 'payment-gateways';
 
         if (filters?.search) {
             const params = new URLSearchParams({ search: filters.search })
             endpoint += `?${params.toString()}`
         }
-        return this.request<ChannelsListItem[]>(endpoint);
+        return this.request<ChannelsListItemResponse>(endpoint);
     }
 
     async getChannelsByCode(code: string): Promise<ChannelsResponse> {
@@ -53,15 +54,15 @@ class ChannelsService {
         });
     }
 
-    async checkCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
-        return this.request<void>('payment-gateways/public-certificates-checks', {
+    async checkCertificatePublic(data: CertificateVerificationRequest): Promise<CertificateVerificationResponse> {
+        return this.request<CertificateVerificationResponse>('payment-gateways/public-certificates-checks', {
             method: 'POST',
             body: JSON.stringify(data)
         });
     }
 
-    async registerCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
-        return this.request<void>('payment-gateways/public-certificates', {
+    async registerCertificatePublic(data: CertificateVerificationRequest): Promise<UserSaveResponse> {
+        return this.request<UserSaveResponse>('payment-gateways/public-certificates', {
             method: 'POST',
             body: JSON.stringify(data)
         });

@@ -170,27 +170,27 @@
     </div>
   </XDialog>
   <XConfirmDialog
-            v-model="showErrorDialog"
-            icon="x:cancel-circle"
-            icon-color="text-red-500"
-            :closable="false"
-            title="Error de verificacion">
-            <template #message>
-                <div class="space-y-2">
-                    <p>
-                        <span class="font-medium text-gray-700">No se pudo verificar el certificado público, intenta de nuevo o vuelve a cargar el archivo. </span>
-                    </p>
-                </div>
-            </template>
-            <template #buttons>
-                <div class="flex gap-3">
-                    <XButton 
-                      label="Confirmar" 
-                      @click="visible = true; showErrorDialog = false"
-                    />
-                </div>
-            </template>  
-        </XConfirmDialog>
+    v-model="showErrorDialog"
+    icon="x:cancel-circle"
+    icon-color="text-red-500"
+    :closable="false"
+    title="Error de verificacion">
+      <template #message>
+          <div class="space-y-2">
+              <p>
+                  <span class="font-medium text-gray-700">No se pudo verificar el certificado público, intenta de nuevo o vuelve a cargar el archivo. </span>
+              </p>
+          </div>
+      </template>
+      <template #buttons>
+          <div class="flex gap-3">
+              <XButton 
+                label="Confirmar" 
+                @click="visible = true; showErrorDialog = false"
+              />
+          </div>
+      </template>  
+  </XConfirmDialog>
   </div>
 
 </template> 
@@ -348,7 +348,7 @@ const onFileSelect = async (event: any) => {
     
     try {
       fileBase64.value = await fileToBase64(file)
-      console.log('Archivo convertido a Base64')
+      console.log('Archivo convertido a Base64', fileBase64.value);
       
     } catch (error) {
       console.error('Error procesando archivo:', error)
@@ -417,14 +417,14 @@ const verifyCertificate = async () => {
 
     const response = await channelsService.checkCertificatePublic(verificationPayload)
     
-    console.log('Response success:', response.success, response.data);
+    console.log('Response success:', response);
     
     // Verificar si la respuesta es exitosa
-    if (response.success) {
+    if (response) {
       verificationData.value = [{
-        nroSerie: response.data.serialNumber,
-        validacionInicio: formatDate(response.data.ValidFrom),
-        validacionFin: formatDate(response.data.ValidTo)
+        nroSerie: response.serialNumber,
+        validacionInicio: formatDate(response.ValidFrom),
+        validacionFin: formatDate(response.ValidTo)
       }]
       
       isVerifying.value = false
@@ -485,8 +485,8 @@ const registerCertificate = async () => {
   try {
     const responseRegisterCertificate = await channelsService.registerCertificatePublic(certificatePayload)
     
-    console.log('Respuesta registro:', responseRegisterCertificate.succes, responseRegisterCertificate.data)
-    if(responseRegisterCertificate.succes){
+    console.log('Respuesta registro:', responseRegisterCertificate)
+    if(responseRegisterCertificate){
       setTimeout(() => {
         close()
         toast.add({ 

@@ -1,6 +1,6 @@
-// services/optionsService.ts
 import { API_CONFIG } from '~/config/api'
-import type { ApiResponse, UserRequest, UserRoleOp, UsersData, UserStatusOp } from '~/features/users/types'
+import type { OptionsResponse, PaymentGatewayOp, UserRoleOp, UserStatusOp } from '~/features/users/options.types'
+
 
 class OptionsService {
     private baseUrl = API_CONFIG.BASE_URL
@@ -48,26 +48,45 @@ class OptionsService {
         return entry ? entry[0] : textValue; // Devolver la clave numérica si se encuentra
     }
 
-    async getOptions(): Promise<ApiResponse<{ users: UsersData }>> {
+
+    private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
         try {
-            const response = await $fetch<ApiResponse<{ users: UsersData }>>(`${this.baseUrl}/options`)
-            return response
-        } catch (error: any) {
-            console.error('Error fetching options:', error)
-            throw {
-                message: error?.data?.message || error?.message || 'Error al obtener las opciones',
-                statusCode: error?.status || 500,
-                data: error?.data || null
+            const url = `${this.baseUrl}/${endpoint}`;
+
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+
+            console.log('Esta es un URL', url);
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
             }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error en la solicitud:', error);
+            throw error;
         }
+    }
+
+
+    // services/optionsService.ts
+    async getOptions(): Promise<OptionsResponse> {
+        const endpoint = 'options';
+        return this.request<OptionsResponse>(endpoint);
     }
 
     async getUserRoles(): Promise<UserRoleOp[]> {
         try {
             const response = await this.getOptions()
-
-            if (response.success && response.data?.users?.userRoles) {
-                return response.data.users.userRoles.filter(role => role.isActive)
+            if (response.users?.userRoles) {
+                return response.users.userRoles.filter(role => role.isActive)
             }
 
             return []
@@ -81,8 +100,8 @@ class OptionsService {
         try {
             const response = await this.getOptions()
 
-            if (response.success && response.data?.users?.serStatuses) {
-                return response.data.users.UserStatuses.filter(status => status.isActive)
+            if (response.users?.UserStatuses) {
+                return response.users.UserStatuses.filter(status => status.isActive)
             }
 
             return []
@@ -92,7 +111,21 @@ class OptionsService {
         }
     }
 
+    async getPaymentGateways(): Promise<PaymentGatewayOp[]> {
+        try {
+            const response = await this.getOptions()
+            if (response.paymentGateways?.paymentGatewaysActive) {
+                return response.paymentGateways.paymentGatewaysActive.filter(gateway => gateway.isActive)
+            }
+            return []
+        } catch (error) {
+            console.error('Error getting payment gateways:', error)
+            return []
+        }
+    }
+
     mapRolesToSelectOptions(roles: UserRoleOp[]) {
+        console.log('Roles: ', roles);
         return roles
             .sort((a, b) => a.order - b.order)
             .map(role => ({
@@ -100,8 +133,6 @@ class OptionsService {
                 label: role.displayName,
                 value: this.formatCodeToLabel(role.code),
             }))
-
-
     }
 
     mapStatusesToSelectOptions(statuses: UserStatusOp[]) {
@@ -109,8 +140,8 @@ class OptionsService {
             .sort((a, b) => a.order - b.order)
             .map(status => ({
                 // label: this.formatCodeToLabel(status.code),
-                label: role.displayName,
-                value: this.formatCodeToLabel(status.code),
+                label: status.displayName,
+                value: status.code,
             }))
     }
 
@@ -129,7 +160,7 @@ class OptionsService {
             .sort((a, b) => a.order - b.order)
             .map(status => ({
                 // label: this.formatCodeToLabel(status.code),
-                label: role.displayName,
+                label: status.displayName,
                 value: this.formatCodeToLabel(status.code),// Usar la clave numérica para el value
             }))
     }

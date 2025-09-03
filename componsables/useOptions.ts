@@ -1,4 +1,5 @@
-import type { ServiceError, UserRole, UserStatus } from "~/features/users/types"
+import type { UserRoleOp, UserStatusOp } from "~/features/users/options.types";
+import type { ServiceError } from "~/features/users/types"
 import { optionsService } from "~/services/optionsService"
 
 export function useOptions() {
@@ -20,7 +21,7 @@ export function useOptions() {
 
             const roles = await optionsService.getUserRoles()
             roleOptions.value = optionsService.mapRolesToSelectOptions(roles)
-            console.log('sss',roles)
+
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar los roles'
@@ -65,17 +66,18 @@ export function useOptions() {
 
             const response = await optionsService.getOptions()
 
-            if (response.success && response.data?.users) {
-                const { userRoles, UserStatuses } = response.data.users
+            if (response.users) {
+                const { userRoles, UserStatuses } = response.users
 
                 if (userRoles) {
-                    const activeRoles = userRoles.filter((role: UserRole) => role.isActive)
+                    const activeRoles = userRoles.filter((role: UserRoleOp) => role.isActive)
                     roleOptions.value = optionsService.mapRolesToSelectOptions(activeRoles)
                     roleFilterOptions.value = optionsService.mapRolesToFilterOptions(activeRoles)
+                    console.log('Roles Options: ', roleOptions.value);
                 }
 
                 if (UserStatuses) {
-                    const activeStatuses = UserStatuses.filter((status: UserStatus) => status.isActive)
+                    const activeStatuses = UserStatuses.filter((status: UserStatusOp) => status.isActive)
                     statusOptions.value = optionsService.mapStatusesToSelectOptions(activeStatuses)
                     statusFilterOptions.value = optionsService.mapStatusesToFilterOptions(activeStatuses)
                 }

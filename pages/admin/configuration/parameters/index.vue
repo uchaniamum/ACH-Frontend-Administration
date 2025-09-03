@@ -7,17 +7,7 @@
         </XHeader>
 
         <div class="flex flex-col gap-12">
-            <div v-if="!hasParameters && !loading" class="flex flex-col items-center justify-center py-16 text-center">
-                <div class="mb-6">
-                    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                        <i class="pi pi-users text-4xl text-gray-400"></i>
-                    </div>
-                </div>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Aún no existen parámetros</h3>
-                <p class="text-gray-500 mb-6">No hay parámetros configurados en el sistema.</p>
-            </div>
-
-            <template v-if="hasParameters">
+            <template>
                 <p class="text-gray-800">Selecciona los canales que deseas ver en la tabla.</p>
 
                 <div class="flex flex-row justify-between">
@@ -170,7 +160,7 @@ const channelOptions = computed(() => {
     
     return [
         { value: 'Todos' },
-        ...channelOpts.sort((a, b) => a.value.localeCompare(b.value))
+        ...channelOpts.sort((a:any, b:any) => a.value.localeCompare(b.value))
     ];
 });
 
@@ -189,11 +179,11 @@ const filteredParameters = computed(() => {
     if (searchTermParameter.value.trim()) {
         const search = searchTermParameter.value.toLowerCase().trim();
         filtered = filtered.filter(param => 
-            param.code.toLowerCase().includes(search) ||
-            param.value.toLowerCase().includes(search) ||
-            param.description.toLowerCase().includes(search) ||
-            param.dataType.toLowerCase().includes(search) ||
-            param.systemAcronym.toLowerCase().includes(search)
+            param.code?.toLowerCase().includes(search) ||
+            param.value?.toLowerCase().includes(search) ||
+            param.description?.toLowerCase().includes(search) ||
+            param.dataType?.toLowerCase().includes(search) ||
+            param.systemAcronym?.toLowerCase().includes(search)
         );
     }
     
@@ -207,10 +197,6 @@ const paginatedParameters = computed(() => {
     return filteredParameters.value.slice(start, end);
 });
 
-// Computed para verificar si hay parámetros
-const hasParameters = computed(() => {
-    return parameters.value && parameters.value.length > 0
-})
 
 // Resetear paginación cuando cambien los filtros
 watch([selectedChannel, searchTermParameter], () => {
@@ -231,7 +217,7 @@ const loadParameters = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await parametersService.getParameters()
-        parameters.value = response.data.parameters
+        parameters.value = response.parameters
     } catch (error) {
         console.error('Error loading parameters:', error)
         const serviceError = error as ServiceError

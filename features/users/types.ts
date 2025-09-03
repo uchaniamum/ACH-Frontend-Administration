@@ -10,6 +10,7 @@ export interface UserRequest {
         verificationHash: string
     }
     roleCode: string
+    isActive?: boolean
 }
 
 export interface PhoneNumber {
@@ -58,7 +59,7 @@ export interface UserSaveResponse {
 
 export interface UserFormData {
     code: string
-    name: string
+    fullname: string
     email: string
     alias: string
     rol: string
@@ -87,44 +88,3 @@ export interface ServiceError {
     traceId?: string
 }
 
-// Opciones para usuarios
-export interface UserRoleOp {
-    code: string;
-    displayName:string;
-    description: string;
-    group: string;
-    order: number;
-    isActive: boolean;
-    icon: string | null;
-    tooltip: string | null;
-    metadata: any | null;
-}
-
-export interface UserStatusOp {
-    code: string;
-    displayName:string;
-    description: string;
-    group: string;
-    order: number;
-    isActive: boolean;
-    icon: string | null;
-    tooltip: string | null;
-    metadata: any | null;
-}
-
-export interface ApiResponse<T> {
-    data: T;
-    success: boolean;
-    errorResponse: any | null;
-    httpStatusCode: number;
-}
-
-export interface UsersData {
-    userRoles: UserRoleOp[];
-    userStatuses: UserStatusOp[];
-}
-
-export interface SelectOptionUser {
-    label: string;
-    value: string;
-}

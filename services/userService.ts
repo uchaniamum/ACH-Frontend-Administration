@@ -30,15 +30,15 @@ class UserService {
         }
     }
 
-    async getUsers(filters?: { search?: string }): Promise<UsersListResponse[]> {
+    async getUsers(filters?: { search?: string }): Promise<UsersListResponse> {
         let endpoint = 'users';
 
         if (filters?.search) {
             const params = new URLSearchParams({ search: filters.search })
             endpoint += `?${params.toString()}`
         }
-        console.log('Esta es un URdddL', this.request<UsersListResponse[]>(endpoint));
-        return this.request<UsersListResponse[]>(endpoint);
+        console.log('Esta es un URdddL', this.request<UsersListResponse>(endpoint));
+        return this.request<UsersListResponse>(endpoint);
     }
 
     async getUserByCode(code: string): Promise<UserDetailResponse> {
@@ -49,6 +49,7 @@ class UserService {
     }
 
     async createUser(userData: UserRequest): Promise<UserSaveResponse> {
+        console.log('Llega aqui',userData);
         return this.request<any>('users', {
             method: 'POST',
             body: JSON.stringify(userData)
@@ -56,6 +57,7 @@ class UserService {
     }
 
     async updateUser(userData: UserRequest): Promise<UserSaveResponse> {
+        console.log('Llega aqui editar',userData);
         return this.request<UserSaveResponse>('users', {
             method: 'PUT',
             body: JSON.stringify(userData)

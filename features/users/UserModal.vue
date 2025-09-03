@@ -29,7 +29,7 @@
 
 </template>
 <script setup lang="ts">
-import type { ModalMode, UserFormData, UserModalData } from './types';
+import type { ModalMode, UserModalData, UserRequest } from './types';
 import { useUserModal, useUserService } from '~/componsables/useUsers';
 import UserForm from './UserForm.vue';
 
@@ -41,7 +41,7 @@ interface Props {
 
 interface Emits {
     (e: 'update:modelValue', value: boolean): void
-    (e: 'save', userData: UserFormData): void
+    (e: 'save', userData: UserModalData): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -53,12 +53,11 @@ const emit = defineEmits<Emits>()
 // Usar el composable
 const {
     modalUser,
-    mode,
+    mode: modalMode,
     loading,
     userDetails,
     isEditMode,
     modalTitle,
-    openModal,
     closeModal,
     loadUserData,
     resetForm
@@ -69,26 +68,26 @@ const { saveUser, loadUserDetails } = useUserService()
 
 const loadingDetails = ref(false)
 
-// Watch para sincronizar con el prop modelValue
+//Watch para sincronizar con el prop modelValue
 watch(() => props.modelValue, async (newValue) => {
     if (newValue) {
-        mode.value = props.mode
+        modalMode.value = props.mode
         modalUser.value = true
         
+        resetForm()
         if (props.mode === 'edit' && props.userData?.code) {
             // Cargar detalles completos desde la API para modo edición
             await loadFullUserDetails(props.userData.code)
         } else if (props.mode === 'edit' && props.userData) {
             // Usar datos proporcionados si no hay código
             loadUserData(props.userData)
-        } else {
-            // Modo crear - resetear formulario
-            resetForm()
-        }
+        } 
     } else {
         closeModal()
     }
 })
+
+
 
 // Watch para emitir cambios del modal al padre
 watch(modalUser, (newValue) => {
@@ -100,11 +99,11 @@ const loadFullUserDetails = async (code: string): Promise<void> => {
     
     try {
         const userDetail = await loadUserDetails(code)
-        console.log('Data: ',userDetails.value);
+        console.log('Data: ',userDetail);
         if (userDetail) {
             userDetails.value = {
                 code: userDetail.code,
-                name: userDetail.fullname,
+                fullname: userDetail.fullname,
                 email: userDetail.email,
                 alias: userDetail.alias,
                 rol: userDetail.roleCode,
@@ -114,14 +113,13 @@ const loadFullUserDetails = async (code: string): Promise<void> => {
             }
         }
     } finally {
-        loadingDetails.value = false
+        loadingDetails.value = false // ✅ Ahora sí tiene sentido
     }
 }
 
-const handleSubmit = async (formData: UserFormData): Promise<void> => {
+const handleSubmit = async (formData: UserRequest): Promise<void> => {
     loading.value = true
     try {
-        
         const success = await saveUser(formData, isEditMode.value)
         console.log('ts', success);
         if (success) {
@@ -134,6 +132,7 @@ const handleSubmit = async (formData: UserFormData): Promise<void> => {
 }
 
 const handleCancel = (): void => {
+    resetForm()
     closeModal()
 }
 </script>

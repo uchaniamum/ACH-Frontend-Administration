@@ -9,11 +9,10 @@ export function useParameterService() {
         toast.add(message)
     }
 
-    const loadParameterDetails = async (parameterCode: string): Promise<ParameterDetailResponse[] | null> => {
+    const loadParameterDetails = async (parameterCode: string): Promise<ParameterDetailResponse | null> => {
         try {
             const response = await parametersService.getParameterByCode(parameterCode)
-            console.log('Data Parameters: ',response.data);
-            return response.data
+            return response
         } catch (error) {
             console.error('Error loading user details:', error)
             const serviceError = error as ServiceError

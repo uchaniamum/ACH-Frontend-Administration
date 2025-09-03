@@ -237,8 +237,10 @@ const paginationContingencyRows = ref(10);
 const itemsBreadContingency = ref([
     { label: 'Inicio' },
     { label: 'Configuración' },
-    { label: 'Participantes' },
+    { label: 'Contingencia' },
 ]);
+
+
 
 const transformContingencyData = (banks: PaymentGatewayBankList): ContingencyTableRow[] => {
     return banks.map(bank => {

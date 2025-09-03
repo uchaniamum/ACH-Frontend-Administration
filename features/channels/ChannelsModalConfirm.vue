@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-interface RouteSelection {
+export interface RouteSelection {
   alias: string
   isActive: boolean
   urls: string[]

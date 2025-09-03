@@ -157,11 +157,11 @@ const aliasOptions = useRouteAliases(channels)
 const channelsWithAliases = computed(() => {
     return channels.value.map(channel => ({
         ...channel,
-        aliases: channel.routes.map(route => route.alias).join(' ') // Concatenar aliases para búsqueda
+        aliases: channel.routes?.map(route => route.alias).join(' ')
     }));
 });
 
-// Filters - Cambié alias por aliases
+// Filters
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     code: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -177,6 +177,11 @@ const itemsBreadParameters = ref([
     { label: 'Canales' }
 ])
 
+// Helper function para safe string conversion
+const safeLowerCase = (str: string | null | undefined): string => {
+    return str?.toLowerCase() || ''
+}
+
 // Filtrado actualizado
 const filteredChannel = computed(() => {
     if (!channelsWithAliases.value.length) return [];
@@ -185,13 +190,14 @@ const filteredChannel = computed(() => {
     const codeFilter = filters.value.code.value;
     const nameFilter = filters.value.name.value;
     const acronymFilter = filters.value.acronym.value;
-    const aliasFilter = filters.value.aliases.value; // Cambié de alias a aliases
+    const aliasFilter = filters.value.aliases.value;
     const updatedAtFilter = filters.value.updatedAt.value;
     
     return channelsWithAliases.value.filter(channel => {
         // Filtro de código
         const matchesCode = !codeFilter || 
-            channel.code.toLowerCase().startsWith(codeFilter.toLowerCase());
+            // channel.code?.toLowerCase().startsWith(codeFilter.toLowerCase());
+            safeLowerCase(channel.code || '').includes(safeLowerCase(codeFilter))
         
         // Filtro de nombre
         const matchesName = !nameFilter || 
@@ -201,15 +207,15 @@ const filteredChannel = computed(() => {
         const matchesAcronym = !acronymFilter || 
             channel.acronym === acronymFilter;
         
-        // Filtro de alias - CORREGIDO para usar el campo aliases computado
+        // Filtro de alias - Versión más limpia
         const matchesAlias = !aliasFilter || 
-            channel.routes.some(route => 
-                route.alias.toLowerCase().includes(aliasFilter.toLowerCase())
-            );
-        
-        // Filtro de fecha
+            channel.routes?.some(route => 
+                safeLowerCase(route.alias).includes(safeLowerCase(aliasFilter))
+            ) || false;
+
+        // Filtro de fecha - Versión más limpia
         const matchesUpdatedAt = !updatedAtFilter || 
-            formatDate(channel.updatedAt).toLowerCase().includes(updatedAtFilter.toLowerCase());
+            safeLowerCase(formatDate(channel.updatedAt || '')).includes(safeLowerCase(updatedAtFilter));
         
         // Filtro de búsqueda global - INCLUYE aliases
         const matchesGlobalSearch = searchTerm === '' || 
@@ -219,7 +225,7 @@ const filteredChannel = computed(() => {
             channel.aliases.toLowerCase().includes(searchTerm); // Usar el campo aliases concatenado
 
         return matchesCode && matchesName && matchesAcronym && 
-               matchesAlias && matchesUpdatedAt && matchesGlobalSearch;
+                matchesAlias && matchesUpdatedAt && matchesGlobalSearch;
     });
 });
 
@@ -250,8 +256,8 @@ const loadChannels = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await channelsService.getChannels()
-        if(response.success){
-            channels.value = response.data.paymentSystems
+        if(response){
+            channels.value = response.paymentSystems
             console.log('Canales cargados:', channels.value);
             
             // Debug detallado de rutas y aliases

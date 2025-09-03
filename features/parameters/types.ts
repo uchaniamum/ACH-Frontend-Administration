@@ -6,6 +6,10 @@ export interface ParameterListItem {
     description?: string
 }
 
+export interface ParametersListResponse {
+    parameters: ParameterListItem[]
+}
+
 export interface ParameterModalData {
     systemAcronym?: string
     code?: string
@@ -19,8 +23,6 @@ export interface ParameterRequest {
     code: string;
     value: string;
 }
-
-
 
 export interface ParameterDetailResponse {
     code: string;
@@ -36,12 +38,9 @@ export interface ParameterDetailResponse {
 }
 
 
-export interface ParameterDetailListResponse {
-    data:  ParameterDetailResponse[]
-    success: boolean
-    errorResponse: string | null
-    httpStatusCode: number
-}
+// export interface ParameterDetailListResponse {
+//     parameters:  ParameterDetailResponse[]
+// }
 
 export interface ParameterSaveResponse {
     wasSaved: boolean

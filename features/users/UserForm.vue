@@ -16,7 +16,7 @@
         />
 
         <XInputText 
-            v-model="formData.name" 
+            v-model="formData.fullname" 
             name="nombre"
             label="Nombre completo" 
             label-required
@@ -44,19 +44,18 @@
             placeholder="Ingresa un alias"
             :rules="requiredRule" 
         />
-
         <XSelect 
-            v-model="formData.rol" 
+            name="rol"
             label="Rol" 
             label-required
+            v-model="formData.rol" 
             :options="roleOptions" 
-            option-label="label" 
-            option-value="value"
-            placeholder="Selecciona el rol"
-            name="rol"
-            :rules="requiredRule"
+            optionLabel="label" 
+            optionValue="value"
+            placeholder="Seleccionar" 
             :loading="optionsLoading"
-            
+            :dropdown="true"
+            appendTo="body"
         />
 
         <XPhoneInput 
@@ -66,7 +65,7 @@
             label-required
             placeholder="Ingresa el número"
             is-validate
-            @update:countryCode="formData.countryCode = $event"
+            @update:countryCode="formData.countryCode = $event as string"
             :rules="requiredRule"
         />
 
@@ -96,6 +95,7 @@ import { ref, onMounted } from 'vue'
 import UserFields from '~/components/fields/UserFields.vue'
 import { useOptions } from '~/componsables/useOptions'
 import { optionsService } from '~/services/optionsService'
+import type { ValidationRuleResult } from './options.types'
 
 const props = defineProps({
     userData: { type: Object, default: () => ({}) },
@@ -113,13 +113,20 @@ const {
     loadRoleOptions 
 } = useOptions()
 
-const requiredRule = (value: any) => {
+
+
+const requiredRule = (value: unknown): ValidationRuleResult => {
     return value !== null && value !== undefined && value !== '' 
         ? true 
         : 'El campo es requerido'
 }
 
-const emailRule = (value: any) => {
+const emailRule = (value: unknown): ValidationRuleResult => {
+  // Primero verificar que sea string
+  if (typeof value !== 'string') {
+    return 'Debe ingresar un correo electrónico válido'
+  }
+  
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/  // regex básico para correos
   return regex.test(value)
     ? true
@@ -129,7 +136,7 @@ const emailRule = (value: any) => {
 
 const formData = ref({
     code: '',
-    name: '',
+    fullname: '',
     email: '',
     alias: '',
     rol: '',
@@ -153,10 +160,11 @@ const determineIsMobile = (countryCode: string, phoneNumber: string): boolean =>
 
 // Watcher para los datos del usuario
 watch(() => props.userData, (newData) => {
+    console.log('Hola: ',newData.isActive)
     if (newData && Object.keys(newData).length > 0) {
         formData.value = {
             code: newData.code || '',
-            name: newData.name || '',
+            fullname: newData.fullname || '',
             email: newData.email || '',
             alias: newData.alias || '',
             numberPhone: newData.numberPhone || '',
@@ -167,7 +175,7 @@ watch(() => props.userData, (newData) => {
     } else {
         formData.value = {
             code: '',
-            name: '',
+            fullname: '',
             email: '',
             alias: '',
             rol: '',
@@ -176,7 +184,6 @@ watch(() => props.userData, (newData) => {
             isActive: true,
         }
     }
-    console.log('Role:', roleOptions);
 }, { immediate: true, deep: true })
 
 const onSubmit = () => {
@@ -186,7 +193,7 @@ const onSubmit = () => {
         code: formData.value.code,
         email: formData.value.email,
         alias: formData.value.alias,
-        fullname: formData.value.name,
+        fullname: formData.value.fullname,
         phone: {
             countryCode: formData.value.countryCode,
             number: formData.value.numberPhone,
@@ -196,6 +203,8 @@ const onSubmit = () => {
         roleCode: optionsService.convertToBackendFormat(formData.value.rol),
         isActive: formData.value.isActive
     }
+
+    console.log('Lo que se manda: ', apiPayload);
     //console.log('datos',apiPayload);
     emits('submit', apiPayload)
 }
