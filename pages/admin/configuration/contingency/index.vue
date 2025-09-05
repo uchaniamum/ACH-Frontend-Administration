@@ -404,7 +404,7 @@ const transformContingencyData = (banks: any[]): ContingencyTableRow[] => {
 
         // Función para formatear la descripción del gateway
         const formatGatewayDescription = (gateway: any) => {
-            if (!gateway) return 'N/A';
+            if (!gateway) return 'MLD';
             return `${gateway.paymentGatewayAcronym} - ${gateway.isOperational ? 'Operacional' : 'No Operacional'}`;
         };
 
