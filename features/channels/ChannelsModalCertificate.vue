@@ -150,7 +150,7 @@
           <XButton 
             @click="registerCertificate()" 
             label="Registrar"
-            :disabled="!isVerified"
+            :disabled="!isVerified || justification.trim() === ''"
           /> 
         </div>
       </div>
@@ -169,30 +169,38 @@
       </div>
     </div>
   </XDialog>
+
+  <!-- Modal de Error Mejorado -->
   <XConfirmDialog
     v-model="showErrorDialog"
     icon="x:cancel-circle"
     icon-color="text-red-500"
     :closable="false"
-    title="Error de verificacion">
+    :title="getErrorTitle()">
       <template #message>
           <div class="space-y-2">
               <p>
-                  <span class="font-medium text-gray-700">No se pudo verificar el certificado público, intenta de nuevo o vuelve a cargar el archivo. </span>
+                  <span class="font-medium text-gray-700">
+                    {{ getErrorMessage() }}
+                  </span>
               </p>
           </div>
       </template>
       <template #buttons>
           <div class="flex gap-3">
               <XButton 
-                label="Confirmar" 
-                @click="visible = true; showErrorDialog = false"
+                :label="getErrorButtonLabel()" 
+                @click="handleErrorConfirm"
+              />
+              <XButton 
+                label="Cancelar" 
+                variant="outlined"
+                @click="handleErrorCancel"
               />
           </div>
       </template>  
   </XConfirmDialog>
   </div>
-
 </template> 
 
 <script setup lang="ts">
@@ -243,19 +251,72 @@ const remainingTime = ref(30)
 const verificationData = ref<VerificationData[]>([])
 const fileupload = ref<any>(null)
 
-// Agrega estas variables con las otras refs
+// Variables para manejo de errores de tamaño
 const showSizeErrorSnackbar = ref(false)
 const sizeErrorMessage = ref('')
 const errorFileName = ref('')
 
-// Nueva variable para controlar el modal de error
+// Variables mejoradas para manejo de errores
 const showErrorDialog = ref(false)
+const errorType = ref<'verification' | 'registration'>('verification')
+const errorMessage = ref('')
 
 let processingTimer: NodeJS.Timeout | null = null
 let verificationTimer: NodeJS.Timeout | null = null
 
 console.log('antes',props.channelRegistered);
 console.log('canal',props.channelCode);
+
+// Función helper para mostrar errores
+const showError = (type: 'verification' | 'registration', message?: string) => {
+  visible.value = false
+  errorType.value = type
+  errorMessage.value = message || ''
+  isProcessing.value = false // Asegurar que se detiene el procesamiento
+  
+  setTimeout(() => {
+    showErrorDialog.value = true
+  }, 100)
+}
+
+// Funciones para el modal de error
+const getErrorTitle = () => {
+  return errorType.value === 'verification' ? 'Error de verificación' : 'Error de registro'
+}
+
+const getErrorMessage = () => {
+  if (errorType.value === 'verification') {
+    return errorMessage.value || 'No se pudo verificar el certificado público. Intenta de nuevo o vuelve a cargar el archivo.'
+  } else {
+    return errorMessage.value || 'No se pudo registrar el certificado público. Verifica los datos e intenta nuevamente.'
+  }
+}
+
+const getErrorButtonLabel = () => {
+  return errorType.value === 'verification' ? 'Intentar de nuevo' : 'Volver a intentar'
+}
+
+const handleErrorConfirm = () => {
+  showErrorDialog.value = false
+  
+  if (errorType.value === 'verification') {
+    // Volver a abrir el modal principal para intentar verificar de nuevo
+    visible.value = true
+  } else {
+    // Para errores de registro, volver al modal principal manteniendo la verificación
+    visible.value = true
+    // Mantener el estado verificado para que el usuario no tenga que verificar de nuevo
+    // isVerified.value sigue siendo true
+  }
+  
+  // Limpiar el mensaje de error
+  errorMessage.value = ''
+}
+
+const handleErrorCancel = () => {
+  showErrorDialog.value = false
+  close() // Cerrar completamente y resetear todo
+}
 
 // Convertir archivo a Base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -305,6 +366,7 @@ const onFileSelect = async (event: any) => {
   selectedFile.value = null
   fileBase64.value = ''
   verificationData.value = []
+  showSizeErrorSnackbar.value = false // Limpiar errores de tamaño previos
   
   if (event.files.length === 0) return
   
@@ -347,9 +409,7 @@ const onFileSelect = async (event: any) => {
     simulateFileLoading(fileKey)
     
     try {
-      fileBase64.value = await fileToBase64(file)
-      console.log('Archivo convertido a Base64', fileBase64.value);
-      
+      fileBase64.value = await fileToBase64(file);
     } catch (error) {
       console.error('Error procesando archivo:', error)
       toast.add({
@@ -397,11 +457,11 @@ const formatDate = (dateString: string) => {
   });
 }
 
-// Función de verificación actualizada
+// Función de verificación mejorada
 const verifyCertificate = async () => {
   if (!selectedFile.value || !fileBase64.value || !props.channelCode) {
-    visible.value=false
-    showErrorDialog.value = true
+    showError('verification', 'Datos incompletos para la verificación')
+    return
   }
 
   isVerifying.value = true
@@ -436,21 +496,21 @@ const verifyCertificate = async () => {
         certificateInfo: verificationData
       })
     } else {
-      // Si response.success es false, mostrar el modal de error
+      // Si response es false, mostrar el modal de error
       isVerifying.value = false
       isVerified.value = false
-      showErrorDialog.value = true
+      showError('verification', 'El certificado no pudo ser verificado correctamente')
     }
     
   } catch (error) {
     isVerifying.value = false
     isVerified.value = false
-    // También mostrar el modal de error en caso de excepción
-    showErrorDialog.value = true
+    showError('verification', 'Error de conexión durante la verificación')
     console.error('Error en verificación:', error)
   }
 }
 
+// Función de registro mejorada
 const registerCertificate = async () => {
   // Prevenir múltiples ejecuciones simultáneas
   if (isProcessing.value) {
@@ -463,6 +523,16 @@ const registerCertificate = async () => {
       severity: 'warn',
       summary: 'Datos incompletos',
       detail: 'Complete todos los campos requeridos',
+      life: 3000
+    })
+    return
+  }
+
+  if (justification.value.trim() === '') {
+    toast.add({
+      severity: 'warn',
+      summary: 'Justificación requerida',
+      detail: 'Por favor ingresa una justificación',
       life: 3000
     })
     return
@@ -486,39 +556,29 @@ const registerCertificate = async () => {
     const responseRegisterCertificate = await channelsService.registerCertificatePublic(certificatePayload)
     
     console.log('Respuesta registro:', responseRegisterCertificate)
-    if(responseRegisterCertificate){
+    
+    if (responseRegisterCertificate) {
+      // Registro exitoso
       setTimeout(() => {
         close()
         toast.add({ 
           severity: 'success', 
           summary: 'Éxito',
-          detail: 'Certificado público registrado', 
+          detail: 'Certificado público registrado correctamente', 
           life: 5000 
         })
       }, 1000)
-    }else{
-        close()
-        toast.add({ 
-          severity: 'error', 
-          summary: 'Error',
-          detail: 'Certificado publico NO registrado', 
-          life: 5000 
-        })
+    } else {
+      // Error en el registro - mostrar modal de error
+      showError('registration', 'No se pudo registrar el certificado. Verifica los datos e intenta nuevamente.')
     }
   
   } catch (error: any) {
     console.error('Error en registro de certificado:', error)
+    console.log('Error capturado:', error);
     
-    // Mostrar toast de error
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: error.message || 'Error al registrar el certificado',
-      life: 5000
-    })
-    
-    // Re-enable the form
-    isProcessing.value = false
+    // Mostrar modal de error para excepciones
+    showError('registration', error.message || 'Error de conexión al registrar el certificado')
     
   } finally {
     // Limpiar timer si existía (por si acaso)
@@ -556,7 +616,12 @@ const resetUploadState = () => {
   justification.value = ''
   remainingTime.value = 30
   verificationData.value = []
-  showErrorDialog.value = false // Reiniciar también el estado del modal de error
+  showErrorDialog.value = false
+  errorType.value = 'verification'
+  errorMessage.value = ''
+  showSizeErrorSnackbar.value = false
+  errorFileName.value = ''
+  sizeErrorMessage.value = ''
 }
 
 // Limpiar timers cuando el componente se desmonta

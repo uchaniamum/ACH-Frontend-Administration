@@ -8,7 +8,6 @@ export function useScheduleModal() {
     const loading = ref(false);
 
     const schedulesDetails = ref<SchudeleFormData>({
-        paymentGatewayCode: '',
         transactionCode: '',
         scheduleEffectiveDate: '',
         startTime: '', 
@@ -52,7 +51,6 @@ export function useScheduleModal() {
             base64JustificationFile: ''
         };
     }
-
 
     const resetForm = () => {
         schedulesDetails.value = {

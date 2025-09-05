@@ -81,7 +81,6 @@
       :previous-selection="previousRouteData"
       @confirm="handleConfirmChange"
       @cancel="handleCloseCertificateModal"
-      
     />
 
     <ChannelsModalCertificate

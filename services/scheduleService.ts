@@ -1,5 +1,6 @@
 import { API_CONFIG } from "~/config/api";
-import type { ScheduleResponseList, SchudeleDetailReponse } from "~/features/schedules/type";
+import type { ScheduleDetailReponse, ScheduleExceptionRequest, ScheduleInActiveException, ScheduleResponseList } from "~/features/schedules/type";
+import type { UserSaveResponse } from "~/features/users/types";
 
 class ScheduleService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -38,12 +39,44 @@ class ScheduleService {
         return this.request<ScheduleResponseList[]>(endpoint);
     }
 
-    async getScheduleByCode(code: string): Promise<SchudeleDetailReponse> {
+    async getScheduleByCode(code: string): Promise<ScheduleDetailReponse> {
         if (!code) {
             throw new Error('User code is required')
         }
-        return this.request<SchudeleDetailReponse>(`payment-gateways-transaction-schedule/${code}/schedule`)
+        return this.request<ScheduleDetailReponse>(`payment-gateways-transaction-schedule/${code}/schedule`)
+    }
+
+    async createScheduleException(scheduleData: ScheduleExceptionRequest): Promise<UserSaveResponse> {
+        console.log('Llega aqui',scheduleData);
+        return this.request<any>('payment-gateways-transaction-schedule/exception', {
+            method: 'POST',
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    async editScheduleException(scheduleData: ScheduleExceptionRequest): Promise<UserSaveResponse> {
+        console.log('Llega aqui',scheduleData);
+        return this.request<any>('payment-gateways-transaction-schedule/exception', {
+            method: 'PUT',
+            body: JSON.stringify(scheduleData)
+        });
+    }
+
+    async editScheduleRegular(scheduleDataRegular: any):Promise<UserSaveResponse>{
+        console.log('Llega aqui',scheduleDataRegular);
+        return this.request<any>('payment-gateways-transaction-schedule', {
+            method: 'PUT',
+            body: JSON.stringify(scheduleDataRegular)
+        });
+    }
+
+    async inActivScheduleException(scheduleExceptionRegular: ScheduleInActiveException):Promise<UserSaveResponse>{
+        console.log('Llega aqui',scheduleExceptionRegular);
+        return this.request<any>('payment-gateways-transaction-schedule/exception', {
+            method: 'PATCH',
+            body: JSON.stringify(scheduleExceptionRegular)
+        });
     }
 }
 
-export const scheduleService = new ScheduleService();
+export const scheduleService = new ScheduleService()

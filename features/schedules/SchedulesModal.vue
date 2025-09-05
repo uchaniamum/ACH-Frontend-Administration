@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <XDialog 
         v-model:visible="modalSchedule" 
         modal
@@ -7,65 +7,41 @@
         :style="{ width: '920px !important' }" 
     > 
         <SchedulesExForm
-        :scheduleData="schedulesDetails"
+        :key="formKey"
+        :scheduleData="props.scheduleData"
         :isEdi="isEditMode"
         :loading="loading || loadingDetails"
-        @submit="handleSubmit"
+        @submit="handleSubmitExtraordinary"
         @cancel="handleCancel"
         />
     </XDialog>
-    <Toast position="top-right">
-        <template #message="{ message }">
-            <Icon 
-                name="x:check-circle" 
-                class="p-toast-message-icon"
-            />
-            <div class="p-toast-message-text">
-                <span class="p-toast-summary">{{ message.summary }}</span>
-                <span class="p-toast-detail">{{ message.detail }}</span>
-            </div>
-        </template>
-    </Toast>
-    <XConfirmDialog
-        v-model="showInfoDialog"
-        icon="x:cancel-circle"
-        icon-color="text-red-500"
-        :closable="false"
-        title="Error de verificacion">
-        <template #message>
-            <div class="space-y-2">
-                <p>
-                    <span class="font-medium text-gray-700">No se pudo verificar el certificado público, intenta de nuevo o vuelve a cargar el archivo. </span>
-                </p>
-            </div>
-        </template>
-        <template #buttons>
-            <div class="flex gap-3">
-                <XButton 
-                  label="Confirmar" 
-                  @click="modalSchedule = true; showInfoDialog = false"
-                />
-            </div>
-        </template> 
-    </XConfirmDialog>
+    
+    <ConfirmDialogWrapper
+        v-model="confirmDialogSchedules.visible"
+        :options="confirmDialogSchedules.options"
+    />
 </template>
 <script setup lang="ts">
 
-import { useScheduleModal } from '~/componsables/useSchedules';
+import { useScheduleModal } from '~/componsables/schedule/useSchedules';
 import type { ModalMode } from '../users/types';
-import type { SchudeleFormData } from './type';
 import SchedulesExForm from './SchedulesExForm.vue';
+import type { ScheduleExceptionRequest, ScheduleFormData } from './type';
+import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { scheduleService } from '~/services/scheduleService';
+// Composables 
+const toast = useToast()
+const formKey = ref(0)
 
 interface Props {
     modelValue: boolean
-    scheduleData?: SchudeleFormData
+    scheduleData?: ScheduleFormData
     mode?: ModalMode
 }
 
 interface Emits {
     (e: 'update:modelValue', value: boolean): void
-    (e: 'save', scheduleData: SchudeleFormData ): void
+    (e: 'save', scheduleData: any ): void 
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -74,14 +50,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// Nueva variable para controlar el modal de error
-const showInfoDialog = ref(false)
 
 const {
     modalSchedule,
     mode: modeSchedule,
     loading,
-    schedulesDetails,
     isEditMode,
     modalTitle,
     closeModal,
@@ -91,20 +64,225 @@ const {
 
 const loadingDetails = ref(false)
 
-// Watch para sincronizar con el prop modelValue
 watch(() => props.modelValue, async (newValue) => {
     if (newValue) {
         modeSchedule.value = props.mode
         modalSchedule.value = true
+        formKey.value++ // ← Incrementa la key para forzar re-render
         
-        if (props.mode === 'edit' && props.scheduleData?.paymentGatewayCode) {
-            // Cargar detalles completos desde la API para modo edición
-            await loadFullScheduleDetails(props.scheduleData.transactionCode)
-        } else if (props.mode === 'edit' && props.scheduleData) {
-            // Usar datos proporcionados si no hay código
+        if (props.mode === 'edit' && props.scheduleData) {
+            console.log('Datos recibidos en Modal para editar:', props.scheduleData);
+            
+            // Cargar datos proporcionados directamente
             loadScheduleData(props.scheduleData)
         } else {
-            // Modo crear - resetear formulario
+            resetForm()
+        }
+    } else {
+        closeModal()
+    }
+}) 
+
+
+// Watch para emitir cambios del modal al padre
+watch(modalSchedule, (newValue) => {
+    emit('update:modelValue', newValue)
+})
+
+
+// State para el modal de confirmación de reseteo de contraseña
+const confirmDialogSchedules = ref({
+    visible: false,
+    options: {
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    }
+})
+
+// Datos del formulario que se enviarán después de la confirmación
+const pendingFormData = ref<ScheduleFormData | null>(null)
+
+const openConfirmModalSave = (formData: ScheduleFormData): void => {
+    pendingFormData.value = formData
+
+    confirmDialogSchedules.value = {
+        visible: true,
+        options: {
+            title: isEditMode.value ? 'Editar horario extraordinario' : 'Nuevo horario extraordinario',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            message: isEditMode.value
+                ? `¿Estás seguro de guardar los cambios del horario extraordinario? 
+                    El horario quedará programado para el <span class="font-semibold">${formData.scheduleEffectiveDate} </span>
+                    de <span class="font-semibold"> ${formData.startTime} </span> a <span class="font-semibold">${formData.endTime}</span>.`
+                : `¿Estás seguro de programar un nuevo horario extraordinario para el <span class="font-semibold">${formData.scheduleEffectiveDate} </span>
+                    de <span class="font-semibold"> ${formData.startTime} </span> a <span class="font-semibold">${formData.endTime}</span>.? 
+                    Ten en cuenta que este horario tendrá prioridad sobre el horario regular actualmente establecido para la transacción.`,
+            onConfirm: async () => {
+                await confirmSave();
+            }
+        }
+    };
+
+}
+
+const confirmSave = async (): Promise<void> => {
+    if (!pendingFormData.value) return
+    
+    loading.value = true
+    try {
+        console.log('Datos COMPLETOS del formulario a guardar:', pendingFormData.value);
+        
+        const toTimeIso = (time: string) => {
+            const date = new Date(`1970-01-01T${time}Z`);
+            return date.toISOString().split("T")[1];
+        };
+
+        console.log('Código para paymentGatewayCode:', pendingFormData.value.code || pendingFormData.value.code);
+        
+        const requestData: ScheduleExceptionRequest = {
+            paymentGatewayCode: pendingFormData.value.code || pendingFormData.value.code || '',
+            transactionCode: pendingFormData.value.transactionCode || '',
+            scheduleEfectiveDate: new Date((pendingFormData.value.scheduleEffectiveDate || '') + "T00:00:00Z"),
+            startTime: pendingFormData.value.startTime || '00:00:00',
+            endTime: pendingFormData.value.endTime || '00:00:00',
+            changeReason: pendingFormData.value.changeReason || '',
+            base64JustificationFile: pendingFormData.value.base64JustificationFile || ''
+        };
+
+        // Solo en modo edición agregamos isActive
+        if (isEditMode.value) {
+            (requestData as any).isActive = pendingFormData.value.isActive ?? true
+        }
+
+        console.log('Datos que se enviarán a la API:', requestData);
+        
+        let result
+        if (isEditMode.value) {
+            result = await scheduleService.editScheduleException(requestData)
+        } else {
+            result = await scheduleService.createScheduleException(requestData)
+        }
+
+        console.log('Resultado de la operación:', result);
+        if(result.wasSaved){
+            toast.add({
+            severity: 'success',
+            summary: `${isEditMode.value ? 'actualizar' : 'crear'}`,
+            life: 5000
+        })
+        }
+        emit('save', requestData)
+        
+        closeModal()
+    } catch (error) {
+        console.error('Error guardando horario:', error)
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: `Error al ${isEditMode.value ? 'Edición exitosa  ' : 'Horario extraordinario programado con éxito'} `,
+            life: 5000
+        })
+    } finally {
+        loading.value = false
+        pendingFormData.value = null
+    }
+}
+
+const handleSubmitExtraordinary = async (formData: ScheduleFormData): Promise<void> => {
+    openConfirmModalSave(formData)
+}
+
+const handleCancel = (): void => {
+    closeModal()
+}
+
+</script> -->
+
+<template>
+    <XDialog 
+        v-model:visible="modalSchedule" 
+        modal
+        :closable="false"
+        :header="modalTitle"
+        :style="{ width: '920px !important' }" 
+    > 
+        <SchedulesExForm
+        :key="formKey"
+        :scheduleData="props.scheduleData"
+        :isEdi="isEditMode"
+        :loading="loading || loadingDetails"
+        @submit="handleSubmitExtraordinary"
+        @cancel="handleCancel"
+        />
+    </XDialog>
+    
+    <ConfirmDialogWrapper
+        v-model="confirmDialogSchedules.visible"
+        :options="confirmDialogSchedules.options"
+    />
+
+    <!-- Toast removido de aquí -->
+</template>
+
+<script setup lang="ts">
+
+import { useScheduleModal } from '~/componsables/schedule/useSchedules';
+import type { ModalMode } from '../users/types';
+import SchedulesExForm from './SchedulesExForm.vue';
+import type { ScheduleExceptionRequest, ScheduleFormData } from './type';
+import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
+import { scheduleService } from '~/services/scheduleService';
+
+// Composables 
+// toast removido de aquí
+const formKey = ref(0)
+
+interface Props {
+    modelValue: boolean
+    scheduleData?: ScheduleFormData
+    mode?: ModalMode
+}
+
+interface Emits {
+    (e: 'update:modelValue', value: boolean): void
+    (e: 'save', scheduleData: any ): void 
+    (e: 'success', message: { summary: string, detail: string }): void // Nuevo evento
+    (e: 'error', message: { summary: string, detail: string }): void   // Nuevo evento
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    mode: 'create'
+})
+
+const emit = defineEmits<Emits>()
+
+const {
+    modalSchedule,
+    mode: modeSchedule,
+    loading,
+    isEditMode,
+    modalTitle,
+    closeModal,
+    loadScheduleData,
+    resetForm
+} = useScheduleModal();
+
+const loadingDetails = ref(false)
+
+watch(() => props.modelValue, async (newValue) => {
+    if (newValue) {
+        modeSchedule.value = props.mode
+        modalSchedule.value = true
+        formKey.value++ // ← Incrementa la key para forzar re-render
+        
+        if (props.mode === 'edit' && props.scheduleData) {
+            console.log('Datos recibidos en Modal para editar:', props.scheduleData);
+            
+            // Cargar datos proporcionados directamente
+            loadScheduleData(props.scheduleData)
+        } else {
             resetForm()
         }
     } else {
@@ -117,60 +295,109 @@ watch(modalSchedule, (newValue) => {
     emit('update:modelValue', newValue)
 })
 
-const loadFullScheduleDetails = async (code: string): Promise<void> => {
-    loadingDetails.value = true
+// State para el modal de confirmación de reseteo de contraseña
+const confirmDialogSchedules = ref({
+    visible: false,
+    options: {
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    }
+})
+
+// Datos del formulario que se enviarán después de la confirmación
+const pendingFormData = ref<ScheduleFormData | null>(null)
+
+const openConfirmModalSave = (formData: ScheduleFormData): void => {
+    pendingFormData.value = formData
+
+    
+    confirmDialogSchedules.value = {
+        visible: true,
+        options: {
+            title: isEditMode.value ? 'Editar horario extraordinario' : 'Nuevo horario extraordinario',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            message: isEditMode.value
+                ? `¿Estás seguro de guardar los cambios del horario extraordinario? 
+                    El horario quedará programado para el <span class="font-semibold">${formData.scheduleEffectiveDate} </span>
+                    de <span class="font-semibold"> ${formData.startTime} </span> a <span class="font-semibold">${formData.endTime}</span>.`
+                : `¿Estás seguro de programar un nuevo horario extraordinario para el <span class="font-semibold">${formData.scheduleEffectiveDate} </span>
+                    de <span class="font-semibold"> ${formData.startTime} </span> a <span class="font-semibold">${formData.endTime}</span>.? 
+                    Ten en cuenta que este horario tendrá prioridad sobre el horario regular actualmente establecido para la transacción.`,
+            onConfirm: async () => {
+                await confirmSave();
+            }
+        }
+    };
+}
+
+const confirmSave = async (): Promise<void> => {
+    if (!pendingFormData.value) return
+    
+    loading.value = true
     try {
-        const sheduleDetail = await scheduleService.getScheduleByCode(code)
-        console.log('Data: ',sheduleDetail);
-        //const scheduleDetail = await scheduleDetail(code)
-        //console.log('Data: ',userDetails.value);
-        // if (userDetail) {
-        //     userDetails.value = {
-        //         code: userDetail.code,
-        //         name: userDetail.fullname,
-        //         email: userDetail.email,
-        //         alias: userDetail.alias,
-        //         rol: userDetail.roleCode,
-        //         numberPhone: userDetail.phoneNumber?.number || '',
-        //         countryCode: userDetail.phoneNumber?.countryCode || '+591',
-        //         isActive: userDetail.isActive
-        //     }
-        // }
+        console.log('Datos COMPLETOS del formulario a guardar:', pendingFormData.value);
+        
+        const toTimeIso = (time: string) => {
+            const date = new Date(`1970-01-01T${time}Z`);
+            return date.toISOString().split("T")[1];
+        };
+
+        console.log('Código para paymentGatewayCode:', pendingFormData.value.code || pendingFormData.value.code);
+        
+        const requestData: ScheduleExceptionRequest = {
+            paymentGatewayCode: pendingFormData.value.code || pendingFormData.value.code || '',
+            transactionCode: pendingFormData.value.transactionCode || '',
+            scheduleEfectiveDate: new Date((pendingFormData.value.scheduleEffectiveDate || '') + "T00:00:00Z"),
+            startTime: pendingFormData.value.startTime || '00:00:00',
+            endTime: pendingFormData.value.endTime || '00:00:00',
+            changeReason: pendingFormData.value.changeReason || '',
+            base64JustificationFile: pendingFormData.value.base64JustificationFile || ''
+        };
+
+        // Solo en modo edición agregamos isActive
+        if (isEditMode.value) {
+            (requestData as any).isActive = pendingFormData.value.isActive ?? true
+        }
+
+        console.log('Datos que se enviarán a la API:', requestData);
+        
+        let result
+        if (isEditMode.value) {
+            result = await scheduleService.editScheduleException(requestData)
+        } else {
+            result = await scheduleService.createScheduleException(requestData)
+        }
+
+        console.log('Resultado de la operación:', result);
+        if(result){
+            // Emitir evento de éxito al padre
+            emit('success', {
+                summary: isEditMode.value ? 'Edición exitosa' : 'Horario extraordinario programado con éxito',
+                detail: isEditMode.value ? 'El horario extraordinario se actualizó correctamente' : 'El nuevo horario extraordinario se ha programado correctamente'
+            })
+        }
+        emit('save', requestData)
+        
+        closeModal()
+    } catch (error) {
+        console.error('Error guardando horario:', error)
+        // Emitir evento de error al padre
+        const errorMessage = {
+            summary: 'Error',
+            detail: `Error al ${isEditMode.value ? 'actualizar' : 'crear'} el horario extraordinario`
+        };
+        console.log('Emitiendo evento error:', errorMessage);
+        emit('error', errorMessage)
     } finally {
-        loadingDetails.value = false
+        loading.value = false
+        pendingFormData.value = null
     }
 }
 
-const handleSubmit = async (formData: SchudeleFormData): Promise<void> => {
-    loading.value = true
-    modalSchedule.value= false
-    showInfoDialog.value = true
-    try {
-        console.log('Datos del formulario:', formData);
-        
-        // Aquí deberías llamar al servicio para guardar
-        // const result = await scheduleService.saveSchedule(formData, isEditMode.value)
-        
-        emit('save', formData)
-        handleCancel()
-        
-        toast.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: isEditMode.value ? 'Horario actualizado correctamente' : 'Horario creado correctamente',
-            life: 5000
-        })
-    } catch (error) {
-        console.error('Error guardando horario:', error)
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Error al guardar el horario',
-            life: 5000
-        })
-    } finally {
-        loading.value = false
-    }
+const handleSubmitExtraordinary = async (formData: ScheduleFormData): Promise<void> => {
+    openConfirmModalSave(formData)
 }
 
 const handleCancel = (): void => {

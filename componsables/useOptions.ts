@@ -1,4 +1,4 @@
-import type { UserRoleOp, UserStatusOp } from "~/features/users/options.types";
+import type { PaymentGatewayOp, UserRoleOp, UserStatusOp } from "~/features/users/options.types";
 import type { ServiceError } from "~/features/users/types"
 import { optionsService } from "~/services/optionsService"
 
@@ -9,6 +9,9 @@ export function useOptions() {
 
     const statusOptions = ref<{ label: string; value: string }[]>([])
     const statusFilterOptions = ref<{ label: string; value: string }[]>([])
+
+    const paymentGatewayOptions = ref<{ label: string; value: string }[]>([])
+    const paymentGatewayFilterOptions = ref<{ label: string; value: string }[]>([])
 
     const loading = ref(false)
     const error = ref<string | null>(null)
@@ -59,6 +62,26 @@ export function useOptions() {
         }
     }
 
+    const loadPaymentGatewayOptions = async () => {
+        try {
+            loading.value = true
+            error.value = null
+            const gateways = await optionsService.getPaymentGateways()
+            paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(gateways)
+        } catch (err) {
+            const serviceError = err as ServiceError
+            error.value = serviceError.message || 'Error al cargar las pasarelas de pago'
+            console.error('Error loading payment gateway options:', err)
+            // Fallback en caso de error
+            paymentGatewayOptions.value = [
+                { label: 'PayPal', value: 'PAYPAL' },
+                { label: 'Stripe', value: 'STRIPE' }
+            ]
+        } finally {
+            loading.value = false
+        }
+    }
+
     const loadAllOptions = async () => {
         try {
             loading.value = true
@@ -83,6 +106,15 @@ export function useOptions() {
                 }
             }
 
+            if (response.paymentGateways?.paymentGatewaysActive) {
+                const activeGateways = response.paymentGateways.paymentGatewaysActive.filter(
+                    (gateway: PaymentGatewayOp) => gateway.isActive
+                )
+                paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(activeGateways)
+                paymentGatewayFilterOptions.value = optionsService.mapPaymentGatewaysToFilterOptions(activeGateways)
+                console.log('Payment Gateway Options: ', paymentGatewayOptions.value);
+            }
+
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar las opciones'
@@ -91,6 +123,10 @@ export function useOptions() {
             // Fallback options
             roleOptions.value = [{ label: 'Administrador', value: 'ADMIN' }]
             statusOptions.value = [{ label: 'Activo', value: 'ACTIVE' }]
+            paymentGatewayOptions.value = [
+                { label: 'PayPal', value: 'PAYPAL' },
+                { label: 'Stripe', value: 'STRIPE' }
+            ]
         } finally {
             loading.value = false
         }
@@ -101,6 +137,8 @@ export function useOptions() {
         statusOptions.value = []
         roleFilterOptions.value = []
         statusFilterOptions.value = []
+        paymentGatewayOptions.value = []
+        paymentGatewayFilterOptions.value = []
         error.value = null
     }
 
@@ -110,6 +148,8 @@ export function useOptions() {
         statusOptions: readonly(statusOptions),
         roleFilterOptions: readonly(roleFilterOptions),
         statusFilterOptions: readonly(statusFilterOptions),
+        paymentGatewayOptions: readonly(paymentGatewayOptions),
+        paymentGatewayFilterOptions: readonly(paymentGatewayFilterOptions),
         loading: readonly(loading),
         error: readonly(error),
 

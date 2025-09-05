@@ -1,75 +1,68 @@
 <template>
     <div>
         <div class="flex flex-col gap-8">
-            <XHeader :title="pageTitle" @back-click="goBack"/>
+            <!-- <XHeader :title="pageTitle" @back-click="goBack"/> -->
+            <XHeader 
+                :title="isMultipleBanks ? `${pageTitle} - Participantes (${contingencyData.length})` : pageTitle" 
+                @back-click="goBack"
+            />
             <span class="text-normal font-normal">
                 {{ pageDescription }}
             </span>
             
-            <div class="pt-8 flex flex-col gap-20">
+            <!-- Botón Ver Participantes - Solo mostrar cuando hay múltiples bancos -->
+            <div v-if="isMultipleBanks" class="flex">
+                <XButton 
+                    variant="text" 
+                    :label="`Ver ${contingencyData.length} Participantes `"
+                    icon="bank"
+                    @click="showParticipantsModal = true"
+                />
+            </div>
+            
+            <div class="flex flex-col gap-20">
                 <!-- Sección Canal - Solo para "Cambiar canal" -->
                 <div v-if="isChannelChange" class="flex flex-col justify-center gap-8">
                     <Divider align="left" type="solid">
                         <b>Canal</b>
                     </Divider>
                     <span class="text-normal font-normal text-gray-700">
-                        Selecciona el canal al que deseas cambiar.
+                        Selecciona el canal al que deseas cambiar las transacciones del participante.
                     </span>
-                    <SelectButton 
-                        v-model="selectedChannelValue" 
-                        :options="channelOptions" 
-                        optionLabel="label" 
-                        optionValue="value"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex items-center justify-center max-w-70 w-50">
-                                <span class="font-medium">{{ slotProps.option.label }}</span>
-                            </div>
-                        </template>
-                    </SelectButton>
-                </div>
-                
-                <div class="flex flex-col justify-center gap-8">
-                    <Divider align="left" type="solid">
-                        <b>Transacciones</b>
-                    </Divider>
-                    <span class="text-normal font-normal text-gray-700">
-                        Selecciona las transacciones que estarán involucradas.
-                    </span>
-                    
-                    <!-- Para "Cambiar canal" - Solo 2 opciones -->
                     <template v-if="isChannelChange">
-                        <div class="flex items-center gap-4">
-                            <Checkbox 
-                                v-model="transInterbancaria" 
-                                inputId="trans-inter" 
-                                :binary="true"
-                                class="mr-2"
-                            />
-                            <label for="trans-inter" class="text-gray-1200 cursor-pointer">
-                                Envío de transferencias interbancarias
-                            </label>
-                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]" 
-                                  v-tooltip.focus.top="'Información sobre transferencias interbancarias'">
-                            </Icon>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <Checkbox 
-                                v-model="qrInterbancaria" 
-                                inputId="qr-inter" 
-                                :binary="true"
-                                class="mr-2"
-                            />
-                            <label for="qr-inter" class="text-gray-1200 cursor-pointer">
-                                Envío de transferencias QR
-                            </label>
-                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]">
-                            </Icon>
-                        </div>
+                        <DataTable :value="transactionData" class="w-full">
+                            <!-- Columna fija de Transacción -->
+                            <Column header="Transacción" sortable class="min-w-80">
+                                <template #body="{ data }">
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ data.transaction }}</span>
+                                        <span v-tooltip="data.tooltip">
+                                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"></Icon>
+                                        </span>
+                                    </div>
+                                </template>
+                            </Column>
+                            
+                            <!-- Columnas dinámicas basadas en los payment gateways -->
+                            <Column 
+                                v-for="gateway in paymentGatewayOptions" 
+                                :key="gateway.value" 
+                                :header="gateway.label"
+                                class="text-center min-w-24"
+                            >
+                                <template #body="{ data }">
+                                    <div class="flex justify-center">
+                                        <Checkbox 
+                                            v-model="data.gateways[gateway.value]"
+                                            :binary="true"
+                                            @change="onGatewayChange(data, gateway.value, $event)"
+                                        />
+                                    </div>
+                                </template>
+                            </Column>
+                        </DataTable>
                     </template>
-                    
-                    <!-- Para "Establecer contingencia" - Todas las opciones -->
-                    <template v-else>
+                        <template v-else>
                         <div class="flex items-center gap-4">
                             <Checkbox 
                                 v-model="transInterbancaria" 
@@ -124,6 +117,100 @@
                         </div>
                     </template>
                 </div>
+                
+                <!-- <div class="flex flex-col justify-center gap-8">
+                    <Divider align="left" type="solid">
+                        <b>Transacciones</b>
+                    </Divider>
+                    <span class="text-normal font-normal text-gray-700">
+                        Selecciona las transacciones que estarán involucradas.
+                    </span>
+                    
+                    <template v-if="isChannelChange">
+                        <DataTable :value="transactionData" class="w-full">
+                          <Column header="Transacción" sortable class="min-w-80">
+                            <template #body="{ data }">
+                              <div class="flex items-center gap-2">
+                                <i class="pi pi-info-circle text-blue-500"></i>
+                                <span>{{ data.transaction }}</span>
+                              </div>
+                            </template>
+                          </Column>
+                      
+                          <Column 
+                            v-for="gateway in paymentGatewayOptions" 
+                            :key="gateway.value" 
+                            :header="gateway.label"
+                            class="text-center min-w-24"
+                          >
+                            <template #body="{ data }">
+                              <div class="flex justify-center">
+                                <Checkbox 
+                                  v-model="data.gateways[gateway.value]"
+                                  :binary="true"
+                                  @change="onGatewayChange(data, gateway.value, $event)"
+                                />
+                              </div>
+                            </template>
+                          </Column>
+                        </DataTable>
+                    </template>
+                    
+                    <template v-else>
+                        <div class="flex items-center gap-4">
+                            <Checkbox 
+                                v-model="transInterbancaria" 
+                                inputId="trans-inter" 
+                                :binary="true"
+                                class="mr-2"
+                            />
+                            <label for="trans-inter" class="text-gray-1200 cursor-pointer">
+                                Envío de transferencias interbancarias
+                            </label>
+                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]">
+                            </Icon>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <Checkbox 
+                                v-model="qrInterbancaria" 
+                                inputId="qr-inter" 
+                                :binary="true"
+                                class="mr-2"
+                            />
+                            <label for="qr-inter" class="text-gray-1200 cursor-pointer">
+                                Envío de transferencias QR
+                            </label>
+                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]">
+                            </Icon>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <Checkbox 
+                                v-model="transRecepcion" 
+                                inputId="trans-recep" 
+                                :binary="true"
+                                class="mr-2"
+                            />
+                            <label for="trans-recep" class="text-gray-1200 cursor-pointer">
+                                Recepción transferencia interbancaria
+                            </label>
+                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]">
+                            </Icon>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <Checkbox 
+                                v-model="qrRecepcion" 
+                                inputId="qr-recep" 
+                                :binary="true"
+                                class="mr-2"
+                            />
+                            <label for="qr-recep" class="text-gray-1200 cursor-pointer">
+                                Recepción transferencia QR
+                            </label>
+                            <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]">
+                            </Icon>
+                        </div>
+                    </template>
+                </div> -->
 
                 <div class="flex flex-col justify-center gap-8">
                     <Divider align="left" type="solid">
@@ -230,6 +317,56 @@
             </div>
         </div>
 
+        <!-- Modal para Ver Participantes - Opción 1: XDialog con visible -->
+        <XDialog 
+            :visible="showParticipantsModal"
+            @update:visible="showParticipantsModal = $event"
+            header="Participantes seleccionados"
+            :style="{ width: '500px' }"
+            :closable="true"
+            :modal="true"
+        >
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600 mb-4">
+                    Se aplicarán los cambios a los siguientes bancos:
+                </p>
+                
+                <div class="max-h-96 overflow-y-auto">
+                    <div class="grid grid-cols-1 gap-2">
+                        <div 
+                            v-for="(bank, index) in contingencyData" 
+                            :key="bank.participantCode"
+                            class="flex items-center p-3"
+                        >
+                            <div class="flex items-center gap-3 w-full">
+                                <div class="flex-1">
+                                    <ul class="font-medium text-gray-900">
+                                        {{ bank.participantName || bank.name }}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-700">
+                        Total de participantes: {{ contingencyData.length }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- <template #footer>
+                <div class="flex justify-end">
+                    <XButton 
+                        label="Cerrar" 
+                        outlined 
+                        @click="showParticipantsModal = false"
+                    />
+                </div>
+            </template> -->
+        </XDialog>
+
         <!-- Modal para Cambiar Canal -->
         <XConfirmDialog
             v-model="visibleChangeCanal"
@@ -304,6 +441,7 @@
 </template>
 
 <script setup lang="ts">
+import { useOptions } from '~/componsables/useOptions';
 import type { PaymentGatewayBankDetail } from '~/features/contingency/type';
 import { contingencyService } from '~/services/contingencySevice';
 
@@ -321,6 +459,7 @@ const contingencyData = ref<PaymentGatewayBankDetail[]>([]);
 // Estados de modales
 const visibleChangeCanal = ref(false);
 const visibleContingency = ref(false);
+const showParticipantsModal = ref(false); // NUEVO: Estado para el modal de participantes
 
 // Estados del formulario
 const justification = ref('');
@@ -336,21 +475,40 @@ const fileBase64 = ref<string>('');
 const isVerifying = ref(false);
 const isVerified = ref(false);
 
+// Datos de transacciones - CAMBIA 'name' por 'transaction' para que coincida con tu template
+const transactionData = ref([
+    {
+        id: 1,
+        transaction: 'Envío de transferencias interbancarias',
+        tooltip: 'Información sobre transferencias interbancarias',
+        gateways: {}
+    },
+    {
+        id: 2,
+        transaction: 'Envío de transferencias QR',
+        tooltip: 'Información sobre transferencias QR',
+        gateways: {}
+    }
+])
+
+// Usar el composable de opciones - RENOMBRA loading para evitar conflicto
+const { paymentGatewayOptions, loading: optionsLoading } = useOptions()
+
+// Función para cargar las opciones de payment gateways
+const onGatewayChange = (data, gateway, event) => {
+  console.log('Cambio en:', data.transaction, 'Gateway:', gateway, 'Valor:', event)
+}
+
 // MAPEO DE CÓDIGOS DE CANAL
 const channelCodeMap = {
     'ACL': '1426',
     'MLD': '1000', 
-    'LIP': '900',
-    'UNILINK': '995'
 };
-
 
 // Configuración de canales
 const channelOptions = ref([
     { value: 'ACL', label: 'ACL' }, 
     { value: 'MLD', label: 'MLD' },
-    { value: 'LIP', label: 'LIP' },  
-    { value: 'UNILINK', label: 'UNILINK' }
 ]);
 
 const selectedChannelValue = ref('');
@@ -417,7 +575,6 @@ const participantCodes = computed(() => {
     return [];
 });
 
-
 // DETECTAR SI SON MÚLTIPLES BANCOS
 const isMultipleBanks = computed(() => {
     return participantCodes.value.length > 1;
@@ -428,12 +585,11 @@ const pageTitle = computed(() => {
     const action = isChannelChange.value ? 'Cambiar canal' : 'Establecer contingencia';
 
     if (isMultipleBanks.value) {
-        return `${action} - ${getBankNames.value}`;
+        return `${action}`;
     }
     
-    return `${action} - ${getBankNames.value}`;
+    return `${action}`;
 });
-
 
 const pageDescription = computed(() => {
     return isChannelChange.value 
@@ -487,8 +643,6 @@ const handleSaveClick = () => {
         visibleContingency.value = true;
     }
 };
-
-
 
 // FUNCIÓN PARA CONSTRUIR DATOS DEL SERVICIO - CORREGIDA
 const buildServicePayload = () => {
@@ -617,7 +771,6 @@ const buildServicePayload = () => {
     return { participants };
 };
 
-
 // FUNCIÓN PARA CONFIRMAR Y GUARDAR
 const saveConfirm = async () => {
     try {
@@ -718,7 +871,7 @@ const loadPaymentGatewayData = async () => {
     }
 };
 
-// FUNCIONES DE ARCHIVOS (sin cambios)
+// FUNCIONES DE ARCHIVOS
 const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;

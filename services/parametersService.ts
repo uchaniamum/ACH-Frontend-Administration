@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { ParameterDetailResponse, ParameterSaveResponse, ParametersListResponse } from "~/features/parameters/types";
+import type { ParameterDetailHistorialResponse, ParameterDetailResponse, ParameterSaveResponse, ParametersListResponse } from "~/features/parameters/types";
 
 class ParameterService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -51,6 +51,13 @@ class ParameterService {
             method: 'PATCH',
             body: JSON.stringify(parameterData)
         });
+    }
+
+    async getParameterHistorical(code: string): Promise<ParameterDetailHistorialResponse> {
+        if (!code) {
+            throw new Error('Parameter code is required')
+        }
+        return this.request<ParameterDetailHistorialResponse>(`historical-parameters/${code}`)
     }
 }
 

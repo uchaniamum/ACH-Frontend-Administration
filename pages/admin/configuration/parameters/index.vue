@@ -7,7 +7,6 @@
         </XHeader>
 
         <div class="flex flex-col gap-12">
-            <template>
                 <p class="text-gray-800">Selecciona los canales que deseas ver en la tabla.</p>
 
                 <div class="flex flex-row justify-between">
@@ -102,6 +101,7 @@
                                         />
                                         <XButton 
                                             label="Ver historial"
+                                            @click="openHistoModal(data)"
                                         />
                                     </div>
                                 </template>
@@ -117,7 +117,6 @@
                         />
                     </div>
                 </div>
-            </template>
         </div>
 
         <ParameterModal 
@@ -125,10 +124,16 @@
             :parameterData="modalStateParameter.parameterData"
             @save="handleParameterSaved"
         />
+
+        <ParameterHistorialModal 
+            v-model="modalStateHistoParameter.modalParameterHistorial" 
+            :parameterHistoData="modalStateHistoParameter.parameterHistoData"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
+import ParameterHistorialModal from '~/features/parameters/ParameterHistorialModal.vue';
 import ParameterModal from '~/features/parameters/ParameterModal.vue';
 import type { ParameterListItem, ParameterModalData } from '~/features/parameters/types';
 import type { ServiceError } from '~/features/users/types';
@@ -212,6 +217,14 @@ const modalStateParameter = ref<{
     parameterData: undefined
 })
 
+const modalStateHistoParameter = ref<{
+    modalParameterHistorial: boolean,
+    parameterHistoData?: ParameterModalData,
+}>({
+    modalParameterHistorial: false,
+    parameterHistoData: undefined
+})
+
 // Methods
 const loadParameters = async (): Promise<void> => {
     loading.value = true
@@ -241,6 +254,21 @@ const openEditModal = (parameterData: ParameterListItem) => {
             value: parameterData.value,
             description: parameterData.description,
             dataType: parameterData.dataType,
+        }
+    }
+}
+
+const openHistoModal = (parameterData: ParameterListItem) => {
+    console.log('Opening historial modal for:', parameterData);
+    
+    modalStateHistoParameter.value = {
+        modalParameterHistorial: true,
+        parameterHistoData: {
+            code: parameterData.code,
+            value: parameterData.value,           // Agregar estos campos
+            description: parameterData.description, // que faltaban
+            dataType: parameterData.dataType,      // en la función original
+            systemAcronym: parameterData.systemAcronym
         }
     }
 }

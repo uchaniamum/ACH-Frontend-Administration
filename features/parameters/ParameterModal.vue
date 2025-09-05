@@ -12,7 +12,7 @@
     <div class="flex flex-col gap-8">
         <XCard class="border border-gray-400 flex gap-2 text-gray-900">
             <template #header>
-                <div class="font-bold">{{ parameterDetails?.code }}</div>
+                <div class="font-bold">{{ props.parameterData?.code }}</div>
             </template>
             <template #content>
                 <div class="flex flex-col">

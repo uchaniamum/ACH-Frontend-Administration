@@ -165,6 +165,25 @@ class OptionsService {
             }))
     }
 
+        // Nuevos métodos para PaymentGateways
+    mapPaymentGatewaysToSelectOptions(gateways: PaymentGatewayOp[]) {
+        return gateways
+            .sort((a, b) => a.order - b.order)
+            .map(gateway => ({
+                label: gateway.displayName,
+                value: gateway.code,
+            }))
+    }
+
+    mapPaymentGatewaysToFilterOptions(gateways: PaymentGatewayOp[]) {
+        return gateways
+            .sort((a, b) => a.order - b.order)
+            .map(gateway => ({
+                label: gateway.displayName,
+                value: this.formatCodeToLabel(gateway.code),
+            }))
+    }
+
     convertToBackendFormat(code: string): string {
         return code.toUpperCase()
     }

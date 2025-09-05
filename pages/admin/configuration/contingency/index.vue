@@ -256,10 +256,10 @@ const transformContingencyData = (banks: PaymentGatewayBankList): ContingencyTab
         };
 
         // Buscar cada tipo de transacción por su código numérico
-        const envioRegular = findTransactionByCode('22');
-        const envioQR = findTransactionByCode('62');  
-        const recepcionRegular = findTransactionByCode('220');
-        const recepcionQR = findTransactionByCode('620');
+        const envioRegular = findTransactionByCode('IASYNC_ACCL');
+        const envioQR = findTransactionByCode('OASYNC_ACCL');  
+        const recepcionRegular = findTransactionByCode('IQR_ACCL');
+        const recepcionQR = findTransactionByCode('OQR_ACCL');
 
         // Función para calcular contingencia
         const calculateContingency = (transaction: any) => {
@@ -392,7 +392,7 @@ const loadContingency = async (): Promise<void> => {
     loading.value = true;
     try {
         const response = await contingencyService.getBanks();
-        contingencyData.value = response.data; // Directamente la respuesta, no response.banks
+        contingencyData.value = response; // Directamente la respuesta, no response.banks
     } catch (error) {
         console.error('Error loading contingency:', error);
         const serviceError = error as ServiceError;

@@ -38,10 +38,6 @@ export interface ParameterDetailResponse {
 }
 
 
-// export interface ParameterDetailListResponse {
-//     parameters:  ParameterDetailResponse[]
-// }
-
 export interface ParameterSaveResponse {
     wasSaved: boolean
     wasNew: boolean
@@ -52,5 +48,15 @@ export interface ParameterSaveResponse {
     traceId: string
 }
 
+export interface ParameterDetailHisto {
+    updatedAt: string;
+    updatedByUser: string;
+    value: string;
+}
 
-
+export interface ParameterDetailHistorialResponse {
+    code: string;
+    dataType: string;
+    description: string;
+    parameters: ParameterDetailHisto[];
+}
