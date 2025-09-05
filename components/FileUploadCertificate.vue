@@ -1,15 +1,14 @@
 <template>
   <div class="flex flex-col gap-8">
     <span class="text-gray-700">Ingresa el archivo del certificado público para cargarlo y verificar sus datos</span>
-    <XFileUpload ref="fileupload" name="certificateFiles" accept=".pfx,.txt"
-      :maxFileSize="1000000" @select="onFileSelect" :showUploadButton="false" :showCancelButton="false"
+    <XFileUpload modelValue="test" ref="fileupload" name="certificateFiles" :accept="documentsAccepted"
+      :maxFileSize="5000000" :fileLimit="1" @select="onFileSelect" :showUploadButton="false" :showCancelButton="false"
       chooseLabel="Elegir archivo" :auto="false">
       <template #empty>
         <div class="mb-6 mt-4 px-[1.714rem]">
           <span class="text-normal font-normal">Arrastra y suelta archivos aquí para subirlos.</span>
         </div>
       </template>
-
       <template #content="{ files, removeFileCallback }">
         <div class="p-fileupload-file-list">
           <div v-for="(file, index) in files" :key="index" class="p-fileupload-file">
@@ -20,6 +19,7 @@
               <div class="p-fileupload-file-name">{{ file.name }}</div>
               <span class="p-fileupload-file-size">{{ formatFileSize(file.size) }}</span>
             </div>
+            <!-- <p>{{ getFileStatus(file).isLoaded }}</p> -->
             <span v-if="getFileStatus(file).isLoaded"
               class="p-badge p-component p-badge-success p-fileupload-file-badge px-4">
               Carga Completa
@@ -37,61 +37,19 @@
               </button>
             </div>
           </div>
-          <div v-if="hasFilesLoaded">
-            <XDivider v-if="!isVerified" />
-            <div class="flex flex-col items-center pt-12 px-12" v-if="!isVerifying && !isVerified">
-              <XButton v-if="!isVerifying && !isVerified" label="Verificar certificado" class="w-[160px]"
-                @click="verifyCertificate(files)" :disabled="!hasFilesLoaded" />
-            </div>
-            <div v-if="isVerifying" class="w-full">
-              <div class="flex items-center justify-center gap-3 mb-3">
-                <Icon name="x:loader" class="text-primary-500 animate-spin text-xl" />
-                <span class="text-gray-700">Verificando certificado...</span>
-              </div>
-              <ProgressSpinner class="flex justify-center" :value="verificationProgress"
-                style="width: 50px; height: 50px" strokeWidth="8" fill="transparent" />
-            </div>
-          </div>
         </div>
       </template>
     </XFileUpload>
-
-    <div v-if="isVerified" class="flex flex-col gap-8">
-      <span class="text-gray-700">Asegúrate que los datos del certificado son correctos para registrarlo.</span>
-      <DataTable :value="verificationData">
-        <Column field="nroSerie" header="Nro. de serie">
-          <template #body="{ data }">
-            {{ data.nroSerie }}
-          </template>
-        </Column>
-        <Column field="validacionInicio" header="Válido desde">
-          <template #body="{ data }">
-            <span>{{ data.validacionInicio }}</span>
-          </template>
-        </Column>
-        <Column field="validacionFin" header="Válido hasta">
-          <template #body="{ data }">
-            <span>{{ data.validacionFin }}</span>
-          </template>
-        </Column>
-      </DataTable>
-      <XTextarea name="justification" v-model="justification" label="Justificación" label-required
-        placeholder="Ingresar motivo" />
-    </div>
     <XDivider />
-    <div class="flex flex-row justify-end gap-4">
-      <XButton @click="close()" variant="outlined" label="Cancelar" />
-      <XButton @click="saveConfirmRegister()" label="Registrar" :disabled="isChargedFile"/>
-    </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { channelsService } from '~/services/channelsService'
 import { participantsService } from '~/services/participantsService'
 
-// const props = defineProps<{
-//   reset:boolean
-// }>();
+const { documentsAccepted = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.text,.pfx" } = defineProps<{
+  documentsAccepted?: string,
+}>();
 
 const toast = useToast()
 
@@ -119,7 +77,7 @@ export interface CertificateVerificationRequest {
 }
 
 const emit = defineEmits<{
-  'registered': [value:boolean],
+  'registered': [value:any],
   'verification-complete': [data: any]
 }>()
 
@@ -137,7 +95,7 @@ const saveConfirmRegister = () => {
       justification: justification.value,
       certificateInfo: verificationData.value[0],
     })
-  emit('registered', isVerified.value)
+  // emit('registered', isVerified.value)
   console.log('se emitio')
 }
 
@@ -159,12 +117,17 @@ const onFileSelect = async (event: any) => {
   selectedFile.value = null
   fileBase64.value = ''
 
-  if (event.files.length === 0) return
+  if (event.files.length > 1) {
+    event.files.shift()
+    onFileSelect(event);
+    return
+  }
 
   const file = event.files[0]
   selectedFile.value = file
 
   // Inicializar estado del archivo
+  if (!file) return null
   const fileKey = getFileKey(file)
   if (!fileStates.has(fileKey)) {
     fileStates.set(fileKey, {
@@ -177,7 +140,9 @@ const onFileSelect = async (event: any) => {
     try {
       fileBase64.value = await fileToBase64(file)
       console.log('Archivo convertido a Base64')
-
+      emit('registered',{
+        base64Content: fileBase64.value
+      })
     } catch (error) {
       console.error('Error procesando archivo:', error)
       toast.add({
@@ -233,10 +198,7 @@ const formatFileSize = (bytes: any) => {
 
 const getFileStatus = (file: any) => {
   const fileKey = getFileKey(file)
-  return fileStates.get(fileKey) || {
-    isLoaded: false,
-    progress: 0
-  }
+  return fileStates.get(fileKey) || { isLoaded: false, progress: 0 }
 }
 
 const formatDate = (dateString: string) => {
