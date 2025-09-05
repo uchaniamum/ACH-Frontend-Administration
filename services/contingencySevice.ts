@@ -33,8 +33,8 @@ class ContingencyService {
 
     // Endpoint 1: Obtener lista de bancos
     async getBanks(filters?: BankFilters): Promise<PaymentGatewayBankList> {
-        let endpoint = 'payment-gateways-transaction/contingency';
-
+        //let endpoint = 'payment-gateways-transaction/contingency';
+        let endpoint = 'participants/route-maps-xxx';
         if (filters) {
             const params = new URLSearchParams();
             if (filters.participantCode) params.append('participantCode', filters.participantCode);
@@ -56,12 +56,19 @@ class ContingencyService {
         if (!participantCode) {
             throw new Error('Participant code is required');
         }
+        return this.request<PaymentGatewayBankDetail>(`participants/route-maps-xxx`);
+    }
+
+    async getBankByCodeAnterior(participantCode: string): Promise<PaymentGatewayBankDetail> {
+        if (!participantCode) {
+            throw new Error('Participant code is required');
+        }
         return this.request<PaymentGatewayBankDetail>(`payment-gateways-transaction-contingency/${participantCode}`);
     }
 
     // Endpoint 3: Actualizar configuración de bancos (PUT)
     async updateBankConfiguration(bankData: BankUpdateRequest): Promise<PaymentGatewayUpdateResponse> {
-        return this.request<PaymentGatewayUpdateResponse>('contingency', {
+        return this.request<PaymentGatewayUpdateResponse>('payment-gateways-transaction-contingency', {
             method: 'PUT',
             body: JSON.stringify(bankData)
         });

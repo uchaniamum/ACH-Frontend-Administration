@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-16">
-        <XHeader title="Gestión de contingencia" :breadcrumb-items="itemsBreadContingency" :show-breadcrumb="true">
+        <XHeader title="Configuración de contingencia " :breadcrumb-items="itemsBreadContingency" :show-breadcrumb="true">
             <template #description>
                 <p>Administra los canales para garantizar la continuidad de las operaciones y establecer contingencias específicas para cada participante.</p>
             </template>
@@ -61,7 +61,7 @@
                 @page="onPageChange"
             >
                 <!-- Columna de Checkbox --> 
-                <Column :showFilterMenu="false" class="w-[75px]" >
+                <Column :showFilterMenu="false" class="min-w-[75px]" >
                     <template #header>
                         <XCheckBox 
                             :modelValue="isAllSelected"
@@ -80,7 +80,7 @@
                 </Column>
 
                 <!-- Columna de Entidad bancaria -->
-                <Column field="participantName" header="Entidad bancaria" sortable :showFilterMenu="false" class="w-[209px]" >
+                <Column field="participantName" header="Entidad bancaria" sortable :showFilterMenu="false" class="min-w-[209px]" >
                     <template #body="{ data }">
                         {{ data.participantName }}
                     </template>
@@ -99,7 +99,7 @@
                 </Column>
 
                 <!-- Envío de Transferencias Interbancarias Regular -->
-                <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="w-[209px]">
+                <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
@@ -126,7 +126,7 @@
                 </Column>
 
                 <!-- Envío de Transferencias QR -->
-                <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="w-[209px]">
+                <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
@@ -153,7 +153,7 @@
                 </Column>
 
                 <!-- Recepción Transferencia Interbancaria Regular -->
-                <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="w-[209px]">
+                <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
@@ -180,7 +180,7 @@
                 </Column>
 
                 <!-- Recepción de Transferencias QR -->
-                <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="w-[209px]">
+                <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
@@ -240,70 +240,221 @@ const itemsBreadContingency = ref([
     { label: 'Contingencia' },
 ]);
 
+// const transformContingencyData = (banks: PaymentGatewayBankList): ContingencyTableRow[] => {
+//     return banks.map(bank => {
+//         const findTransactionByCode = (targetCode: string) => {
+//             return bank.transactions.find(transaction => {
+//                 return transaction.transactionCode === targetCode;
+//             });
+//         };
 
+//         // Buscar cada tipo de transacción por su código completo según la imagen
+//         const envioRegular = findTransactionByCode('IASYNC');        // Envío Interbancarias
+//         const envioQR = findTransactionByCode('IQR');                // Envío QR  
+//         const recepcionRegular = findTransactionByCode('OASYNC');    // Recepción Interbancarias
+//         const recepcionQR = findTransactionByCode('OQR');            // Recepción QR
 
-const transformContingencyData = (banks: PaymentGatewayBankList): ContingencyTableRow[] => {
+//         console.log('hola', envioRegular);
+
+//         // Función para calcular contingencia
+//         const calculateContingency = (transaction: any) => {
+//             if (!transaction) return false;
+//             // Una contingencia está activa si el canal principal está deshabilitado O el secundario está habilitado
+//             return transaction.paymentGateways.isPrimary;
+//         };
+
+        
+
+//         return {
+//             participantCode: bank.participantCode,
+//             participantName: bank.participantName,
+//             envioRegular: {
+//                 mainGateway: envioRegular?.paymentGateways.paymentGatewayCode || 'N/A',
+//                 secondaryGateway: envioRegular?.secondaryPaymentGatewayDescription || 'N/A',
+//                 contingencyEnabled: calculateContingency(envioRegular),
+//                 mainEnabled: envioRegular?.mainPaymentGatewayEnabled,
+//                 secondaryEnabled: envioRegular?.secondaryPaymentGatewayEnabled,
+//             },
+//             envioQR: {
+//                 mainGateway: envioQR?.mainPaymentGatewayCodeDescription || 'N/A',
+//                 secondaryGateway: envioQR?.secondaryPaymentGatewayDescription || 'N/A',
+//                 contingencyEnabled: calculateContingency(envioQR),
+//                 mainEnabled: envioQR?.mainPaymentGatewayEnabled,
+//                 secondaryEnabled: envioQR?.secondaryPaymentGatewayEnabled,
+//             },
+//             recepcionRegular: {
+//                 mainGateway: recepcionRegular?.mainPaymentGatewayCodeDescription || 'N/A',
+//                 secondaryGateway: recepcionRegular?.secondaryPaymentGatewayDescription || 'N/A',
+//                 contingencyEnabled: calculateContingency(recepcionRegular),
+//                 mainEnabled: recepcionRegular?.mainPaymentGatewayEnabled,
+//                 secondaryEnabled: recepcionRegular?.secondaryPaymentGatewayEnabled,
+//             },
+//             recepcionQR: {
+//                 mainGateway: recepcionQR?.mainPaymentGatewayCodeDescription || 'N/A',
+//                 secondaryGateway: recepcionQR?.secondaryPaymentGatewayDescription || 'N/A',
+//                 contingencyEnabled: calculateContingency(recepcionQR),
+//                 mainEnabled: recepcionQR?.mainPaymentGatewayEnabled,
+//                 secondaryEnabled: recepcionQR?.secondaryPaymentGatewayEnabled,
+//             }
+//         };
+//     });
+// };
+
+// Computed para datos transformados
+
+// const transformContingencyData = (data: any): ContingencyTableRow[] => {
+//     return data.participants.map((participant: any) => {
+//         const findTransactionByCode = (targetCode: string) => {
+//             return participant.transactions.find((transaction: any) => {
+//                 return transaction.transactionCode === targetCode;
+//             });
+//         };
+
+//         // Buscar cada tipo de transacción por su código completo
+//         const envioRegular = findTransactionByCode('IASYNC');      // Envío Interbancarias
+//         const envioQR = findTransactionByCode('IQR');              // Envío QR  
+//         const recepcionRegular = findTransactionByCode('OASYNC');  // Recepción Interbancarias
+//         const recepcionQR = findTransactionByCode('OQR');          // Recepción QR
+
+//         // Función para extraer información del gateway
+//         const extractGatewayInfo = (transaction: any) => {
+//             if (!transaction || !transaction.paymentGateways || transaction.paymentGateways.length === 0) {
+//                 return {
+//                     mainGateway: 'N/A',
+//                     secondaryGateway: 'N/A',
+//                     contingencyEnabled: false,
+//                     mainEnabled: false,
+//                     secondaryEnabled: false,
+//                     contingencyTitle: '',
+//                     contingencyDetail: '',
+//                     isTemporarilyActive: false
+//                 };
+//             }
+
+//             // Tomar el primer gateway (o el primario si existe)
+//             const primaryGateway = transaction.paymentGateways.find((gw: any) => gw.isPrimary) || 
+//                                  transaction.paymentGateways[0];
+
+//             return {
+//                 mainGateway: primaryGateway.paymentGatewayAcronym || 'N/A',
+//                 secondaryGateway: 'N/A', // En la nueva estructura no hay gateway secundario explícito
+//                 contingencyEnabled: !primaryGateway.isOperational || primaryGateway.isTemporarilyActive,
+//                 mainEnabled: primaryGateway.isOperational,
+//                 secondaryEnabled: primaryGateway.isTemporarilyActive,
+//                 contingencyTitle: primaryGateway.contingencyTitle || '',
+//                 contingencyDetail: primaryGateway.contingencyDetail || '',
+//                 isTemporarilyActive: primaryGateway.isTemporarilyActive || false
+//             };
+//         };
+
+//         return {
+//             participantCode: participant.participantCode,
+//             participantName: participant.participantName,
+//             envioRegular: extractGatewayInfo(envioRegular),
+//             envioQR: extractGatewayInfo(envioQR),
+//             recepcionRegular: extractGatewayInfo(recepcionRegular),
+//             recepcionQR: extractGatewayInfo(recepcionQR)
+//         };
+//     });
+// };
+
+const transformContingencyData = (banks: any[]): ContingencyTableRow[] => {
     return banks.map(bank => {
         const findTransactionByCode = (targetCode: string) => {
-            return bank.Transactions.find(transaction => {
-                // Extraer solo los números del transactionCode
-                const codeMatch = transaction.transactionCode.match(/(\d+)/);
-                if (!codeMatch) return false;
-                
-                const numericCode = codeMatch[1];
-                return numericCode === targetCode;
+            return bank.transactions.find(transaction => {
+                return transaction.transactionCode === targetCode;
             });
         };
 
-        // Buscar cada tipo de transacción por su código numérico
-        const envioRegular = findTransactionByCode('IASYNC_ACCL');
-        const envioQR = findTransactionByCode('OASYNC_ACCL');  
-        const recepcionRegular = findTransactionByCode('IQR_ACCL');
-        const recepcionQR = findTransactionByCode('OQR_ACCL');
+        // Buscar cada tipo de transacción por su código
+        const envioRegular = findTransactionByCode('IASYNC');        // Envío Interbancarias
+        const envioQR = findTransactionByCode('IQR');                // Envío QR  
+        const recepcionRegular = findTransactionByCode('OASYNC');    // Recepción Interbancarias
+        const recepcionQR = findTransactionByCode('OQR');            // Recepción QR
+
+        // Función para obtener el gateway principal (isPrimary: true)
+        const getPrimaryGateway = (transaction: any) => {
+            if (!transaction || !transaction.paymentGateways) return null;
+            return transaction.paymentGateways.find((gateway: any) => gateway.isPrimary);
+        };
+
+        // Función para obtener gateways secundarios (isPrimary: false)
+        const getSecondaryGateways = (transaction: any) => {
+            if (!transaction || !transaction.paymentGateways) return [];
+            return transaction.paymentGateways.filter((gateway: any) => !gateway.isPrimary);
+        };
 
         // Función para calcular contingencia
         const calculateContingency = (transaction: any) => {
             if (!transaction) return false;
-            // Una contingencia está activa si el canal principal está deshabilitado O el secundario está habilitado
-            return !transaction.mainPaymentGatewayEnabled || transaction.secondaryPaymentGatewayEnabled;
+            
+            const primaryGateway = getPrimaryGateway(transaction);
+            const secondaryGateways = getSecondaryGateways(transaction);
+            
+            // Hay contingencia si:
+            // 1. El gateway principal NO está operacional O
+            // 2. Hay algún gateway secundario que esté operacional y temporalmente activo
+            const primaryNotOperational = primaryGateway && !primaryGateway.isOperational;
+            const hasActiveSecondary = secondaryGateways.some((gateway: any) => 
+                gateway.isOperational && gateway.isTemporarilyActive
+            );
+            
+            return primaryNotOperational || hasActiveSecondary;
         };
+
+        // Función para formatear la descripción del gateway
+        const formatGatewayDescription = (gateway: any) => {
+            if (!gateway) return 'N/A';
+            return `${gateway.paymentGatewayAcronym} - ${gateway.isOperational ? 'Operacional' : 'No Operacional'}`;
+        };
+
+        // Obtener gateways primarios
+        const primaryEnvioRegular = getPrimaryGateway(envioRegular);
+        const primaryEnvioQR = getPrimaryGateway(envioQR);
+        const primaryRecepcionRegular = getPrimaryGateway(recepcionRegular);
+        const primaryRecepcionQR = getPrimaryGateway(recepcionQR);
+
+        // Obtener gateways secundarios (tomamos el primero si existe)
+        const secondaryEnvioRegular = getSecondaryGateways(envioRegular)[0] || null;
+        const secondaryEnvioQR = getSecondaryGateways(envioQR)[0] || null;
+        const secondaryRecepcionRegular = getSecondaryGateways(recepcionRegular)[0] || null;
+        const secondaryRecepcionQR = getSecondaryGateways(recepcionQR)[0] || null;
 
         return {
             participantCode: bank.participantCode,
             participantName: bank.participantName,
             envioRegular: {
-                mainGateway: envioRegular?.mainPaymentGatewayCodeDescription || 'N/A',
-                secondaryGateway: envioRegular?.secondaryPaymentGatewayDescription || 'N/A',
+                mainGateway: formatGatewayDescription(primaryEnvioRegular),
+                secondaryGateway: formatGatewayDescription(secondaryEnvioRegular),
                 contingencyEnabled: calculateContingency(envioRegular),
-                mainEnabled: envioRegular?.mainPaymentGatewayEnabled,
-                secondaryEnabled: envioRegular?.secondaryPaymentGatewayEnabled,
+                mainEnabled: primaryEnvioRegular?.isOperational || false,
+                secondaryEnabled: secondaryEnvioRegular?.isOperational || false,
             },
             envioQR: {
-                mainGateway: envioQR?.mainPaymentGatewayCodeDescription || 'N/A',
-                secondaryGateway: envioQR?.secondaryPaymentGatewayDescription || 'N/A',
+                mainGateway: formatGatewayDescription(primaryEnvioQR),
+                secondaryGateway: formatGatewayDescription(secondaryEnvioQR),
                 contingencyEnabled: calculateContingency(envioQR),
-                mainEnabled: envioQR?.mainPaymentGatewayEnabled,
-                secondaryEnabled: envioQR?.secondaryPaymentGatewayEnabled,
+                mainEnabled: primaryEnvioQR?.isOperational || false,
+                secondaryEnabled: secondaryEnvioQR?.isOperational || false,
             },
             recepcionRegular: {
-                mainGateway: recepcionRegular?.mainPaymentGatewayCodeDescription || 'N/A',
-                secondaryGateway: recepcionRegular?.secondaryPaymentGatewayDescription || 'N/A',
+                mainGateway: formatGatewayDescription(primaryRecepcionRegular),
+                secondaryGateway: formatGatewayDescription(secondaryRecepcionRegular),
                 contingencyEnabled: calculateContingency(recepcionRegular),
-                mainEnabled: recepcionRegular?.mainPaymentGatewayEnabled,
-                secondaryEnabled: recepcionRegular?.secondaryPaymentGatewayEnabled,
+                mainEnabled: primaryRecepcionRegular?.isOperational || false,
+                secondaryEnabled: secondaryRecepcionRegular?.isOperational || false,
             },
             recepcionQR: {
-                mainGateway: recepcionQR?.mainPaymentGatewayCodeDescription || 'N/A',
-                secondaryGateway: recepcionQR?.secondaryPaymentGatewayDescription || 'N/A',
+                mainGateway: formatGatewayDescription(primaryRecepcionQR),
+                secondaryGateway: formatGatewayDescription(secondaryRecepcionQR),
                 contingencyEnabled: calculateContingency(recepcionQR),
-                mainEnabled: recepcionQR?.mainPaymentGatewayEnabled,
-                secondaryEnabled: recepcionQR?.secondaryPaymentGatewayEnabled,
+                mainEnabled: primaryRecepcionQR?.isOperational || false,
+                secondaryEnabled: secondaryRecepcionQR?.isOperational || false,
             }
         };
     });
 };
 
-// Computed para datos transformados
 const transformedContingency = computed(() => {
     return transformContingencyData(contingencyData.value);
 });
@@ -392,7 +543,8 @@ const loadContingency = async (): Promise<void> => {
     loading.value = true;
     try {
         const response = await contingencyService.getBanks();
-        contingencyData.value = response; // Directamente la respuesta, no response.banks
+        contingencyData.value = response.participants; // Directamente la respuesta, no response.banks
+        console.log('respons',response.participants);
     } catch (error) {
         console.error('Error loading contingency:', error);
         const serviceError = error as ServiceError;
