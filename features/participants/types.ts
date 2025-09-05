@@ -7,13 +7,13 @@ export interface ParticipantsList{
 }
 
 export interface ParticipantsDetail{
-    name: string,
-    acronym: string,
     code: string,
-    isSelf: boolean,
-    urlIcon: string,
+    paymentGatewayCode: string,
+    acronym: string,
+    name: boolean,
+    logo: string,
     paymentSystems?: PaymentSystems[];
-    references: string[];
+    // references: string[];
 }
 
 export interface PaymentSystems{
@@ -26,7 +26,6 @@ export interface PaymentSystems{
      base64Content: string,
      password: string
    },
-   isPrimary: boolean
 }
 
 export interface CertificatePublicParticipantVerificationRequest {
