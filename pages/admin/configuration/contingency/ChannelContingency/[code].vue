@@ -118,7 +118,12 @@
                             </template>
                         </div>
                         <div class="flex flex-col justify-center gap-8">
+
                             <div v-if="!isChannelChange" class="flex flex-col justify-center gap-8">
+                                <XSnackBar variant="warn">
+                                    <h5 class="font-semibold">Configuración de participantes</h5>
+                                    <p>Los participantes cuentan con distintas configuraciones. La nueva configuración que apliques se reflejará de manera uniforme en todos los participantes seleccionados.</p>
+                                </XSnackBar>
                                 <Divider align="left" type="solid">
                                     <b>Transacciones</b>
                                 </Divider>
@@ -135,10 +140,12 @@
                                                         <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
                                                     </span>
                                                 </div>
-                                                <XTag severity="success" value="Sin contingencia"></XTag>
+                                                <!-- <XTag severity="success" value="Sin contingencia"></XTag> -->
+                                                <XTag :severity="checkedContingency1 ? 'danger' : 'success'" 
+                                                    :value="checkedContingency1 ? 'Con contingencia' : 'Sin contingencia'"/>
                                             </div>
                                             <div class="self-center">
-                                                <XToggleSwitch v-model="checkedContingency"/>
+                                                <XToggleSwitch v-model="checkedContingency1"/>
                                             </div>
                                         </div>
                                     </template>
@@ -153,15 +160,17 @@
                                                         <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
                                                     </span>
                                                 </div>
-                                                <XTag severity="danger" value="Con Contingencia"></XTag>
+                                                <XTag :severity="checkedContingency2 ? 'danger' : 'success'" 
+                                                    :value="checkedContingency2 ? 'Con contingencia' : 'Sin contingencia'">
+                                                </XTag>
                                             </div>
                                             <div class="self-center">
-                                                <XToggleSwitch v-model="checkedContingency"/>
+                                                <XToggleSwitch v-model="checkedContingency2"/>
                                             </div>
                                         </div>
                                     </template>
                                 </XCard>
-                                 <XCard class="border border-gray-200 ">
+                                <XCard class="border border-gray-200 ">
                                     <template #content>
                                         <div class="flex flex-row justify-between">
                                             <div class="self-center">
@@ -171,10 +180,11 @@
                                                         <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
                                                     </span>
                                                 </div>
-                                                <XTag severity="success" value="Sin contingencia"></XTag>
+                                                <XTag :severity="checkedContingency3 ? 'danger' : 'success'" 
+                                                    :value="checkedContingency3 ? 'Con contingencia' : 'Sin contingencia'"/>
                                             </div>
                                             <div class="self-center">
-                                                <XToggleSwitch v-model="checkedContingency"/>
+                                                <XToggleSwitch v-model="checkedContingency3"/>
                                             </div>
                                         </div>
                                     </template>
@@ -189,8 +199,8 @@
                                                         <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
                                                     </span>
                                                 </div>
-                                                <XTag severity="danger" value="Con Contingencia"></XTag>
-                                            </div>
+                                                <XTag :severity="checkedContingency4 ? 'danger' : 'success'" 
+                                                    :value="checkedContingency4 ? 'Con contingencia' : 'Sin contingencia'"/>                                            </div>
                                             <div class="self-center">
                                                 <XToggleSwitch v-model="checkedContingency"/>
                                             </div>
@@ -389,7 +399,12 @@ const showParticipantsModal = ref(false);
 const justification = ref('');
 const titleContingency = ref('');
 const messageContingency = ref('');
-const checkedContingency = ref(false);
+
+const checkedContingency1 = ref(false);
+const checkedContingency2 = ref(false);
+const checkedContingency3 = ref(false);
+const checkedContingency4 = ref(false);
+
 const transInterbancaria = ref(false);
 const qrInterbancaria = ref(false);
 const transRecepcion = ref(false);
