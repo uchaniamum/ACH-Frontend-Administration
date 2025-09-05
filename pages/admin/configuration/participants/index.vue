@@ -1,13 +1,20 @@
 <template>
     <div>
-        <XHeader title="Gestión de Participantes" :breadcrumb-items="itemsBreadParticipants" :show-breadcrumb="true">
+        <XHeader @click="router.push('admin/configuration/participants/')" title="Gestión de Participantes" :breadcrumb-items="itemsBreadParticipants" :show-breadcrumb="true">
             <template #description>
                 <p>Registra participantes propios y destinatarios, actualiza sus datos y carga los certificados públicos y privados requeridos.</p>
             </template>
         </XHeader>
         <div class="pt-12 flex flex-col gap-12">
             <h5 class="text-lg text-gray-700">Selecciona el tipo de persona que realizará la solicitud.</h5>
-            <h3 class="text-[1.429rem] font-semibold">Participante propio</h3>
+            <h3 class="text-[1.429rem] font-semibold">Mi Perfil</h3>
+            <div v-if="participants.ownParticipants?.length < 1" class="flex justify-end">
+                <XButton 
+                    @click="navigateToNewParticipant('own')"
+                    label="Nuevo Participante" 
+                    icon="think-plus" 
+                    size="large" />
+            </div>
             <ParticipantsFields
                 :participants="{
                     ownParticipants: participants.ownParticipants || [],
@@ -15,6 +22,7 @@
                 }"
                 mode="ownParticipants"
                 :loading="loading"
+                @participantSelected="participantCodeMain =  $event"
             />
             <Divider/>
             <h3 class="text-[1.429rem] font-semibold">Participantes destinatarios</h3>
@@ -32,7 +40,7 @@
                 </div>
                 <div class="self-center">
                     <XButton 
-                        @click="navigateToNewParticipant"
+                        @click="navigateToNewParticipant('new')"
                         label="Nuevo Participante" 
                         icon="think-plus" 
                         size="large" />
@@ -65,6 +73,7 @@
 
 import { ref, computed } from 'vue';
 import ParticipantsFields from '~/components/fields/ParticipantsFields.vue';
+import { useFormRegisterParticipant } from '~/componsables/useFormRegisterParticipant';
 import type { ParticipantsList } from '~/features/participants/types';
 import type { ServiceError } from '~/features/users/types';
 import { participantsService } from '~/services/participantsService';
@@ -72,10 +81,19 @@ import { participantsService } from '~/services/participantsService';
 const router = useRouter();
 
 const participantCode = ref()
+const participantCodeMain = ref()
+
+watch(participantCodeMain, (newCode) => {
+    if (newCode) {
+        console.log(newCode)
+        // router.push(`/admin/configuration/participants/edith/${newCode}`);
+    }
+});
+
 watch(participantCode, (newCode) => {
     if (newCode) {
-        // console.log(newCode)
-        router.push(`/admin/configuration/participants/${newCode}`);
+        console.log(newCode)
+        router.push(`/admin/configuration/participants/edith/${newCode}`);
     }
 });
 
@@ -114,7 +132,7 @@ const filteredExternalParticipants = computed(() => {
 const paginatedExternalParticipants = computed(() => {
     const start = paginationFirstExternal.value;
     const end = start + paginationRowsExternal.value;
-    return filteredExternalParticipants.value.slice(start, end);
+    return filteredExternalParticipants.value.slice(start, end) ?? [];
 });
 
 const onSearchExternal = () => {
@@ -127,13 +145,39 @@ const onPageChange = (event: any) => {
     paginationRowsExternal.value = event.rows;
 };
 
-const loadParticipants = async (): Promise<void> => {
+const loadParticipantsExternal = async (): Promise<void> => {
     loading.value = true
     try {
-        const response = await participantsService.getParticipants({
+        let response = await participantsService.getParticipantsExternal({
             search: ''
         });
-        participants.value = response.data;
+        const responseOwn = await loadParticipantsOwn();
+        response = { ...response, ownParticipants: responseOwn}
+        participants.value = response
+    } catch (error) {
+        console.error('Error loading participants:', error)
+        const serviceError = error as ServiceError
+
+        console.error('Error:', serviceError.message || 'Error al cargar los participantes');
+        
+    } finally {
+        loading.value = false
+    }
+}
+
+const loadParticipantsOwn = async (): Promise<void> => {
+    loading.value = true
+    try {
+        const response = await participantsService.getParticipantsOwn({
+            search: ''
+        });
+        const data = {
+            ...response,
+            urlIcon: 'https://lpz.ucb.edu.bo/wp-content/uploads/2021/10/BNB.png'
+        }
+        console.log('participante propio response', data)
+        return [{...data}]
+        // return []
     } catch (error) {
         console.error('Error loading participants:', error)
         const serviceError = error as ServiceError
@@ -147,11 +191,15 @@ const loadParticipants = async (): Promise<void> => {
 
 // Lifecycle
 onMounted(() => {
-    loadParticipants()
+    loadParticipantsExternal()
 })
 
-const navigateToNewParticipant = () => {
-    router.push('/admin/configuration/participants/NewParticipant');
+// const navigateToNewParticipant = () => {
+//     router.push('/admin/configuration/participants/NewParticipant');
+// };
+
+const navigateToNewParticipant = (create:string) => {
+    router.push(`/admin/configuration/participants/create/${create}`);
 };
 
 </script>

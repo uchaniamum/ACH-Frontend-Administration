@@ -28,8 +28,8 @@ class ParticipantsService {
         }
     }
 
-    async getParticipants(filters?: { search?: string }): Promise<ParticipantsList[]> {
-        let endpoint = 'participants';
+    async getParticipantsExternal(filters?: { search?: string }): Promise<ParticipantsList[]> {
+        let endpoint = 'external-participants/';
         if (filters?.search) {
             const params = new URLSearchParams({ search: filters.search })
             endpoint += `?${params.toString()}`
@@ -37,8 +37,19 @@ class ParticipantsService {
         return this.request<ParticipantsList[]>(endpoint);
     }
 
+    async getParticipantsOwn(filters?: { search?: string }): Promise<ParticipantsList[]> {
+    let endpoint = 'own-participants';
+    if (filters?.search) {
+        const params = new URLSearchParams({ search: filters.search })
+        endpoint += `?${params.toString()}`
+    }
+    return this.request<ParticipantsList[]>(endpoint);
+    }
+    
+
     async registerCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
-        return this.request<void>('participants/public-certificates', {
+        console.log('service: ',data)
+        return this.request<void>('certificates/public-certificates-validate', {
             method: 'POST',
             body: JSON.stringify(data)
         });
@@ -48,23 +59,38 @@ class ParticipantsService {
         if (!code) {
             throw new Error('participant code is required')
         }
-        return this.request<any>(`participants/${code}`)
+        return this.request<any>(`external-participants/${code}`)
     }
 
     // Actualizar certificado publico
-    async updateCertificatePublicParticipant(data: CertificatePublicParticipantVerificationRequest): Promise<void> {
-        return this.request<void>('participants/public-certificate', {
+    async updateCertificatePublicParticipantExternal(data: CertificatePublicParticipantVerificationRequest, participantCode:string, paymentGatewayCode:string): Promise<void> {
+        console.log('el service es: ',data)
+        return this.request<void>(`external-participants/${participantCode}/payment-gateways/${paymentGatewayCode}/public-certificates`, {
             method: 'PUT',
             body: JSON.stringify(data)
         });
     }
 
     async registerNewParticipant(data: ParticipantsDetail): Promise<void> {
-    return this.request<void>('participants', {
+    return this.request<void>('external-participants', {
         method: 'POST',
         body: JSON.stringify(data)
     });
     }
+
+    async updateParticipantExternal(data: ParticipantsDetail): Promise<void> {
+    return this.request<void>('external-participants', {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    });
+    }
+
+     async getChannelsParticipantRegister(){
+        const { paymentGateways: { paymentGatewaysActive } } = await this.request<any>('options', {
+            method: 'GET'
+        })
+        return paymentGatewaysActive
+     }
 
 }
 

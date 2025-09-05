@@ -6,7 +6,7 @@
             class="border border-gray-400 flex gap-2 text-gray-900"
         >
             <template #header>
-                <div class="flex justify-between items-start">
+                <div class="flex justify-between items-start mt-10">
                     <!-- Parte izquierda: Logo + Nombre -->
                     <div class="flex gap-12">
                         <XAvatar
@@ -14,13 +14,13 @@
                             :image="participant.urlIcon"
                             class="w-20 h-20"
                         />
-                        <Icon v-else name="x:media-image" class="w-20 h-20 text-gray-400" />
+                        <Icon v-else name="x:bank" class="w-20 h-20 text-gray-400" />
                         <div>
                             <p class="text-sm text-gray-500">Entidad</p>
                             <p class="text-base font-semibold text-gray-900">{{ participant.name }}</p>
                         </div>
                     </div>
-                    <XButton label="Editar banco" icon="edit-pencil" variant="text" class="flex items-center gap-1" />
+                    <!-- <XButton @Click="router.push(`participants/edith/${participant.participantCode}`)"  label="Editar banco" icon="edit-pencil" variant="text" class="flex items-center gap-1" /> -->
                 </div>
             </template>
             <template #content>
@@ -43,7 +43,7 @@
             </template>
             <template #footer>
             <div class="mt-6  flex justify-end">
-                <XButton label="Ver canales"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
+                <XButton label="Editar Banco"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
             </div>
             </template>
         </XCard>
@@ -54,6 +54,7 @@
 import { XButton, XCard } from '#components';
 import type { ParticipantsDetail } from '~/features/participants/types';
 
+const router = useRouter()
 type ParticipantMode = 'ownParticipants' | 'externalParticipants';
 
 interface Props {
@@ -83,7 +84,7 @@ const currentParticipants = computed(() => {
 
 const formatPaymentSystems = (paymentSystems?: Array<{ paymentSystemAcronym: string }>) => {
     if (!paymentSystems?.length) return 'Ninguno';
-    return paymentSystems.map(sys => sys.paymentSystemAcronym).join(' / ');
+    return paymentSystems.map(sys => sys.acronym).join(' / ');
 };
 
 </script>
