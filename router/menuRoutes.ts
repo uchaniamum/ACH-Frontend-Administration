@@ -42,7 +42,7 @@ const menuConfigACH: MenuBarAdminConfig = {
             icon: 'reports',
         },
         {
-            label: 'Usuarios',
+            label: 'Usuarios',Ñ
             icon: 'user',
             to: '/admin/security/users'
         }
