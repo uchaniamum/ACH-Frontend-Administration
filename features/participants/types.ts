@@ -13,6 +13,7 @@ export interface ParticipantsDetail{
     name: boolean,
     logo: string,
     paymentSystems?: PaymentSystems[];
+    isSelf?: boolean
     // references: string[];
 }
 
@@ -41,4 +42,11 @@ export interface CertificateVerificationRequest {
     publicCertificate: {
     base64Content: string
   }
+}
+
+export interface CertificateVerificationPrivateRequest {
+    privateCertificate: {
+      base64Content: string,
+      password: string
+     }
 }

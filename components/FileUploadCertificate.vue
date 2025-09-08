@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-8">
     <span class="text-gray-700">Ingresa el archivo del certificado público para cargarlo y verificar sus datos</span>
-    <XFileUpload modelValue="test" ref="fileupload" name="certificateFiles" :accept="documentsAccepted"
+    <XFileUpload ref="fileupload" name="certificateFiles" :accept="documentsAccepted"
       :maxFileSize="5000000" :fileLimit="1" @select="onFileSelect" :showUploadButton="false" :showCancelButton="false"
       chooseLabel="Elegir archivo" :auto="false">
       <template #empty>
@@ -40,7 +40,6 @@
         </div>
       </template>
     </XFileUpload>
-    <XDivider />
   </div>
 </template>
 <script lang="ts" setup>
@@ -53,6 +52,7 @@ const { documentsAccepted = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.text,.pfx" } = def
 
 const toast = useToast()
 
+const fileupload = ref(null);
 const isVerifying = ref(false)
 const isVerified = ref(false)
 const verificationProgress = ref(0)
@@ -228,6 +228,10 @@ const fileToBase64 = (file: File): Promise<string> => {
     reader.onerror = error => reject(error)
   })
 }
+
+const removeCertificateFile = () => {
+  fileupload.value?.removeFile(0); 
+};
 
 const verifyCertificate = async () => {
   console.log('test')

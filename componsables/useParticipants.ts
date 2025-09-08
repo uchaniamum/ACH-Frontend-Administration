@@ -60,10 +60,65 @@ export function usePartipantsService() {
     }
     }
 
+    const chargeCertificatePrivate = async (data: any): Promise<any> => {
+        try {
+            console.log('data en el participante',data)
+            const response = await participantsService.registerCertificatePrivate(data)
+            return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'El certificado no es valido',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    const getHistorial = async (participantCode:string, paymentGatewayCode:string): Promise<any> => {
+    try {
+        const response = await participantsService.getHistorialChannel(participantCode, paymentGatewayCode)
+        return response
+    } catch (error) {
+        console.error('Error loading user details:', error)
+        const serviceError = error as ServiceError
+        showToast({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'El certificado no es valido',
+            life: 5000
+        })
+        return null
+    }
+    }
+
+
     const registerParticipant = async (data: any): Promise<any> => {
     try {
         console.log('composable', data)
         const response = await participantsService.registerNewParticipant(data)
+        console.log('la response es',response)
+        return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: serviceError.message || 'No se pudo registrar al participante',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    const registerParticipantOwn = async (data: any): Promise<any> => {
+    try {
+        console.log('composable', data)
+        const response = await participantsService.registerNOwnParticipant(data)
         console.log('la response es',response)
         return response
         } catch (error) {
@@ -120,7 +175,10 @@ export function usePartipantsService() {
         registerParticipant,
         getChannels,
         registerCertificatePublicExternal,
+        chargeCertificatePrivate,
         updateCertificatePublicParticipantExternal,
-        UpdateParticipantExrternal
+        UpdateParticipantExrternal,
+        registerParticipantOwn,
+        getHistorial
     }
 }

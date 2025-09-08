@@ -86,7 +86,7 @@ const participantCodeMain = ref()
 watch(participantCodeMain, (newCode) => {
     if (newCode) {
         console.log(newCode)
-        // router.push(`/admin/configuration/participants/edith/${newCode}`);
+        router.push(`/admin/configuration/participants/edith/${newCode}`);
     }
 });
 
@@ -176,7 +176,7 @@ const loadParticipantsOwn = async (): Promise<void> => {
             urlIcon: 'https://lpz.ucb.edu.bo/wp-content/uploads/2021/10/BNB.png'
         }
         console.log('participante propio response', data)
-        return [{...data}]
+        return [{...data, isSelf: true}]
         // return []
     } catch (error) {
         console.error('Error loading participants:', error)
