@@ -1,7 +1,8 @@
 <template>
+   <Toast position="top-right" />
    <div class="flex flex-col gap-20">
       <div class="flex flex-col gap-8">
-            <XHeader :title="`Editar destinatario - Tipo de alerta:${alert?.alertDescription} - ${alert?.paymentGatewayDescription}`" />
+            <XHeader :title="`Editar destinatario - Tipo de alerta:${alert?.alertDescription} - ${alert?.paymentGatewayDescription}`" @click="router.back()" class="cursor-pointer"/>
             <span>Asigna las alertas a destinatarios específicos, recuerda tener cuidado al registrarlos y/o actualizaros.</span>
       </div>
       <div class="flex flex-col mx-40">
@@ -20,12 +21,13 @@
 <script lang="ts" setup>
 import { useAlertsService } from '~/componsables/useAlerts'
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast'
 const { getAlertCode, updateEmails } = useAlertsService();
 const router = useRouter();
 const { params: { code, gateway }} = useRoute();
 const alert = ref()
 const emails = ref()
-
+const toast = useToast();
 onMounted(async () => {
     alert.value = await getAlertCode({ code, gateway })
     console.log('el valor alert',alert.value)
@@ -52,7 +54,13 @@ async function saveEmails(){
    try {
       const response = await updateEmails(data, code, gateway)
       if(response) {
-         return router.back()
+         toast.add({
+            severity: 'success',
+            summary: 'Registro de correo',
+            detail: 'El registro se realizo correctamente',
+            life: 5000
+         })
+         router.back()
       }
       console.log(response)
       console.log('result',convert)
