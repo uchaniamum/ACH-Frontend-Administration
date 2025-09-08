@@ -28,12 +28,12 @@ const menuConfigACH: MenuBarAdminConfig = {
                     to: '/admin/configuration/parameters',
                 },
                 {
-                    label: 'Alertas',
-                    to: '/admin/configuration/alerts'
-                },
-                {
                     label: 'Horarios',
                     to: '/admin/configuration/schedules'
+                },
+                {
+                    label: 'Alertas',
+                    to: '/admin/configuration/alertas'
                 }
             ]
         },
