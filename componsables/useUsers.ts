@@ -9,7 +9,7 @@ export function useUserModal() {
 
     const userDetails = ref<UserFormData>({
         code: '',
-        name: '',
+        fullname: '',
         email: '',
         alias: '',
         rol: '',
@@ -45,7 +45,7 @@ export function useUserModal() {
     const loadUserData = (userData: UserModalData) => {
         userDetails.value = {
             code: userData.code || '',
-            name: userData.fullname || '',
+            fullname: userData.fullname || '',
             email: userData.email || '',
             alias: userData.alias || '',
             rol: userData.roleCode || '',
@@ -58,7 +58,7 @@ export function useUserModal() {
     const resetForm = () => {
         userDetails.value = {
             code: '',
-            name: '',
+            fullname: '',
             email: '',
             alias: '',
             rol: '',
@@ -82,7 +82,7 @@ export function useUserModal() {
         // Methods
         openModal,
         closeModal,
-        loadUserData, // ← Esta función faltaba en el return
+        loadUserData,
         resetForm
     }
 }
@@ -96,40 +96,55 @@ export function useUserService() {
 
     const loadUserDetails = async (code: string): Promise<UserDetailResponse | null> => {
         try {
-            return await userService.getUserByCode(code)
+            const response = await userService.getUserByCode(code)
+            return response
+
         } catch (error) {
             console.error('Error loading user details:', error)
             const serviceError = error as ServiceError
             showToast({
                 severity: 'error',
                 summary: 'Error',
-                detail: serviceError.message || 'No se pudieron cargar los detalles del usuario',
+                detail: serviceError.message || 'No se logro cargar los detalles del usuario',
                 life: 5000
             })
             return null
         }
     }
-    const saveUser = async (userData: UserFormData, isEdit: boolean): Promise<boolean> => {
+    const saveUser = async (userData: UserRequest, isEdit: boolean): Promise<boolean> => {
         try {
-            const apiPayload: UserRequest = {
+            const apiPayload = {
                 code: userData.code,
                 email: userData.email,
                 alias: userData.alias,
-                fullname: userData.name,
+                fullname: userData.fullname,
                 phone: {
-                    countryCode: userData.countryCode,
-                    number: userData.numberPhone,
-                    isMobile: true,
+                    countryCode: userData.phone?.countryCode,
+                    number: userData.phone?.number,
+                    isMobile: userData.phone?.isMobile,
                     verificationHash: ""
                 },
-                roleCode: userData.rol
+                roleCode: userData.roleCode
             }
 
+            const apiPayloadEdit = {
+                code: userData.code,
+                email: userData.email,
+                alias: userData.alias,
+                fullname: userData.fullname,
+                phone: {
+                    countryCode: userData.phone?.countryCode,
+                    number: userData.phone?.number,
+                    isMobile: userData.phone?.isMobile,
+                    verificationHash: ""
+                },
+                roleCode: userData.roleCode,
+                isActive: userData.isActive
+            }
             if (isEdit) {
-                const response = await userService.updateUser(apiPayload)
-
+                const response = await userService.updateUser(apiPayloadEdit)
                 // Verificar si la operación fue exitosa según la estructura de tu respuesta
-                if (response.wasSaved) {
+                if (response) {
                     showToast({
                         severity: 'success',
                         summary: 'Cambios guardados',
@@ -141,16 +156,16 @@ export function useUserService() {
                     showToast({
                         severity: 'error',
                         summary: 'Error',
-                        detail: response.message || response.description || 'No se pudo actualizar el usuario',
+                        detail: 'No se logro actualizar el usuario',
                         life: 8000
                     })
                     return false
                 }
             } else {
                 const response = await userService.createUser(apiPayload)
-
+                console.log('holasss', response);
                 // Verificar si la operación fue exitosa según la estructura de tu respuesta
-                if (response.wasSaved) {
+                if (response) {
                     showToast({
                         severity: 'success',
                         summary: 'Nuevo usuario',
@@ -162,7 +177,7 @@ export function useUserService() {
                     showToast({
                         severity: 'error',
                         summary: 'Error',
-                        detail: response.message || response.description || 'No se pudo crear el usuario',
+                        detail: 'No se pudo crear el usuario',
                         life: 5000
                     })
                     return false
@@ -184,8 +199,8 @@ export function useUserService() {
     const saveResetPassword = async (code: string): Promise<boolean> => {
         try {
             const response = await userService.resetPasswordUser(code)
-
-            if (response.wasSaved) {
+            console.log('Respomse reset: ', response);
+            if (response) {
                 showToast({
                     severity: 'success',
                     summary: 'Contraseña reseteada',
@@ -197,7 +212,7 @@ export function useUserService() {
                 showToast({
                     severity: 'error',
                     summary: 'Error',
-                    detail: response.message || response.description || 'No se pudo resetear la contraseña',
+                    detail: 'No se logro resetear la contraseña',
                     life: 8000
                 })
                 return false

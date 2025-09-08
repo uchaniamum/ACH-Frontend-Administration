@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { ParameterDetailResponse, ParameterListItem, ParameterSaveResponse } from "~/features/parameters/types";
+import type { ParameterDetailHistorialResponse, ParameterDetailResponse, ParameterSaveResponse, ParametersListResponse } from "~/features/parameters/types";
 
 class ParameterService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -28,19 +28,19 @@ class ParameterService {
         }
     }
 
-    async getParameters(filters?: { search?: string }): Promise<ParameterListItem[]> {
+    async getParameters(filters?: { search?: string }): Promise<ParametersListResponse> {
         let endpoint = 'parameters';
 
         if (filters?.search) {
             const params = new URLSearchParams({ search: filters.search })
             endpoint += `?${params.toString()}`
         }
-        return this.request<ParameterListItem[]>(endpoint);
+        return this.request<ParametersListResponse>(endpoint);
     }
 
     async getParameterByCode(code: string): Promise<ParameterDetailResponse> {
         if (!code) {
-            throw new Error('User code is required')
+            throw new Error('Parameter code is required')
         }
         return this.request<ParameterDetailResponse>(`parameters/${code}`)
     }
@@ -51,6 +51,13 @@ class ParameterService {
             method: 'PATCH',
             body: JSON.stringify(parameterData)
         });
+    }
+
+    async getParameterHistorical(code: string): Promise<ParameterDetailHistorialResponse> {
+        if (!code) {
+            throw new Error('Parameter code is required')
+        }
+        return this.request<ParameterDetailHistorialResponse>(`historical-parameters/${code}`)
     }
 }
 

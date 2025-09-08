@@ -10,6 +10,7 @@ export interface UserRequest {
         verificationHash: string
     }
     roleCode: string
+    isActive?: boolean
 }
 
 export interface PhoneNumber {
@@ -58,7 +59,7 @@ export interface UserSaveResponse {
 
 export interface UserFormData {
     code: string
-    name: string
+    fullname: string
     email: string
     alias: string
     rol: string
@@ -86,3 +87,4 @@ export interface ServiceError {
     code?: string
     traceId?: string
 }
+

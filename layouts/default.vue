@@ -3,7 +3,12 @@
         <XMenuBar :model="menuItems">
             <template #item="{ item, props, hasSubmenu }">
                 <template v-if="item.items">
-                    <a v-ripple class="flex align-items-center" v-bind="props.action">
+                    <a 
+                      v-ripple 
+                      class="flex align-items-center p-3" 
+                      v-bind="props.action"
+                      :class="{ 'menu-selected': selectedItemKey === item.key }"
+                    >
                       <Icon :name="`x:${item.icon}`" />
                       <span class="ml-2">{{ item.label }}</span>
                       <span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
@@ -12,10 +17,11 @@
                 <template v-else>
                     <NuxtLink 
                       v-ripple 
-                      class="flex align-items-center" 
+                      class="flex align-items-center p-3" 
                       :to="item.to" 
                       v-bind="props.action"
-                      :class="{ 'active-menu-item': isActive(item.to) }"
+                      :class="{ 'menu-selected': selectedItemKey === item.key }"
+                      @click="selectMenuItem(item)"
                     >
                       <Icon :name="`x:${item.icon}`" />
                       <span class="ml-2">{{ item.label }}</span>
@@ -35,13 +41,61 @@ import type { MenuBarAdminItem } from '../types/admin/menu.types';
 
 const route = useRoute();
 const menuItems = ref<MenuBarAdminItem[]>([]);
+const selectedItemKey = ref<string | null>(null);
 
 onMounted(() => {
-  menuItems.value = menuConfigACH.items;
+  menuItems.value = addKeysToMenuItems(menuConfigACH.items);
+  updateSelectedItemFromRoute();
 });
 
-const isActive = (to?: string) => {
-  if (!to) return false;
-  return route.path === to || route.path.startsWith(to + '/');
+// Observar cambios de ruta para actualizar la selección
+watch(() => route.path, () => {
+  updateSelectedItemFromRoute();
+});
+
+// Función para agregar keys únicos a los items del menú
+const addKeysToMenuItems = (items: MenuBarAdminItem[]): MenuBarAdminItem[] => {
+  return items.map((item, index) => {
+    const newItem = { 
+      ...item, 
+      key: item.to || `item-${index}` 
+    };
+    
+    if (item.items) {
+      newItem.items = addKeysToMenuItems(item.items);
+    }
+    
+    return newItem;
+  });
 };
+
+// Función para encontrar el item activo basado en la ruta
+const findActiveItem = (items: MenuBarAdminItem[], path: string): MenuBarAdminItem | null => {
+  for (const item of items) {
+    if (item.items) {
+      const hasActiveChild = item.items.some(child => 
+        child.to && (path === child.to || path.startsWith(child.to + '/'))
+      );
+      if (hasActiveChild) {
+        return item;
+      }
+    }
+    if (item.to && (path === item.to || path.startsWith(item.to + '/'))) {
+      return item;
+    }
+  }
+  return null;
+};
+
+// Actualizar item seleccionado basado en la ruta actual
+const updateSelectedItemFromRoute = () => {
+  const activeItem = findActiveItem(menuItems.value, route.path);
+  selectedItemKey.value = activeItem?.key || null;
+};
+
+// Seleccionar item del menú
+const selectMenuItem = (item: MenuBarAdminItem) => {
+  selectedItemKey.value = item.key;
+};
+
 </script>

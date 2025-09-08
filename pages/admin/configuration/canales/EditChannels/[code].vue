@@ -1,13 +1,13 @@
 <template>
     <div>
       <div v-if="channelData" class="flex flex-col gap-8">
-        <XHeader :title="`Editar canal - ${channelData.name}`" />
+        <XHeader :title="`Editar canal - ${channelData.name}`"  @back-click="goBack"/>
         <span class="text-normal font-normal">Esta sección te permite modificar el centro de procesamiento, asegúrate de contar con los certificados y respaldos correspondientes.</span>
     
         <div class="pt-12 flex flex-col gap-20">
         <div class="px-[calc((210/14)*1rem)] flex flex-col gap-12 ">
           <div class="flex justify-end">
-            <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="visibleDialogCertificate = true"/>
+            <XButton variant="outlined" icon="plus" label="Registrar certificado público" @click="handleCertificateRegistered"/>
           </div>
           
           <!-- DataTable -->
@@ -15,7 +15,9 @@
             <Column header="Ruta" sortable>
               <template #body="{ data }">
                 <div v-for="(url, index) in data.urls" :key="index">
-                    {{ url }}
+                    <div v-if="index === 0">
+                      {{ url }} ...
+                    </div>
                 </div>
               </template>
             </Column>
@@ -70,23 +72,43 @@
         </div>
         </div>
       </div>
-    <Toast position="top-right" />
+    
+      <Toast position="top-right" />
 
     <ChannelsModalConfirm
       v-model="confirmModalVisible"
       :current-selection="selectedRouteData"
       :previous-selection="previousRouteData"
       @confirm="handleConfirmChange"
-      @cancel="confirmModalVisible = false"
+      @cancel="handleCloseCertificateModal"
     />
 
     <ChannelsModalCertificate
       v-model="visibleDialogCertificate"
       :channel-code="channelData?.code"
       :channel-name="channelData?.name"
-      @registered="handleCertificateRegistered"
       @close="visibleDialogCertificate = false"
     />
+
+    <XConfirmDialog
+      v-model="visibleDialogCertificateRegister"
+      icon="x:warning-circle"
+      icon-color="text-yellow-500"
+      title="Certificado ya registrado">
+      <template #message>
+          <div class="space-y-2">
+              <p>
+                <span class="font-medium text-gray-700">Ya se cuenta con un certificado registrado, ¿Deseas continuar en el cargado de un nuevo certificado?</span>
+              </p>
+          </div>
+      </template>
+      <template #buttons>
+              <div class="flex gap-3">
+                  <XButton label="Cancelar" variant="outlined" @click="visibleDialogCertificateRegister=false" class="w-65"/>
+                  <XButton label="Continuar" @click="visibleDialogCertificate = true; visibleDialogCertificateRegister = false" class="w-65"/>
+              </div>
+      </template>  
+    </XConfirmDialog>
     </div>
     
 </template>
@@ -96,10 +118,12 @@ import { ref, computed, watch } from 'vue'
 import { useToast } from 'primevue/usetoast';
 import { channelsService } from '~/services/channelsService';
 import type { ChannelsResponse } from '~/features/channels/type';
-import ChannelsModalConfirm from '~/features/channels/ChannelsModalConfirm.vue';
+import ChannelsModalConfirm, { type RouteSelection } from '~/features/channels/ChannelsModalConfirm.vue';
 import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertificate.vue';
 
 const route = useRoute();
+const router = useRouter();
+
 const toast = useToast();
 
 // Estados
@@ -111,6 +135,8 @@ const selectedRouteAlias = ref<string>('')
 const originalSelectedRoute = ref<string>('')
 const confirmModalVisible = ref(false)
 const visibleDialogCertificate = ref(false)
+const visibleDialogCertificateRegister = ref(false)
+
 
 const channelCode = computed(() => route.params.code as string)
 
@@ -120,21 +146,33 @@ const processedRoutes = computed(() => {
   return channelData.value.routes
 })
 
-const selectedRouteData = computed(() => {
-  if (!channelData.value || !selectedRouteAlias.value) return null
-  return channelData.value.routes.find(r => r.alias === selectedRouteAlias.value)
+const selectedRouteData = computed<RouteSelection | undefined>(() => {
+  if (!channelData.value || !selectedRouteAlias.value) return undefined
+  const found = channelData.value.routes?.find(r => r.alias === selectedRouteAlias.value)
+  return found
+    ? {
+        alias: found.alias ?? '',
+        isActive: found.isActive ?? false,
+        urls: found.urls ?? [],
+      }
+    : undefined
 })
 
-const previousRouteData = computed(() => {
-  if (!channelData.value || !originalSelectedRoute.value) return null
-  return channelData.value.routes.find(r => r.alias === originalSelectedRoute.value)
+const previousRouteData = computed<RouteSelection | undefined>(() => {
+  if (!channelData.value || !originalSelectedRoute.value) return undefined
+  const found = channelData.value.routes?.find(r => r.alias === originalSelectedRoute.value)
+  return found
+    ? {
+        alias: found.alias ?? '',
+        isActive: found.isActive ?? false,
+        urls: found.urls ?? [],
+      }
+    : undefined
 })
 
 const hasRouteChanged = computed(() => {
   return selectedRouteAlias.value !== originalSelectedRoute.value
 })
-
-
 
 const loadChannelData = async () => {
     try {
@@ -142,18 +180,20 @@ const loadChannelData = async () => {
         error.value = null
         
         const response = await channelsService.getChannelsByCode(channelCode.value)
-        channelData.value = response
-        
-        // Encontrar la ruta activa actual
-        const activeRoute = channelData.value.routes.find(r => r.isActive)
-        if (activeRoute) {
-            selectedRouteAlias.value = activeRoute.alias
-            originalSelectedRoute.value = activeRoute.alias
-        } else if (channelData.value.routes.length > 0) {
-            selectedRouteAlias.value = channelData.value.routes[0].alias
-            originalSelectedRoute.value = channelData.value.routes[0].alias
+        if(response){
+          channelData.value = response
+          
+          if (channelData.value.routes && channelData.value.routes.length > 0) {
+            const activeRoute = channelData.value.routes.find(r => r.isActive)
+            if (activeRoute?.alias) {
+                selectedRouteAlias.value = activeRoute.alias
+                originalSelectedRoute.value = activeRoute.alias
+            } else if (channelData.value.routes.length > 0) {
+                selectedRouteAlias.value = ''
+                originalSelectedRoute.value = ''
+            }
         }
-        
+      }
     } catch (err: any) {
         console.error('Error loading channel data:', err)
         error.value = err.message || 'Error al cargar la información del canal'
@@ -172,8 +212,11 @@ const showToast = (message: any) => {
     toast.add(message)
 }
 
+// NAVEGACIÓN
+const goBack = () => {
+    router.back();
+};
 
-// Cambiar canal
 const handleConfirmChange = async () => {
   if (!channelData.value || !selectedRouteData.value) return
 
@@ -184,10 +227,11 @@ const handleConfirmChange = async () => {
       code: channelData.value.code,
       name: channelData.value.name,
       acronym: channelData.value.acronym,
-      routes: channelData.value.routes.map(route => ({
+      routes: channelData.value.routes?.map(route => ({
         alias: route.alias,
         isActive: route.alias === selectedRouteAlias.value,
-        urls: route.urls
+        urls: route.urls,
+        target: route.target
       })),
       changeReason: `Cambio de CPD de ${originalSelectedRoute.value} a ${selectedRouteAlias.value}`
     }
@@ -195,18 +239,35 @@ const handleConfirmChange = async () => {
     console.log('Update Data:', updateData);
     const response = await channelsService.updateChannels(updateData);
     console.log('Response Channels: ', response);
-    if (response.wasSaved) {
-      console.log('hols');
-        showToast({ 
-          severity: 'success', 
-          summary: `Nuevo CPD ${selectedRouteAlias.value} asignado correctamente`, 
-          life: 3000 
-        })
+    
+    if (response) {
+      console.log('Operación exitosa');
+      
+      originalSelectedRoute.value = selectedRouteAlias.value;
+      showToast({ 
+        severity: 'success', 
+        summary: 'Éxito',
+        detail: `Nuevo CPD ${selectedRouteAlias.value} asignado correctamente`, 
+        life: 3000 
+      });
+      
+      // Opcional: Recargar los datos para sincronizar con el servidor
+      await loadChannelData();
+      
+    } else {
+      // Manejar respuesta no exitosa del servidor
+      console.log('Respuesta no exitosa del servidor');
+      showToast({ 
+        severity: 'error', 
+        summary: 'Error',
+        detail: 'Error al procesar la solicitud', 
+        life: 3000 
+      });
     }
     
   } catch (err: any) {
     console.error('Error updating channel:', err)
-    toast.add({
+    showToast({
       severity: 'error',
       summary: 'Error',
       detail: err.message || 'Error al guardar los cambios',
@@ -223,15 +284,21 @@ const resetSelection = () => {
 }
 
 //Cambiar certificado
-const handleCertificateRegistered = (certificateData: any) => {
-  console.log('Certificado registrado:', certificateData)
-  toast.add({ 
-    severity: 'success', 
-    summary: 'Éxito',
-    detail: 'Certificado registrado correctamente', 
-    life: 3000 
-  })
+const handleCertificateRegistered = () => {
+  if(channelData.value?.certificateRegistered){
+    visibleDialogCertificate.value = false;
+    visibleDialogCertificateRegister.value = true;
+  }else{
+
+    visibleDialogCertificate.value = true;
+  }
 }
+
+const handleCloseCertificateModal = async () => {
+  visibleDialogCertificate.value = false
+  await loadChannelData()
+}
+
 
 // Lifecycle
 onMounted(() => {

@@ -7,17 +7,6 @@
         </XHeader>
 
         <div class="flex flex-col gap-12">
-            <div v-if="!hasParameters && !loading" class="flex flex-col items-center justify-center py-16 text-center">
-                <div class="mb-6">
-                    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                        <i class="pi pi-users text-4xl text-gray-400"></i>
-                    </div>
-                </div>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Aún no existen parámetros</h3>
-                <p class="text-gray-500 mb-6">No hay parámetros configurados en el sistema.</p>
-            </div>
-
-            <template v-if="hasParameters">
                 <p class="text-gray-800">Selecciona los canales que deseas ver en la tabla.</p>
 
                 <div class="flex flex-row justify-between">
@@ -112,6 +101,7 @@
                                         />
                                         <XButton 
                                             label="Ver historial"
+                                            @click="openHistoModal(data)"
                                         />
                                     </div>
                                 </template>
@@ -127,18 +117,26 @@
                         />
                     </div>
                 </div>
-            </template>
         </div>
 
         <ParameterModal 
             v-model="modalStateParameter.modalParameter" 
             :parameterData="modalStateParameter.parameterData"
             @save="handleParameterSaved"
+            @success="handleParameterSuccess"
+            @error="handleParameterError"
         />
+
+        <ParameterHistorialModal 
+            v-model="modalStateHistoParameter.modalParameterHistorial" 
+            :parameterHistoData="modalStateHistoParameter.parameterHistoData"
+        />
+         <Toast />
     </div>
 </template>
 
 <script setup lang="ts">
+import ParameterHistorialModal from '~/features/parameters/ParameterHistorialModal.vue';
 import ParameterModal from '~/features/parameters/ParameterModal.vue';
 import type { ParameterListItem, ParameterModalData } from '~/features/parameters/types';
 import type { ServiceError } from '~/features/users/types';
@@ -170,7 +168,7 @@ const channelOptions = computed(() => {
     
     return [
         { value: 'Todos' },
-        ...channelOpts.sort((a, b) => a.value.localeCompare(b.value))
+        ...channelOpts.sort((a:any, b:any) => a.value.localeCompare(b.value))
     ];
 });
 
@@ -189,11 +187,11 @@ const filteredParameters = computed(() => {
     if (searchTermParameter.value.trim()) {
         const search = searchTermParameter.value.toLowerCase().trim();
         filtered = filtered.filter(param => 
-            param.code.toLowerCase().includes(search) ||
-            param.value.toLowerCase().includes(search) ||
-            param.description.toLowerCase().includes(search) ||
-            param.dataType.toLowerCase().includes(search) ||
-            param.systemAcronym.toLowerCase().includes(search)
+            param.code?.toLowerCase().includes(search) ||
+            param.value?.toLowerCase().includes(search) ||
+            param.description?.toLowerCase().includes(search) ||
+            param.dataType?.toLowerCase().includes(search) ||
+            param.systemAcronym?.toLowerCase().includes(search)
         );
     }
     
@@ -207,10 +205,6 @@ const paginatedParameters = computed(() => {
     return filteredParameters.value.slice(start, end);
 });
 
-// Computed para verificar si hay parámetros
-const hasParameters = computed(() => {
-    return parameters.value && parameters.value.length > 0
-})
 
 // Resetear paginación cuando cambien los filtros
 watch([selectedChannel, searchTermParameter], () => {
@@ -224,6 +218,14 @@ const modalStateParameter = ref<{
 }>({
     modalParameter: false,
     parameterData: undefined
+})
+
+const modalStateHistoParameter = ref<{
+    modalParameterHistorial: boolean,
+    parameterHistoData?: ParameterModalData,
+}>({
+    modalParameterHistorial: false,
+    parameterHistoData: undefined
 })
 
 // Methods
@@ -259,8 +261,41 @@ const openEditModal = (parameterData: ParameterListItem) => {
     }
 }
 
+const openHistoModal = (parameterData: ParameterListItem) => {
+    console.log('Opening historial modal for:', parameterData);
+    
+    modalStateHistoParameter.value = {
+        modalParameterHistorial: true,
+        parameterHistoData: {
+            code: parameterData.code,
+            value: parameterData.value,           // Agregar estos campos
+            description: parameterData.description, // que faltaban
+            dataType: parameterData.dataType,      // en la función original
+            systemAcronym: parameterData.systemAcronym
+        }
+    }
+}
+
 const handleParameterSaved = (): void => {
     loadParameters()
+}
+
+const handleParameterSuccess = (message: string): void => {
+    toast.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: message,
+        life: 5000
+    })
+}
+
+const handleParameterError = (message: string): void => {
+    toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: message,
+        life: 5000
+    })
 }
 
 // Lifecycle

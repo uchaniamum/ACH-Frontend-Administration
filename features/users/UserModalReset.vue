@@ -1,7 +1,7 @@
 <template>
     <div>
     <XConfirmDialog
-            v-model:visible="visible"
+            v-model="props.modelValue"
             icon="x:warning-circle"
             icon-color="text-yellow-500"
             title="Reseteo de contraseña"
@@ -39,7 +39,7 @@ const emit = defineEmits<Emits>()
 const { saveResetPassword } = useUserService()
 
 const handleSave = async (): Promise<void>  => {
-    const success = await saveResetPassword(props.userData.code)
+    const success = await saveResetPassword(props?.userData?.code)
     if (success) {
         emit('save', props.userData)
     }

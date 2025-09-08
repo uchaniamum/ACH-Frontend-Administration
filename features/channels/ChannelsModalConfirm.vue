@@ -9,14 +9,14 @@
       <div class="space-y-2">
         <p>
           <span class="font-medium text-gray-700">¿Estás seguro de cambiar del {{ previousSelection?.alias }} a </span>
-          <span class="font-semibold"> {{ currentSelection?.alias }} con ruta {{ currentSelection?.urls.join(', ') }}</span>
+          <span class="font-semibold"> {{ currentSelection?.alias }}</span> con ruta <span class="font-semibold">{{ currentSelection?.urls.join(', ') }}</span>
           <span class="font-medium text-gray-700">?</span>
         </p>
       </div>
     </template>
     <template #buttons>
       <div class="flex gap-3">
-        <XButton label="Cancelar" severity="secondary" outlined @click="handleCancel"/>
+        <XButton label="Cancelar"  variant="outlined" @click="handleCancel"/>
         <XButton label="Confirmar" @click="handleConfirm" />
       </div>
     </template>  
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-interface RouteSelection {
+export interface RouteSelection {
   alias: string
   isActive: boolean
   urls: string[]

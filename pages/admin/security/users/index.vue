@@ -5,11 +5,11 @@
                 <p class="text-gray-800">Crea usuarios y asigna los roles correspondientes, procura garantizar que cada usuario cuente con los permisos adecuados para sus funciones.</p>
             </template>
         </XHeader>
-        <div  class="flex flex-col gap-16">
-            <div v-if="!hasUsers && !loading" class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="flex flex-col gap-16">
+            <div v-if="!hasUsers && !loading" class="flex flex-col items-center justify-center pt-[100px] text-center">
                 <div class="mb-6">
-                    <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                        <i class="pi pi-users text-4xl text-gray-400"></i>
+                    <div class="flex items-center justify-center">
+                        <Icon name="x:user-pro" class="text-[115px]"></Icon>
                     </div>
                 </div>
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Aún no existen usuarios</h3>
@@ -41,14 +41,13 @@
                             class="!w-[150px]"/>
                     </div>
                 </div>
-                <!-- DataTable -->
                 <div class="flex flex-col gap-12">
                     <DataTable 
                         v-if="hasUsers"
                         :value="paginatedUsers" 
                         v-model:filters="filters"
                         :rowsPerPageOptions="[10, 25, 50, 100]"
-                        :loading="loading"
+                        :loading="loading || optionsLoading"
                         dataKey="id"
                         filterDisplay="row"
                         :globalFilterFields="['email', 'fullname', 'roleDescription', 'code', 'statusDescription']"
@@ -71,7 +70,6 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-
                             </template>
                         </Column>
                     
@@ -111,7 +109,7 @@
                             </template>
                         </Column>
                     
-                        <Column field="rol" header="Rol" sortable class="w-[158px]" :showFilterMenu="false">
+                        <Column field="roleDescription" header="Rol" sortable class="w-[158px]" :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.roleDescription" 
@@ -120,20 +118,20 @@
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <XSelect 
-                                        name="filterRole"
-                                        v-model="filterModel.value" 
-                                        @change="filterCallback()" 
-                                        :options="roles" 
-                                        optionLabel="label" 
-                                        optionValue="value"
-                                        placeholder="Seleccionar" 
-                                        class="!w-56" 
-                                        :showClear="true"
-                                    />
+                                    name="filterRole"
+                                    v-model="filterModel.value" 
+                                    @change="filterCallback()" 
+                                    :options="roleFilterOptions" 
+                                    optionLabel="label" 
+                                    optionValue="value"
+                                    placeholder="Seleccionar" 
+                                    class="!w-56" 
+                                    :showClear="true"
+                                />
                             </template>
                         </Column>
                     
-                        <Column field="isActive" header="Estado" sortable class="w-[158px]" :showFilterMenu="false">
+                        <Column field="statusDescription" header="Estado" sortable class="w-[158px]" :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
@@ -141,20 +139,20 @@
                                 />
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
-                                    <XSelect 
-                                        name="filterIsActive"
-                                        v-model="filterModel.value" 
-                                        @change="filterCallback()" 
-                                        :options="statusOptions" 
-                                        optionLabel="label" 
-                                        optionValue="value"
-                                        placeholder="Seleccionar" 
-                                        class="!w-56" 
-                                        :showClear="true"
-                                    />
-                                </template>
+                                <XSelect 
+                                    name="filterIsActive"
+                                    v-model="filterModel.value" 
+                                    @change="filterCallback()" 
+                                    :options="statusFilterOptions" 
+                                    optionLabel="label" 
+                                    optionValue="value"
+                                    placeholder="Seleccionar" 
+                                    class="!w-56" 
+                                    :showClear="true"
+                                />
+                            </template>
                         </Column>
-                        <Column header="Acciones"  class="w-[133px]">
+                        <Column header="Acciones" class="w-[133px]">
                             <template #body="{ data }">
                                 <div class="flex gap-2">
                                     <XButton 
@@ -198,11 +196,19 @@
             :userData="modalStateRevert.userData"
             @save="handlePasswordReset"
         />
+
+        <ConfirmDialogWrapper
+            v-model="confirmDialog.visible"
+            :options="confirmDialog.options"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core';
+import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
+import { useOptions } from '~/componsables/useOptions';
+import { useUserService } from '~/componsables/useUsers';
 import type { ModalMode, ServiceError, UserListItem, UserModalData } from '~/features/users/types';
 import UserModal from '~/features/users/UserModal.vue';
 import UserModalReset from '~/features/users/UserModalReset.vue';
@@ -210,8 +216,16 @@ import { userService } from '~/services/userService';
 
 // Composables 
 const toast = useToast()
+const {  
+    roleFilterOptions, 
+    statusFilterOptions,
+    loading: optionsLoading,
+    error: optionsError,
+    loadAllOptions 
+} = useOptions()
 
-//State
+const { saveResetPassword } = useUserService()
+// State
 const users = ref<UserListItem[]>([]);
 const loading = ref(false)
 const searchTerm = ref('')
@@ -223,21 +237,12 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     email: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     fullname: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    rol: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    roleDescription: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     codigo: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    isActive: { value: null, matchMode: FilterMatchMode.EQUALS }
+    statusDescription: { value: null, matchMode: FilterMatchMode.EQUALS  }
 });
 
-const roles = ref([
-    { label: 'Administrador', value: 'Administrador' },
-]);
-
-const statusOptions = ref([
-    { label: 'Activo', value: true },
-    { label: 'Inactivo', value: false }
-]);
-
-//Paginator
+// Paginator
 const paginatedUsers = computed(() => {
     return users.value.slice(first.value, first.value + rows.value)
 })
@@ -267,6 +272,32 @@ const modalStateRevert = ref<{
     userData: undefined
 })
 
+// State para el modal de confirmación de reseteo de contraseña
+const confirmDialog = ref({
+    visible: false,
+    options: {
+        title: '',
+        message: '',
+        onConfirm: () => {}
+    }
+})
+
+const openRevertPassModal = (userData: UserModalData): void => {
+    confirmDialog.value = {
+        visible: true,
+        options: {
+            title: 'Reseteo de contraseña',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            message: `¿Estás seguro de resetear la contraseña de ${userData.fullname}? 
+                        Se enviará la nueva contraseña a su correo electrónico 
+                        <span class="font-semibold">${userData.email}</span>`,
+            onConfirm: async () => {
+                await saveResetPassword(userData.code)
+            }
+        }
+    }
+}
 
 // Computed para verificar si hay usuarios
 const hasUsers = computed(() => {
@@ -278,7 +309,9 @@ const loadUsers = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await userService.getUsers()
-        users.value = response.users
+        if(response){
+            users.value = response.users
+        }
     } catch (error) {
         console.error('Error loading users:', error)
         const serviceError = error as ServiceError
@@ -303,6 +336,7 @@ const handleSearch = async (): Promise<void> => {
             const response = await userService.getUsers({ 
                 search: searchTerm.value.trim() 
             })
+            
             users.value = response.users
         } catch (error) {
             console.error('Error searching users:', error)
@@ -340,7 +374,7 @@ const openEditModal = (userData: UserModalData): void => {
             email: userData.email,
             alias: userData.alias,
             roleCode: userData.roleCode,
-            isActive: userData  .isActive
+            isActive: userData.isActive
         }
     }
 }
@@ -349,26 +383,27 @@ const handleUserSaved = (): void => {
     loadUsers()
 }
 
-const openRevertPassModal = (userData: UserModalData): void => {
-    modalStateRevert.value = {
-        showModal: true,
-        userData: {
-            code: userData.code,
-            fullname: userData.fullname,
-            email: userData.email,
-            alias: userData.alias,
-            roleCode: userData.roleCode,
-            isActive: userData.isActive
-        }
-    }
-}
-
 const handlePasswordReset = (userData?: UserModalData): void => {
-    console.log('Contraseña reseteada para:oo', userData)
+    console.log('Contraseña reseteada para:', userData)
 }
 
 // Lifecycle
-onMounted(() => {
-    loadUsers()
+onMounted(async () => {
+    // Cargar opciones y usuarios en paralelo
+    await Promise.all([
+        loadUsers(),
+        loadAllOptions()
+    ])
+    
+    // Manejar errores de opciones si es necesario
+    if (optionsError.value) {
+        toast.add({
+            severity: 'warn',
+            summary: 'Advertencia',
+            detail: 'Algunas opciones de filtro pueden no estar disponibles',
+            life: 3000
+        })
+    }
 })
 </script>
+

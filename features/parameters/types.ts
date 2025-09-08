@@ -6,6 +6,10 @@ export interface ParameterListItem {
     description?: string
 }
 
+export interface ParametersListResponse {
+    parameters: ParameterListItem[]
+}
+
 export interface ParameterModalData {
     systemAcronym?: string
     code?: string
@@ -20,8 +24,6 @@ export interface ParameterRequest {
     value: string;
 }
 
-
-
 export interface ParameterDetailResponse {
     code: string;
     value: string;
@@ -35,6 +37,7 @@ export interface ParameterDetailResponse {
     updatedByUserId: number;
 }
 
+
 export interface ParameterSaveResponse {
     wasSaved: boolean
     wasNew: boolean
@@ -45,5 +48,15 @@ export interface ParameterSaveResponse {
     traceId: string
 }
 
+export interface ParameterDetailHisto {
+    updatedAt: string;
+    updatedByUser: string;
+    value: string;
+}
 
-
+export interface ParameterDetailHistorialResponse {
+    code: string;
+    dataType: string;
+    description: string;
+    parameters: ParameterDetailHisto[];
+}

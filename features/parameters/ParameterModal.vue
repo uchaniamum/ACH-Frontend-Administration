@@ -12,12 +12,12 @@
     <div class="flex flex-col gap-8">
         <XCard class="border border-gray-400 flex gap-2 text-gray-900">
             <template #header>
-                <div class="font-bold">{{ parameterDetails?.code }}</div>
+                <div class="font-bold">{{ props.parameterData?.code }}</div>
             </template>
             <template #content>
                 <div class="flex flex-col">
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span>{{ parameterDetails?.dataType }}</div>
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span>{{ parameterDetails?.description }}</div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span>{{ props.parameterData?.dataType }}</div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span>{{ props.parameterData?.description }}</div>
                 </div>
             </template>
         </XCard>
@@ -54,8 +54,6 @@
         </div>
         </XForm>
     </div>
-    <XToast position="top-right" />
-        
     </XDialog>
     </div>
 </template>
@@ -64,25 +62,26 @@
 import { parametersService } from '~/services/parametersService'
 import type { ParameterDetailResponse, ParameterModalData, ParameterRequest } from './types'
 import { useParameterService } from '~/componsables/useParameters'
+import type { ValidationRuleResult } from '../users/options.types'
+
 
 interface Props {
     modelValue: boolean
-    parameterData?: ParameterDetailResponse
+    parameterData?: ParameterModalData
 }
 
 interface Emits {
     (event: 'update:modelValue', value: boolean): void
     (event: 'save', parameterData: ParameterModalData): void
+    (event: 'success', message: string): void
+    (event: 'error', message: string): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// Composables
-const toast = useToast()
-
 // State
-const modalParameter = defineModel<boolean>()
+const modalParameter = defineModel<boolean>({ default: false })
 const loading = ref(false)
 const loadingDetails = ref(false)
 
@@ -93,10 +92,6 @@ const formData = ref<ParameterRequest>({
     code: '',
     value: ''
 })
-
-const showToast = (message: any) => {
-    toast.add(message)
-}
 
 const { loadParameterDetails } = useParameterService()
 
@@ -111,12 +106,13 @@ const hasValueChanged = computed(() => {
 })
 
 
-const requiredRule = (value) => {
+const requiredRule = (value:unknown):ValidationRuleResult => {
     console.log('Validating:', value);
     return value !== null && value !== undefined && value !== '' 
         ? true 
         : 'El campo es requerido'
 }
+
 
 watch(() => props.modelValue, async (newValue) => {
     if (newValue) {
@@ -125,13 +121,11 @@ watch(() => props.modelValue, async (newValue) => {
         if (props.parameterData?.code) {
             await loadFullParameterDetails(props.parameterData.code)
         } else if (props.parameterData) {
-            // Usar datos proporcionados si no hay código para cargar
-            parameterDetails.value = props.parameterData as ParameterDetailResponse
+            // No asignar a parameterDetails, solo usar para formData
             formData.value = {
                 code: props.parameterData.code || '',
                 value: props.parameterData.value || ''
             }
-            // ¡IMPORTANTE! Guardar el valor original
             originalValue.value = props.parameterData.value || ''
         }
     } else {
@@ -141,7 +135,10 @@ watch(() => props.modelValue, async (newValue) => {
 
 // Watch para emitir cambios del modal al padre
 watch(modalParameter, (newValue) => {
-    emit('update:modelValue', newValue)
+    // emit('update:modelValue', newValue)
+    if (typeof newValue === 'boolean') {
+        emit('update:modelValue', newValue)
+    }
 })
 
 const loadFullParameterDetails = async (code: string): Promise<void> => {
@@ -151,24 +148,21 @@ const loadFullParameterDetails = async (code: string): Promise<void> => {
         const parameterDetail = await loadParameterDetails(code);
 
         if (parameterDetail) {
-            parameterDetails.value = parameterDetail
-            
-            // Actualizar formData con los valores cargados
             formData.value = {
                 code: parameterDetail.code,
                 value: parameterDetail.value
             }
-            // ¡IMPORTANTE! Guardar el valor original
             originalValue.value = parameterDetail.value
         }
+
     } catch (error) {
         console.error('Error loading parameter details:', error)
-        showToast({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudieron cargar los detalles del parámetro',
-            life: 5000
-        })
+        // toast.add({
+        //     severity: 'error',
+        //     summary: 'Error',
+        //     detail: 'No se pudieron cargar los detalles del parámetro',
+        //     life: 5000
+        // })
     } finally {
         loadingDetails.value = false
     }
@@ -178,19 +172,26 @@ const handleSubmit = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await parametersService.updateParameter(formData.value)
-        console.log('Response: ', response);
         if (response.wasSaved) {
+            // toast.add({
+            //     severity: 'success',
+            //     summary: 'Éxito',
+            //     detail: 'Parámetro actualizado correctamente',
+            //     life: 5000
+            // })
+            emit('success', 'Parámetro actualizado correctamente')
             emit('save', formData.value)
             handleCancel()
         } 
     } catch (error) {
         console.error('Error saving parameter:', error)
-        showToast({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Error al actualizar el parámetro',
-            life: 5000
-        })
+        emit('error', 'Error al actualizar el parámetro')
+        // toast.add({
+        //     severity: 'error',
+        //     summary: 'Error',
+        //     detail: 'Error al actualizar el parámetro',
+        //     life: 5000
+        // })
     } finally {
         loading.value = false
     }

@@ -15,41 +15,108 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-12 items-center">
-                <DataTable 
+            <DataTable 
                     :value="paginatedChannels" 
                     :loading="loading"
-                    dataKey="code"
+                    dataKey="id"
+                    filterDisplay="row"
                     :rows="paginationChannelRows"
                     :first="paginationChannelFirst"
-                    @page="onPageChange">
-                <Column field="code" header="Codigo" sortable>
+                    @page="onPageChange"
+                    v-model:filters="filters"
+                    :globalFilterFields="['code', 'name', 'acronym', 'aliases']"
+                >
+                <Column field="code" header="Codigo" sortable :showFilterMenu="false" class="min-w-[143px]">
                     <template #body="{ data }">
                         {{ data.code }}
                     </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <IconField>
+                            <InputText 
+                                v-model="filterModel.value"  
+                                type="text" 
+                                @input="filterCallback()" 
+                                class="!w-47" 
+                                placeholder="Buscar"
+                            />
+                            <XInputIcon icon="search" />
+                        </IconField>
+                    </template>
                 </Column>
-                <Column field="name" header="Nombre">
+                <Column field="name" header="Nombre" :showFilterMenu="false" class="min-w-[328px]">
                     <template #body="{ data }">
                         {{ data.name }}
                     </template>
+                    <template #filter="{ filterModel, filterCallback }" >
+                        <XSelect 
+                            name="filterRole"
+                            v-model="filterModel.value" 
+                            @change="filterCallback()" 
+                            :options="nameOptions" 
+                            optionLabel="label" 
+                            optionValue="value"
+                            placeholder="Buscar" 
+                            class="w-[300px]" 
+                            :showClear="true"
+                        />
+                    </template>
                 </Column>
-                <Column field="acronym" header="Sigla">
+                <Column field="acronym" header="Sigla" :showFilterMenu="false" class="w-[145px]">
                     <template #body="{ data }">
                         {{ data.acronym }}
                     </template>
-                </Column>
-                <Column field="alias" header="Alias CPD">
-                    <template #body="{ data }">
-                        <!-- Mostrar todos los alias separados por coma -->
-                        {{ data.routes.map(route => route.alias).join(', ') }}
+                    <template #filter="{ filterModel, filterCallback }" >
+                        <XSelect 
+                            name="filterRole"
+                            v-model="filterModel.value" 
+                            @change="filterCallback()" 
+                            :options="acronymOptions" 
+                            optionLabel="label" 
+                            optionValue="value"
+                            placeholder="Buscar" 
+                            class="!min-w-48" 
+                            :showClear="true"
+                        />
                     </template>
                 </Column>
-                <Column field="updatedAt" header="Última modificación">
+                <Column field="aliases" header="Alias CPD" :showFilterMenu="false" style="width:145px">
+                    <template #body="{ data }">
+                        <div v-for="(route, index) in data.routes" :key="index">
+                            {{ route.alias }}
+                        </div>
+                    </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <XSelect 
+                            name="filterAlias"
+                            v-model="filterModel.value" 
+                            @change="filterCallback()" 
+                            :options="aliasOptions" 
+                            optionLabel="label" 
+                            optionValue="value"
+                            placeholder="Buscar" 
+                            class="!min-w-47" 
+                            :showClear="true"
+                        />
+                    </template>
+                </Column>
+                <Column field="updatedAt" header="Última modificación" :showFilterMenu="false" class="!min-w-[189px]">
                     <template #body="{ data }">
                         {{ formatDate(data.updatedAt) }}
                     </template>
+                    <template #filter="{ filterModel, filterCallback }">
+                        <IconField>
+                            <InputText 
+                                v-model="filterModel.value" 
+                                type="text" 
+                                @input="filterCallback()" 
+                                class="!w-70" 
+                                placeholder="Buscar"
+                            />
+                            <XInputIcon icon="search" />
+                        </IconField>
+                    </template>
                 </Column>
-                <Column field="accion" header="Acción">
+                <Column field="accion" header="Acción" class="!w-[122px]">
                     <template #body="{ data }">
                         <div class="flex gap-4">
                             <XButton variant="outlined" icon="edit-pencil" @click="navigateToEditChannel(data)" />
@@ -59,20 +126,14 @@
                     </template>
                 </Column>
             </DataTable>
-            
-                <!-- Paginación -->
-                <Paginator 
-                    :rows="paginationChannelRows" 
-                    :totalRecords="filteredParameters.length"
-                    :first="paginationChannelFirst"
-                    :rowsPerPageOptions="[2, 10, 25, 50, 100]"
-                />
-            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { FilterMatchMode } from '@primevue/core';
+import { useRouteAliases } from '~/componsables/useRouteAliases';
+import { useUniqueValues } from '~/componsables/useUniqueValues';
 import type { ChannelsListItem } from '~/features/channels/type';
 import type { ServiceError } from '~/features/users/types';
 import { channelsService } from '~/services/channelsService';
@@ -88,31 +149,91 @@ const searchChannels = ref('')
 const paginationChannelFirst = ref(0)
 const paginationChannelRows = ref(10)
 
+const nameOptions = useUniqueValues(channels, 'name')
+const acronymOptions = useUniqueValues(channels, 'acronym')
+const aliasOptions = useRouteAliases(channels)
+
+// Computed para añadir el campo aliases a cada canal
+const channelsWithAliases = computed(() => {
+    return channels.value.map(channel => ({
+        ...channel,
+        aliases: channel.routes?.map(route => route.alias).join(' ')
+    }));
+});
+
+// Filters
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    code: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    acronym: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    aliases: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Cambié de 'alias' a 'aliases'
+    updatedAt: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
+
 const itemsBreadParameters = ref([
     { label: 'Inicio', to: '/' },
     { label: 'Configuracion', to: '/admin/configuration' },
     { label: 'Canales' }
 ])
 
-// Computed para filtrar canales
-const filteredParameters = computed(() => {
-    if (!channels.value.length) return [];
+// Helper function para safe string conversion
+const safeLowerCase = (str: string | null | undefined): string => {
+    return str?.toLowerCase() || ''
+}
+
+// Filtrado actualizado
+const filteredChannel = computed(() => {
+    if (!channelsWithAliases.value.length) return [];
 
     const searchTerm = searchChannels.value.toLowerCase().trim();
+    const codeFilter = filters.value.code.value;
+    const nameFilter = filters.value.name.value;
+    const acronymFilter = filters.value.acronym.value;
+    const aliasFilter = filters.value.aliases.value;
+    const updatedAtFilter = filters.value.updatedAt.value;
     
-    return channels.value.filter(channel =>
-        channel.code.toLowerCase().includes(searchTerm) ||
-        channel.name.toLowerCase().includes(searchTerm) ||
-        channel.acronym.toLowerCase().includes(searchTerm) ||
-        channel.routes.some(route => route.alias.toLowerCase().includes(searchTerm))
-    );
+    return channelsWithAliases.value.filter(channel => {
+        // Filtro de código
+        const matchesCode = !codeFilter || 
+            // channel.code?.toLowerCase().startsWith(codeFilter.toLowerCase());
+            safeLowerCase(channel.code || '').includes(safeLowerCase(codeFilter))
+        
+        // Filtro de nombre
+        const matchesName = !nameFilter || 
+            channel.name === nameFilter;
+            
+        // Filtro de acronym
+        const matchesAcronym = !acronymFilter || 
+            channel.acronym === acronymFilter;
+        
+        // Filtro de alias - Versión más limpia
+        const matchesAlias = !aliasFilter || 
+            channel.routes?.some(route => 
+                safeLowerCase(route.alias).includes(safeLowerCase(aliasFilter))
+            ) || false;
+
+        // Filtro de fecha - Versión más limpia
+        const matchesUpdatedAt = !updatedAtFilter || 
+            safeLowerCase(formatDate(channel.updatedAt || '')).includes(safeLowerCase(updatedAtFilter));
+        
+        // Filtro de búsqueda global - INCLUYE aliases
+        const matchesGlobalSearch = searchTerm === '' || 
+            channel.code.toLowerCase().includes(searchTerm) ||
+            channel.name.toLowerCase().includes(searchTerm) ||
+            channel.acronym.toLowerCase().includes(searchTerm) ||
+            channel.aliases.toLowerCase().includes(searchTerm); // Usar el campo aliases concatenado
+
+        return matchesCode && matchesName && matchesAcronym && 
+                matchesAlias && matchesUpdatedAt && matchesGlobalSearch;
+    });
 });
 
 // Computed para paginación
 const paginatedChannels = computed(() => {
     const start = paginationChannelFirst.value;
     const end = start + paginationChannelRows.value;
-    return filteredParameters.value.slice(start, end);
+    return filteredChannel.value.slice(start, end);
 });
 
 // Función para formatear fecha
@@ -130,19 +251,28 @@ const onPageChange = (event: any) => {
     paginationChannelRows.value = event.rows;
 }
 
-
-
 // Cargar canales
 const loadChannels = async (): Promise<void> => {
     loading.value = true
     try {
         const response = await channelsService.getChannels()
-        channels.value = response.paymentSystems
-        console.log('Channels loaded:', channels.value);
+        if(response){
+            channels.value = response.paymentSystems
+            console.log('Canales cargados:', channels.value);
+            
+            // Debug detallado de rutas y aliases
+            channels.value.forEach((channel, index) => {
+                console.log(`Canal ${index} (${channel.code}):`, {
+                    routes: channel.routes,
+                    aliases: channel.routes.map(r => r.alias)
+                });
+            });
+        }
+        
+        
     } catch (error) {
         console.error('Error loading channels:', error)
         const serviceError = error as ServiceError
-
         toast.add({
             severity: 'error',
             summary: 'Error',
@@ -171,4 +301,14 @@ const navigateToHistory = (channel: ChannelsListItem) => {
 const navigateToCertificates = (channel: ChannelsListItem) => {
     router.push(`/admin/configuration/canales/HistorialCertificados/${channel.code}`);
 }
+
+// Debug para verificar las opciones de alias
+watch(aliasOptions, (newVal) => {
+    console.log('Opciones de alias:', newVal);
+}, { immediate: true });
+
+// Debug para verificar el filtrado
+watch(() => filters.value.aliases.value, (newVal) => {
+    console.log('Filtro de alias aplicado:', newVal);
+});
 </script>

@@ -16,6 +16,10 @@ const menuConfigACH: MenuBarAdminConfig = {
                     to: '/admin/configuration/canales',
                 },
                 {
+                    label: 'Contingencia',
+                    to: '/admin/configuration/contingency',
+                },
+                {
                     label: 'Participantes',
                     to: '/admin/configuration/participants',
                 },
@@ -25,7 +29,7 @@ const menuConfigACH: MenuBarAdminConfig = {
                 },
                 {
                     label: 'Horarios',
-                    to: '/admin/configuration/horarios'
+                    to: '/admin/configuration/schedules'
                 },
                 {
                     label: 'Alertas',
