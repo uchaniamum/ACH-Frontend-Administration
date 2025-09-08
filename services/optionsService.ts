@@ -125,7 +125,6 @@ class OptionsService {
     }
 
     mapRolesToSelectOptions(roles: UserRoleOp[]) {
-        console.log('Roles: ', roles);
         return roles
             .sort((a, b) => a.order - b.order)
             .map(role => ({

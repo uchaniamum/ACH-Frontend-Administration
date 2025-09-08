@@ -52,12 +52,17 @@ class ContingencyService {
         return this.request<PaymentGatewayBankList>(endpoint);
     }
 
-    async getBankByCode(participantCode: string): Promise<PaymentGatewayBankDetail> {
-        if (!participantCode) {
-            throw new Error('Participant code is required');
-        }
-        return this.request<PaymentGatewayBankDetail>(`participants/route-maps-xxx`);
-    }
+
+    async getParticipantsByCode(participantCodes: string[]): Promise<any> {
+    console.log('📤 ENVIANDO AL BACKEND:', { participantCodes });
+    
+    return this.request<any>(`participants/route-maps/matching-xxx`, {
+        method: 'POST', // o el método que uses
+        body: JSON.stringify({
+            participantCodes: participantCodes
+        })
+    });
+}
 
     async getBankByCodeAnterior(participantCode: string): Promise<PaymentGatewayBankDetail> {
         if (!participantCode) {
@@ -66,9 +71,15 @@ class ContingencyService {
         return this.request<PaymentGatewayBankDetail>(`payment-gateways-transaction-contingency/${participantCode}`);
     }
 
-    // Endpoint 3: Actualizar configuración de bancos (PUT)
-    async updateBankConfiguration(bankData: BankUpdateRequest): Promise<PaymentGatewayUpdateResponse> {
-        return this.request<PaymentGatewayUpdateResponse>('payment-gateways-transaction-contingency', {
+    async updateChangeChannel(bankData: any): Promise<PaymentGatewayUpdateResponse> {
+        return this.request<PaymentGatewayUpdateResponse>('participants/route-maps/operational-gateway-xxx', {
+            method: 'PUT',
+            body: JSON.stringify(bankData)
+        });
+    }
+
+    async updateContingency(bankData: any): Promise<PaymentGatewayUpdateResponse> {
+        return this.request<PaymentGatewayUpdateResponse>('participants/route-maps/contingency-xxx', {
             method: 'PUT',
             body: JSON.stringify(bankData)
         });

@@ -64,8 +64,6 @@ import type { ParameterDetailResponse, ParameterModalData, ParameterRequest } fr
 import { useParameterService } from '~/componsables/useParameters'
 import type { ValidationRuleResult } from '../users/options.types'
 
-// Composables
-const toast = useToast()
 
 interface Props {
     modelValue: boolean
@@ -75,6 +73,8 @@ interface Props {
 interface Emits {
     (event: 'update:modelValue', value: boolean): void
     (event: 'save', parameterData: ParameterModalData): void
+    (event: 'success', message: string): void
+    (event: 'error', message: string): void
 }
 
 const props = defineProps<Props>()
@@ -157,12 +157,12 @@ const loadFullParameterDetails = async (code: string): Promise<void> => {
 
     } catch (error) {
         console.error('Error loading parameter details:', error)
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudieron cargar los detalles del parámetro',
-            life: 5000
-        })
+        // toast.add({
+        //     severity: 'error',
+        //     summary: 'Error',
+        //     detail: 'No se pudieron cargar los detalles del parámetro',
+        //     life: 5000
+        // })
     } finally {
         loadingDetails.value = false
     }
@@ -173,24 +173,25 @@ const handleSubmit = async (): Promise<void> => {
     try {
         const response = await parametersService.updateParameter(formData.value)
         if (response.wasSaved) {
-            console.log('hola');
-            toast.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: 'Parámetro actualizado correctamente',
-                life: 5000
-            })
+            // toast.add({
+            //     severity: 'success',
+            //     summary: 'Éxito',
+            //     detail: 'Parámetro actualizado correctamente',
+            //     life: 5000
+            // })
+            emit('success', 'Parámetro actualizado correctamente')
             emit('save', formData.value)
             handleCancel()
         } 
     } catch (error) {
         console.error('Error saving parameter:', error)
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Error al actualizar el parámetro',
-            life: 5000
-        })
+        emit('error', 'Error al actualizar el parámetro')
+        // toast.add({
+        //     severity: 'error',
+        //     summary: 'Error',
+        //     detail: 'Error al actualizar el parámetro',
+        //     life: 5000
+        // })
     } finally {
         loading.value = false
     }

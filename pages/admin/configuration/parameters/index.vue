@@ -123,12 +123,15 @@
             v-model="modalStateParameter.modalParameter" 
             :parameterData="modalStateParameter.parameterData"
             @save="handleParameterSaved"
+            @success="handleParameterSuccess"
+            @error="handleParameterError"
         />
 
         <ParameterHistorialModal 
             v-model="modalStateHistoParameter.modalParameterHistorial" 
             :parameterHistoData="modalStateHistoParameter.parameterHistoData"
         />
+         <Toast />
     </div>
 </template>
 
@@ -275,6 +278,24 @@ const openHistoModal = (parameterData: ParameterListItem) => {
 
 const handleParameterSaved = (): void => {
     loadParameters()
+}
+
+const handleParameterSuccess = (message: string): void => {
+    toast.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: message,
+        life: 5000
+    })
+}
+
+const handleParameterError = (message: string): void => {
+    toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: message,
+        life: 5000
+    })
 }
 
 // Lifecycle

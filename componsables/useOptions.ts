@@ -96,7 +96,6 @@ export function useOptions() {
                     const activeRoles = userRoles.filter((role: UserRoleOp) => role.isActive)
                     roleOptions.value = optionsService.mapRolesToSelectOptions(activeRoles)
                     roleFilterOptions.value = optionsService.mapRolesToFilterOptions(activeRoles)
-                    console.log('Roles Options: ', roleOptions.value);
                 }
 
                 if (UserStatuses) {

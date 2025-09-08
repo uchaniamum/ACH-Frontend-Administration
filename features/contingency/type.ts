@@ -91,3 +91,59 @@ export interface ContingencyTableRow {
     recepcionRegular: TransactionStatus;
     recepcionQR: TransactionStatus;
 }
+
+
+//Nueva version
+// Constants
+export const GATEWAY_CODE_MAP = {
+  'ACL': '1426001',
+  'MLD': '1000',
+  'LIP': '900', 
+  'UNI': '995'
+} as const;
+
+export const TRANSACTION_CONFIG = {
+  IASYNC: {
+    label: 'Envío de transferencias interbancarias IASYNC',
+    tooltip: 'Información sobre transferencias interbancarias',
+    switchRef: 'iasyncContingency' as const
+  },
+  IQR: {
+    label: 'Envío de transferencias QR IQR',
+    tooltip: 'Información sobre transferencias QR',
+    switchRef: 'iqrContingency' as const
+  },
+  OASYNC: {
+    label: 'Recepción transferencia interbancaria OASYNC',
+    tooltip: 'Salida de transferencias regulares.',
+    switchRef: 'oasyncContingency' as const
+  },
+  OQR: {
+    label: 'Recepción transferencia QR OQR',
+    tooltip: 'Procesamiento de transacciones de cobro por QR.',
+    switchRef: 'oqrContingency' as const
+  }
+} as const;
+
+export const TRANSACTION_DATA = Object.entries(TRANSACTION_CONFIG).map(([code, config], index) => ({
+  id: index + 1,
+  transaction: config.label,
+  transactionCode: code,
+  tooltip: config.tooltip,
+  gateways: {}
+}));
+
+// Types
+export interface GatewayState {
+  isPrimary?: boolean;
+  isOperational?: boolean;
+  isTemporarilyActive?: boolean;
+  paymentGatewayAcronym?: string;
+  paymentGatewayCode?: string;
+}
+
+export interface ValidationResult {
+  estado: string;
+  isContingency: boolean;
+  descripcion: string;
+}
