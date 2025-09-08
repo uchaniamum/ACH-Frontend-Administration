@@ -268,6 +268,9 @@ async function registerNewParticipantfunc(){
         }
         console.log('la data final es: ', data)
         const response  = await UpdateParticipantExrternal(data)
+        if(response){
+            router.back()
+        }
         console.log('la response es: ',response);
     } catch (error) {
         console.log('error al actualizar participante propio: ', error)

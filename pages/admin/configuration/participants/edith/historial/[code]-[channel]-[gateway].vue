@@ -15,6 +15,7 @@
 import { useRoute } from 'vue-router';
 import { usePartipantsService } from '~/componsables/useParticipants';
 import { useDates } from '~/componsables/useDates';
+
     const { getHistorial } = usePartipantsService();
     const { formatDate } = useDates();
     const { params: { code, channel, gateway}} = useRoute();
