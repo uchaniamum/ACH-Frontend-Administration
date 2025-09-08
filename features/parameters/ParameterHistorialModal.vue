@@ -34,7 +34,7 @@
                         >
                             <Column field="updatedAt" header="Fecha de modificación" sortable style="min-width: 180px;">
                                 <template #body="{ data }">
-                                    {{ formatDateTime(data.updatedAt) }}
+                                    {{ formatDate(data.updatedAt) }}
                                 </template>
                             </Column>
 
@@ -64,7 +64,8 @@
 <script setup lang="ts">
 import { parametersService } from '~/services/parametersService';
 import type { ParameterDetailHisto } from './types';
-
+import { useDates } from '~/componsables/useDates';
+const { formatDate } = useDates();
 // Composables
 const toast = useToast()
 
@@ -138,20 +139,7 @@ const loadFullParameterHistorical = async (code: string): Promise<void> => {
     }
 }
 
-const formatDateTime = (dateString: string): string => {
-    if (!dateString) return 'N/A'
-    
-    try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-        })
-    } catch (error) {
-        return dateString
-    }
-}
+
 
 const closeModal = (): void => {
     modalParameter.value = false

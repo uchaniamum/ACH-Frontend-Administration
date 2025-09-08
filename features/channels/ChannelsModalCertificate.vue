@@ -209,6 +209,7 @@ import { useToast } from 'primevue/usetoast'
 import type { CertificateVerificationRequest } from './type'
 import { channelsService } from '~/services/channelsService'
 import type { UserSaveResponse } from '../users/types'
+import { useDates } from '~/componsables/useDates'
 
 interface VerificationData {
   nroSerie: string
@@ -238,6 +239,8 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
+const { formatDate } = useDates();
+
 const visible = ref(props.modelValue)
 const justification = ref('')
 const isVerifying = ref(false)
@@ -447,14 +450,6 @@ const simulateFileLoading = (fileKey: string) => {
       }
     }
   }, 200)
-}
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('es-BO', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
 }
 
 // Función de verificación mejorada

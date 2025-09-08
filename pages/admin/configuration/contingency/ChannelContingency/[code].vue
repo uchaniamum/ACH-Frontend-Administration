@@ -351,19 +351,19 @@ const oqrContingency = ref(false);
 const hasContingencyInconsistencies = ref(false);
 const contingencyStats = ref({});
 
-// Datos de transacciones - CAMBIA 'name' por 'transaction' para que coincida con tu template
+
 const transactionData = ref([
     {
         id: 1,
-        transaction: 'Envío de transferencias interbancarias IASYNC',
-        transactionCode: 'IASYNC',
+        transaction: 'Envío de transferencias interbancarias OASYNC',
+        transactionCode: 'OASYNC',
         tooltip: 'Información sobre transferencias interbancarias',
         gateways: {}
     },
     {
         id: 2,
-        transaction: 'Envío de transferencias QR IQR',
-        transactionCode: 'IQR',
+        transaction: 'Envío de transferencias QR OQR',
+        transactionCode: 'OQR',
         tooltip: 'Información sobre transferencias QR',
         gateways: {}
     }
@@ -675,7 +675,7 @@ const validateGatewayState = (gateway) => {
 //FUNCIÓN PARA FILTRAR SOLO TRANSACCIONES OUTBOUND
 const isOutboundTransaction = (transactionCode) => {
     // Solo las transacciones de SALIDA pueden cambiar de canal
-    const outboundTransactions = ['IASYNC', 'IQR']; // Envío interbancarias y QR
+    const outboundTransactions = ['OASYNC', 'OQR']; // Envío interbancarias y QR
     return outboundTransactions.includes(transactionCode);
 };
 
@@ -1022,36 +1022,6 @@ const generateOrderedPayload = () => {
                 paymentGateways: []
             };
 
-            // PASO 1: PRIMERO - Agregar el gateway que ERA PRIMARIO ANTES (degradado)
-            console.log(`\n   PASO 1: Buscando gateway primario anterior`);
-            
-            const currentPrimaryGateway = currentBankTransaction.paymentGateways?.find(gw => {
-                const state = validateGatewayState(gw);
-                return state.estado === 'primario_activo';
-            });
-
-            if (currentPrimaryGateway && currentPrimaryGateway.paymentGatewayCode !== selectedGatewayCode) {
-                const oldPrimaryLabel = paymentGatewayOptions.value
-                    .find(opt => opt.value === currentPrimaryGateway.paymentGatewayCode)?.label;
-                
-                console.log(`      Primario anterior: ${oldPrimaryLabel} (${currentPrimaryGateway.paymentGatewayCode})`);
-                console.log(`      🔄 AGREGANDO PRIMERO - Degradando a secundario`);
-                
-                // PRIMERO: El gateway original degradado
-                transaction.paymentGateways.push({
-                    paymentGatewayCode: currentPrimaryGateway.paymentGatewayCode,
-                    isPrimary: false,  // Ahora es secundario
-                    isOperational: true,
-                    isTemporarilyActive: false,
-                    changeReason: `Canal degradado de primario a secundario: ${justification.value}`
-                });
-                
-            } else if (currentPrimaryGateway && currentPrimaryGateway.paymentGatewayCode === selectedGatewayCode) {
-                console.log(`      El canal seleccionado ya era el primario - sin cambio`);
-            } else {
-                console.log(`      No se encontró primario anterior`);
-            }
-
             // PASO 2: SEGUNDO - Agregar el gateway SELECCIONADO (nuevo primario)
             console.log(`\n   PASO 2: Agregando nuevo primario`);
             console.log(`      Nuevo primario: ${selectedGatewayLabel} (${selectedGatewayCode})`);
@@ -1066,44 +1036,36 @@ const generateOrderedPayload = () => {
                 changeReason: `Canal promovido a primario: ${justification.value}`
             });
 
-            // PASO 3: TERCERO - Mantener otros gateways existentes (si los hay)
-            console.log(`\n   PASO 3: Verificando otros gateways existentes`);
+            // // PASO 3: TERCERO - Mantener otros gateways existentes (si los hay)
+            // console.log(`\n   PASO 3: Verificando otros gateways existentes`);
             
-            let otherGatewaysAdded = 0;
-            currentBankTransaction.paymentGateways?.forEach(existingGateway => {
-                const alreadyIncluded = transaction.paymentGateways.some(
-                    pg => pg.paymentGatewayCode === existingGateway.paymentGatewayCode
-                );
+            // let otherGatewaysAdded = 0;
+            // currentBankTransaction.paymentGateways?.forEach(existingGateway => {
+            //     const alreadyIncluded = transaction.paymentGateways.some(
+            //         pg => pg.paymentGatewayCode === existingGateway.paymentGatewayCode
+            //     );
 
-                if (!alreadyIncluded) {
-                    const label = paymentGatewayOptions.value
-                        .find(opt => opt.value === existingGateway.paymentGatewayCode)?.label;
+            //     if (!alreadyIncluded) {
+            //         const label = paymentGatewayOptions.value
+            //             .find(opt => opt.value === existingGateway.paymentGatewayCode)?.label;
                     
-                    console.log(`      Manteniendo: ${label} con estado actual`);
+            //         console.log(`      Manteniendo: ${label} con estado actual`);
                     
-                    transaction.paymentGateways.push({
-                        paymentGatewayCode: existingGateway.paymentGatewayCode,
-                        isPrimary: existingGateway.isPrimary,
-                        isOperational: existingGateway.isOperational,
-                        isTemporarilyActive: existingGateway.isTemporarilyActive,
-                        changeReason: `Estado mantenido: ${justification.value}`
-                    });
+            //         transaction.paymentGateways.push({
+            //             paymentGatewayCode: existingGateway.paymentGatewayCode,
+            //             isPrimary: existingGateway.isPrimary,
+            //             isOperational: existingGateway.isOperational,
+            //             isTemporarilyActive: existingGateway.isTemporarilyActive,
+            //             changeReason: `Estado mantenido: ${justification.value}`
+            //         });
                     
-                    otherGatewaysAdded++;
-                }
-            });
+            //         otherGatewaysAdded++;
+            //     }
+            // });
             
-            if (otherGatewaysAdded === 0) {
-                console.log(`      No hay otros gateways para mantener`);
-            }
-
-            // MOSTRAR ORDEN FINAL
-            console.log(`\n   📋 ORDEN FINAL DE GATEWAYS PARA ${transactionRow.transactionCode}:`);
-            transaction.paymentGateways.forEach((pg, index) => {
-                const label = paymentGatewayOptions.value.find(opt => opt.value === pg.paymentGatewayCode)?.label;
-                const role = pg.isPrimary ? 'PRIMARIO' : 'SECUNDARIO';
-                console.log(`      ${index + 1}. ${label} (${pg.paymentGatewayCode}): ${role}`);
-            });
+            // if (otherGatewaysAdded === 0) {
+            //     console.log(`      No hay otros gateways para mantener`);
+            // }
 
             participant.transactions.push(transaction);
         });
@@ -1216,95 +1178,18 @@ const saveConfirm = async () => {
             console.log('\n📋 PAYLOAD FINAL CON ORDEN CORRECTO:');
             console.log(JSON.stringify(payload, null, 2));
 
-            const responseChannel = await contingencyService.updateChangeChannel(payload);
-            console.log('Respuesta canal: ',responseChannel);
-            if(responseChannel){
-                toast.add({
-                    severity: 'success',
-                    summary: 'Éxito',
-                    detail: 'Canal cambiado exitosamente',
-                    life: 5000
-                });
-            }
-            
-        }else {
-            // // LÓGICA PARA ESTABLECER CONTINGENCIA
-            // const payload = {
-            //     contingencyTitle: titleContingency.value,
-            //     contingencyDetail: messageContingency.value,
-            //     isOperational: false, // Según tu JSON debe ser true
-            //     participants: []
-            // };
-
-            // // Mapeo de switches a códigos de transacción
-            // const transactionSwitches = {
-            //     'IASYNC': iasyncContingency.value,
-            //     'IQR': iqrContingency.value,
-            //     'OASYNC': oasyncContingency.value,
-            //     'OQR': oqrContingency.value
-            // };
-
-            // // Para cada banco/participante
-            // contingencyData.value.forEach(bank => {
-            //     const participant = {
-            //         participantCode: bank.participantCode || bank.code,
-            //         transactions: []
-            //     };
-
-            //     // Procesar solo las transacciones donde el switch está activado
-            //     Object.entries(transactionSwitches).forEach(([transactionCode, switchValue]) => {
-            //         if (switchValue) {
-            //             // Buscar la transacción en los datos del banco
-            //             const bankTransaction = bank.transactions?.find(t => t.transactionCode === transactionCode);
-                        
-            //             if (bankTransaction) {
-            //                 const transaction = {
-            //                     transactionCode: transactionCode,
-            //                     paymentGateways: []
-            //                 };
-
-            //                 // Para cada gateway de esta transacción
-            //                 bankTransaction.paymentGateways?.forEach(gateway => {
-            //                     transaction.paymentGateways.push({
-            //                         paymentGatewayCode: gateway.paymentGatewayCode,
-            //                         changeReason: `Contingencia establecida para ${gateway.paymentGatewayAcronym}: ${justification.value}`
-            //                     });
-            //                 });
-
-            //                 if (transaction.paymentGateways.length > 0) {
-            //                     participant.transactions.push(transaction);
-            //                 }
-            //             }
-            //         }
-            //     });
-
-            //     // Solo agregar participante si tiene transacciones con cambios
-            //     if (participant.transactions.length > 0) {
-            //         payload.participants.push(participant);
-            //     }
-            // });
-
-            // // Validar que hay al menos un switch activado
-            // const hasActiveSwitch = Object.values(transactionSwitches).some(value => value === true);
-            // if (!hasActiveSwitch) {
-            //     throw new Error('Debe activar al menos una transacción para establecer la contingencia');
-            // }
-
-            // //console.log('Payload contingencia:', JSON.stringify(payload, null, 2));
-
-            // console.log('Payload contingencia:',payload);
-
-            // const responseContingency = await contingencyService.updateContingency(payload);
-            // console.log('Response contingency: ', responseContingency)
-
-            // if(responseContingency){
+            // const responseChannel = await contingencyService.updateChangeChannel(payload);
+            // console.log('Respuesta canal: ',responseChannel);
+            // if(responseChannel){
             //     toast.add({
             //         severity: 'success',
             //         summary: 'Éxito',
-            //         detail: `Contingencia establecida exitosamente para ${payload.participants.length} participantes`,
+            //         detail: 'Canal cambiado exitosamente',
             //         life: 5000
             //     });
             // }
+            
+        }else {
                     // Mapeo de switches a códigos de transacción
         const transactionSwitches = {
             'IASYNC': iasyncContingency.value,
@@ -1442,10 +1327,10 @@ const saveConfirm = async () => {
             visibleChangeCanal.value = false;
             visibleContingency.value = false;
 
-            // Redirigir después de un breve delay
-            setTimeout(() => {
-                router.push('/admin/configuration/contingency');
-            }, 1500);
+            // // Redirigir después de un breve delay
+            // setTimeout(() => {
+            //     router.push('/admin/configuration/contingency');
+            // }, 1500);
         
     } catch (err) {
         console.error('Error saving changes:', err);

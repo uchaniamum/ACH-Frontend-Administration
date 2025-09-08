@@ -28,7 +28,7 @@
 
 
 <script setup lang="ts">
-import { useMenuNavigation } from '~/componsables/useMenuNavigation';
+import { useMenuNavigation } from '~/componsables/useNavigation';
 
 
 const { 

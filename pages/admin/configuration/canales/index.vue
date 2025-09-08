@@ -132,6 +132,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core';
+import { useDates } from '~/componsables/useDates';
 import { useRouteAliases } from '~/componsables/useRouteAliases';
 import { useUniqueValues } from '~/componsables/useUniqueValues';
 import type { ChannelsListItem } from '~/features/channels/type';
@@ -141,7 +142,7 @@ import { channelsService } from '~/services/channelsService';
 // Composables 
 const toast = useToast()
 const router = useRouter();
-
+const { formatDate } = useDates();
 // State
 const channels = ref<ChannelsListItem[]>([]);
 const loading = ref(false);
@@ -236,14 +237,6 @@ const paginatedChannels = computed(() => {
     return filteredChannel.value.slice(start, end);
 });
 
-// Función para formatear fecha
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-BO', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-    });
-}
 
 // Manejo de paginación
 const onPageChange = (event: any) => {

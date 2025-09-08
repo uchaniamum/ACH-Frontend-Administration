@@ -26,8 +26,8 @@
                     </div>
                 </div>
                 <!-- Horarios extraordinarios/excepciones -->
-                <div v-if="schedulesDetails?.scheduleExceptions && schedulesDetails.scheduleExceptions.length > 0">
-                        <div v-for="(exception, index) in schedulesDetails.scheduleExceptions" 
+                    <div v-if="activeScheduleExceptions && activeScheduleExceptions.length > 0">
+                        <div v-for="(exception, index) in activeScheduleExceptions" 
                                 :key="exception.code + index">
                                 <XAccordion value="0">
                                     <XAccordionPanel value="0">
@@ -109,8 +109,10 @@ import type { ScheduleDetailReponse, ScheduleExceptions, ScheduleFormData, Sched
 import { useScheduleModalDetail } from '~/componsables/schedule/useScheduleDetalle';
 import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { scheduleService } from '~/services/scheduleService';
+import { useDates } from '~/componsables/useDates';
 
 const toast = useToast()
+const { formatDate, formatTime } = useDates();
 
 interface Props {
     modelValue: boolean
@@ -152,6 +154,20 @@ const deleteFormData = ref<{
     scheduleData: ScheduleInActiveException,
     index: number
 } | null>(null)
+
+const activeScheduleExceptions = computed(() => {
+    if (!schedulesDetails.value?.scheduleExceptions) return [];
+    
+    return schedulesDetails.value.scheduleExceptions.filter(exception => {
+        const isActive = exception.isActive !== undefined ? exception.isActive : 
+                        exception.active !== undefined ? exception.active :
+                        exception.status === 'active' ||
+                        exception.status === 'ACTIVE' ||
+                        true;
+        
+        return isActive;
+    });
+});
 
 const openConfirmModalDelete = (scheduleInActive: ScheduleInActiveException, index: number): void => {
     deleteFormData.value = {
@@ -247,46 +263,47 @@ const loadFullScheduleDetails = async (code: string): Promise<void> => {
     }
 }
 
-const formatDate = (date: string | Date | null | undefined): string => {
-    if (!date) return 'No disponible'
+// const formatDate = (date: string | Date | null | undefined): string => {
+//     if (!date) return 'No disponible'
     
-    try {
-        const dateObj = typeof date === 'string' ? new Date(date) : date
-        return dateObj.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        })
-    } catch (error) {
-        return `Fecha inválida ${error}`
-    }
-}
+//     try {
+//         const dateObj = typeof date === 'string' ? new Date(date) : date
+//         return dateObj.toLocaleDateString('es-ES', {
+//             year: 'numeric',
+//             month: 'long',
+//             day: 'numeric'
+//         })
+//     } catch (error) {
+//         return `Fecha inválida ${error}`
+//     }
+// }
 
-const formatTime = (time: string | Date | null | undefined): string => {
-    if (!time) return 'No disponible'
+// const formatTime = (time: string | Date | null | undefined): string => {
+//     if (!time) return 'No disponible'
     
-    try {
-        if (typeof time === 'string') {
-            if (time.includes(':')) {
-                return time.substring(0, 5) // Retorna solo HH:MM
-            }
-            const dateObj = new Date(time)
-            return dateObj.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            })
-        } else {
-            return time.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            })
-        }
-    } catch (error) {
-        return 'Hora inválida'
-    }
-}
+//     try {
+//         if (typeof time === 'string') {
+//             if (time.includes(':')) {
+//                 return time.substring(0, 5) // Retorna solo HH:MM
+//             }
+//             const dateObj = new Date(time)
+//             return dateObj.toLocaleTimeString('es-ES', {
+//                 hour: '2-digit',
+//                 minute: '2-digit',
+//                 hour12: false
+//             })
+//         } else {
+//             return time.toLocaleTimeString('es-ES', {
+//                 hour: '2-digit',
+//                 minute: '2-digit',
+//                 hour12: false
+//             })
+//         }
+//     } catch (error) {
+//         return 'Hora inválida'
+//     }
+// }
+
 
 const handleEditSchuleException = (exception: ScheduleExceptions, index: number) => {
     console.log('Editando excepción:', exception, 'Índice:', index);
@@ -359,10 +376,6 @@ const confirmDelete = async (): Promise<void> => {
                 life: 5000
             })
         }
-        // Emitir evento de eliminación exitosa si es necesario
-        // emit('delete', { exception: deleteFormData.value.scheduleData, index: deleteFormData.value.index })
-        
-        // Recargar datos o cerrar modal según sea necesario
         
     } catch (error) {
         console.error('Error eliminando horario:', error)
