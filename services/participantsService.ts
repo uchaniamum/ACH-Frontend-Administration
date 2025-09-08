@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { CertificatePublicParticipantVerificationRequest, CertificateVerificationRequest, ParticipantsDetail, ParticipantsList } from "~/features/participants/types";
+import type { CertificatePublicParticipantVerificationRequest, CertificateVerificationRequest, ParticipantsDetail, ParticipantsList, CertificateVerificationPrivateRequest } from "~/features/participants/types";
 
 class ParticipantsService {
     private baseURL = API_CONFIG.BASE_URL;
@@ -48,12 +48,20 @@ class ParticipantsService {
     
 
     async registerCertificatePublic(data: CertificateVerificationRequest): Promise<void> {
-        console.log('service: ',data)
         return this.request<void>('certificates/public-certificates-validate', {
             method: 'POST',
             body: JSON.stringify(data)
         });
     }
+
+    async registerCertificatePrivate(data: CertificateVerificationPrivateRequest): Promise<void> {
+        console.log('service: ',data)
+        return this.request<void>('certificates/private-certificates-validate', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
 
     async getParticipantByCode(code: string): Promise<any> {
         if (!code) {
@@ -78,6 +86,13 @@ class ParticipantsService {
     });
     }
 
+    async registerNOwnParticipant(data: ParticipantsDetail): Promise<void> {
+    return this.request<void>('own-participants', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+    }
+
     async updateParticipantExternal(data: ParticipantsDetail): Promise<void> {
     return this.request<void>('external-participants', {
         method: 'PUT',
@@ -90,6 +105,13 @@ class ParticipantsService {
             method: 'GET'
         })
         return paymentGatewaysActive
+     }
+
+    async getHistorialChannel(participantCode:string, paymentGatewayCode:string){
+        const response = await this.request<any>(`certificates/${participantCode}/payment-gateways/${paymentGatewayCode}/certificates`, {
+            method: 'GET'
+        })
+        return response
      }
 
 }

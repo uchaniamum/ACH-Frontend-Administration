@@ -42,8 +42,10 @@
                 </div>
             </template>
             <template #footer>
-            <div class="mt-6  flex justify-end">
-                <XButton label="Editar Banco"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
+            <div class="mt-6  flex justify-end gap-10">
+                <!-- {{ participant.participantCode }} -->
+                <!-- <XButton label="Ver Historial"  variant="outlined" class="w-65" @click="router.push(`participants/historial/${participant.participantCode}`)"/> -->
+                <XButton label="Editar"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
             </div>
             </template>
         </XCard>
@@ -71,7 +73,13 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const checkCanales = (participant: string) => {
-    emit('participantSelected', participant.participantCode);
+    console.log(participant)
+    if(participant.isSelf){
+        emit('participantSelected', participant.code);
+    }else{
+        emit('participantSelected', participant.participantCode);
+    }
+    // emit('participantSelected', participant.isSelf ? participant.code : participant.participantCode);
 };
 
 const emit = defineEmits<{

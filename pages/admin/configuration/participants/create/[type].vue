@@ -88,19 +88,47 @@
                             <div class="mt-12 flex justify-end gap-2">
                                 <XButton variant="text" label="Limpiar" @click="clearChannel(channel)"
                                     :disabled="!channel.registered" class="w-[10.714rem]" />
-                                <XButton variant="outlined" label="Registrar" @click="registerCertificate(channel)" />
+                                <XButton variant="outlined" label="Registrar" @click="registerCertificate(channel)" :disabled="channel.registered"/>
                             </div>
                             <!-- cliente propio -->
-                            <div class="flex flex-col" v-if="type == 'own'">
-                                <h4 class="font-semibold"> Certificado privado</h4>
-                                <XInputText label="Password" name="password" v-model="channel.privatecertificate.password"
-                                label-required class="w-full" />
-                                <FileUploadCertificate documents-accepted=".pfx"
-                                @registered="channel.privateCertificate = $event" />
+                             <XDivider class="my-10"/>
+                            <div class="flex flex-col" v-if="type == 'own' " >
+                                <div class="flex flex-col" v-if="!channel.registeredPrivate">
+                                    <h4 class="font-semibold"> Certificado privado</h4>
+                                    <XInputText label="Password" :name="`password-${index}`" v-model="channel.password"
+                                        label-required class="w-full" />
+                                    <FileUploadCertificate documents-accepted=".pfx"
+                                        @registered="channel.privateCertificate = $event" />
+                                </div>
+                                <div class="flex flex-col gap-12" v-if="channel.registeredPrivate">
+                                    <div class="flex flex-col">
+                                        <H5 class="font-semibold">Código {{ channel.name }}</H5>
+                                        <span> {{ channel.dataCertificatePrivate.serialNumber }}</span>
+                                    </div>
+                                    <h5 class="font-semibold">Certificado</h5>
+                                    <div class="grid grid-cols-4 gap-32">
+                                        <div class="flex flex-col">
+                                            <p class="text-[12px]">Certificado activo</p>
+                                            <span>{{ channel.dataCertificatePrivate.serialNumber }}</span>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <p class="text-[12px]">Válido desde</p>
+                                            <span>{{ channel.dataCertificatePrivate.ValidFrom }}</span>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <p class="text-[12px]">Válido hasta</p>
+                                            <span>{{ channel.dataCertificatePrivate.ValidTo }}</span>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <p class="text-[12px]">Estado</p>
+                                            <XTag severity="success" value="Activo" class="w-[60px]" />
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="mt-12 flex justify-end gap-2">
-                                    <XButton variant="text" label="Limpiar" @click="clearChannel(channel)"
-                                        :disabled="!channel.registered" class="w-[10.714rem]" />
-                                    <XButton variant="outlined" label="Registrar" @click="registerCertificate(channel)" />
+                                    <XButton variant="text" label="Limpiar" @click="clearChannelPrivate(channel)"
+                                        :disabled="!channel.registeredPrivate" class="w-[10.714rem]" />
+                                    <XButton variant="outlined" label="Registrar" @click="chargePrivateCertificate(channel)" :disabled="channel.registeredPrivate" />
                                 </div>
                             </div>
                         </AccordionContent>
@@ -146,7 +174,7 @@ const schema = {
 
 const router = useRouter()
 const toast = useToast()
-const { getChannels, registerCertificatePublicExternal, registerParticipant  } = usePartipantsService();
+const { getChannels, registerCertificatePublicExternal, registerParticipant, chargeCertificatePrivate, registerParticipantOwn  } = usePartipantsService();
 const { entidad } = useFormRegisterParticipant();
 const type = useRouteParams('type');
 const { formatDate } = useDates();
@@ -179,11 +207,16 @@ onMounted(async () => {
         if (item.isActive) {
             return {
                 ...item,
-                privatecertificate: {},
                 name: item.displayName,
                 paymentGatewayCode: '',
                 registered: false,
+                registeredPrivate: false,
                 dataCertificate: {
+                    serialNumber: '',
+                    ValidFrom: '',
+                    ValidTo: ''
+                },
+                dataCertificatePrivate: {
                     serialNumber: '',
                     ValidFrom: '',
                     ValidTo: ''
@@ -211,6 +244,14 @@ function clearChannel(channel) {
     console.log('delete', channel)
 }
 
+function clearChannelPrivate(channel) {
+    channel.password = '',
+    channel.privateCertificate = {},
+    channel.registeredPrivate = false
+
+    console.log('delete', channel)
+}
+
 // Register
 async function registerCertificate(code) {
     console.log('data capturada: ',code)
@@ -232,7 +273,7 @@ async function registerCertificate(code) {
             console.log('code registro certificate: ', code)
             searchCertificate(listCertificates.value, { ...code })
         }
-
+        console.log('list update publicc', listCertificates.value)
     } catch (error) {
         throw new Error(error)
     }
@@ -264,20 +305,35 @@ async function registerNewParticipantfunc() {
         ...dataCertificate.value,
         ...listCertificates.value
     }
+    console.log('la data es: ', data)
     const { codigo, participant, sigla, mainChannel} = data
     const newList:any = []
     listCertificates.value.forEach(element => {
             if(element.code !== '' && element.publicCertificate){
-                const certificate = {
-                    code: element.code,
-                    paymentGatewayParticipantCode: element.paymentGatewayCode,
-                    publicCertificate: element.publicCertificate,
-                    privateCertificate: {
-                        base64Content: '',
-                        password: ''
+                if(type.value == 'own'){
+                    console.log(element.code)
+                    const certificate = {
+                        code: element.code,
+                        paymentGatewayParticipantCode: element.paymentGatewayCode,
+                        publicCertificate: element.publicCertificate,
+                        privateCertificate: {
+                            ...element.privateCertificate,
+                            password: element.password
+                        }
                     }
+                    newList.push(certificate)
+                }else{
+                    const certificate = {
+                        code: element.code,
+                        paymentGatewayParticipantCode: element.paymentGatewayCode,
+                        publicCertificate: element.publicCertificate,
+                        privateCertificate: {
+                            base64Content: '',
+                            password: ''
+                        }
+                    }
+                    newList.push(certificate)
                 }
-                newList.push(certificate)
             }
     });
     const newPartcipant = {
@@ -291,8 +347,13 @@ async function registerNewParticipantfunc() {
     console.log(
         'test',newPartcipant
     )
-    const response = await registerParticipant(newPartcipant)
-    console.log('response', response)
+    const response = ref()
+    if(type.value == 'own'){
+       response.value  = await registerParticipantOwn(newPartcipant)
+    }else{
+       response.value = await registerParticipant(newPartcipant)
+    }
+    console.log('response', response.value)
     if(response){
     toast.add({
             severity: 'success',
@@ -311,6 +372,37 @@ async function registerNewParticipantfunc() {
         })
     }
     
+}
+
+async function chargePrivateCertificate({ privateCertificate: { base64Content }, password, code,  }:any){
+    const chargingCertificate = {
+            privateCertificate: {
+                base64Content: base64Content,
+                password: password
+            }
+    }
+    console.log('data private: ', chargingCertificate)
+    console.log('list general: ', listCertificates.value)
+    try {
+        const { ValidFrom, ValidTo, serialNumber } = await chargeCertificatePrivate(chargingCertificate)
+        console.log('response private', { ValidFrom, ValidTo, serialNumber })
+        const found = listCertificates.value.find(item => item.code == code);
+        console.log('found', found.dataCertificate.ValidFrom)
+        if(certificate){
+            found.dataCertificatePrivate = {
+                serialNumber: serialNumber,
+                ValidFrom: formatDate(ValidFrom),
+                ValidTo: formatDate(ValidTo)
+            }
+            found.registeredPrivate = true
+        }
+
+        console.log('list update: ',listCertificates.value)
+
+    } catch (error) {
+        
+    }
+
 }
 
 // watch(channels,(newVal:JSON)=>{
