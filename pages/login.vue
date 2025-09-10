@@ -8,7 +8,7 @@
                 class="absolute flex flex-col items-center justify-center gap-6 text-center transition-opacity duration-700"
                 :class="{ 'opacity-100': index === currentIndex, 'opacity-0': index !== currentIndex }"
             >
-                <img :src="slide.image" alt="Slide image" class="w-[250px]" />
+                <img :src="slide.image" alt="Slide image" class="w-[440px]" />
                 <div class="flex flex-col w-[440px]">
                     <span class="text-primary-600 text-[38px] font-bold">{{ slide.title }}</span>
                     <span class="text-gray-700">{{ slide.subtitle }}</span>

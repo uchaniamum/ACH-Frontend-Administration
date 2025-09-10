@@ -49,7 +49,6 @@ class UserService {
     }
 
     async createUser(userData: UserRequest): Promise<UserSaveResponse> {
-        console.log('Llega aqui',userData);
         return this.request<any>('users', {
             method: 'POST',
             body: JSON.stringify(userData)
@@ -57,7 +56,6 @@ class UserService {
     }
 
     async updateUser(userData: UserRequest): Promise<UserSaveResponse> {
-        console.log('Llega aqui editar',userData);
         return this.request<UserSaveResponse>('users', {
             method: 'PUT',
             body: JSON.stringify(userData)

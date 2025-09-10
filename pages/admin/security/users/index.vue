@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-16">
-        <XHeader title="Gestión de usuarios">
+        <XHeader title="Gestión de usuarios" :breadcrumb-items="itemsBreadUsers" :show-breadcrumb="true">
             <template #description>
                 <p class="text-gray-800">Crea usuarios y asigna los roles correspondientes, procura garantizar que cada usuario cuente con los permisos adecuados para sus funciones.</p>
             </template>
@@ -55,7 +55,7 @@
                         <template #empty> <span class="flex justify-center">No se encontraron usuarios.</span> </template>
                         <template #loading> <span class="flex justify-center">Cargando datos de usuarios. Por favor espere.</span> </template>
 
-                        <Column field="codigo" header="Código" sortable class="w-[158px]" :showFilterMenu="false">
+                        <Column field="codigo" header="Código" sortable class="min-w-[158px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.code }}
                             </template>
@@ -73,7 +73,7 @@
                             </template>
                         </Column>
                     
-                        <Column field="fullname" header="Nombre" sortable class="w-[280px]" :showFilterMenu="false">
+                        <Column field="fullname" header="Nombre" sortable class="min-w-[280px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.fullname }}
                             </template>
@@ -91,7 +91,7 @@
                             </template>
                         </Column>
                     
-                        <Column field="email" header="Correo Electrónico" sortable class="w-[225px]" :showFilterMenu="false">
+                        <Column field="email" header="Correo Electrónico" sortable class="min-w-[225px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.email }}
                             </template>
@@ -109,7 +109,7 @@
                             </template>
                         </Column>
                     
-                        <Column field="roleDescription" header="Rol" sortable class="w-[158px]" :showFilterMenu="false">
+                        <Column field="roleDescription" header="Rol" sortable class="min-w-[158px]" :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.roleDescription" 
@@ -131,7 +131,7 @@
                             </template>
                         </Column>
                     
-                        <Column field="statusDescription" header="Estado" sortable class="w-[158px]" :showFilterMenu="false">
+                        <Column field="statusDescription" header="Estado" sortable class="min-w-[158px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
@@ -152,7 +152,7 @@
                                 />
                             </template>
                         </Column>
-                        <Column header="Acciones" class="w-[133px]">
+                        <Column header="Acciones" class="min-w-[133px] text-left">
                             <template #body="{ data }">
                                 <div class="flex gap-2">
                                     <XButton 
@@ -171,15 +171,22 @@
                             </template>
                         </Column>
                     </DataTable>
-
-                    <Paginator 
-                        v-if="hasUsers"
-                        :rows="rows"
-                        :totalRecords="users.length"
-                        :first="first"
-                        :rowsPerPageOptions="[10, 25, 50, 100]"
-                        @page="onPage"
-                    />
+                    <div class="flex justify-center">
+                        <Paginator 
+                            v-if="hasUsers"
+                            :rows="rows"
+                            :totalRecords="users.length"
+                            :first="first"
+                            :rowsPerPageOptions="[10, 25, 50, 100]"
+                            @page="onPage"
+                            template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                        >
+                            <template #start="slotProps">
+                                Página: {{ slotProps.state.page + 1 }}, Filas: 
+                            </template>
+                        </Paginator>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -189,12 +196,6 @@
             :mode="modalStateUser.mode"
             :userData="modalStateUser.userData"
             @save="handleUserSaved"
-        />
-
-        <UserModalReset
-            v-model="modalStateRevert.showModal"
-            :userData="modalStateRevert.userData"
-            @save="handlePasswordReset"
         />
 
         <ConfirmDialogWrapper
@@ -211,7 +212,7 @@ import { useOptions } from '~/componsables/useOptions';
 import { useUserService } from '~/componsables/useUsers';
 import type { ModalMode, ServiceError, UserListItem, UserModalData } from '~/features/users/types';
 import UserModal from '~/features/users/UserModal.vue';
-import UserModalReset from '~/features/users/UserModalReset.vue';
+import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { userService } from '~/services/userService';
 
 // Composables 
@@ -231,6 +232,8 @@ const loading = ref(false)
 const searchTerm = ref('')
 const first = ref(0)
 const rows = ref(10)
+
+const itemsBreadUsers = getBreadcrumbItems('users', 'list');
 
 // Filters
 const filters = ref({
@@ -260,15 +263,6 @@ const modalStateUser = ref<{
 }>({
     modalUser: false,
     mode: 'create',
-    userData: undefined
-})
-
-// State para el modal de reseteo de contraseña
-const modalStateRevert = ref<{
-    showModal: boolean,
-    userData?: UserModalData,
-}>({
-    showModal: false,
     userData: undefined
 })
 
@@ -381,10 +375,6 @@ const openEditModal = (userData: UserModalData): void => {
 
 const handleUserSaved = (): void => {
     loadUsers()
-}
-
-const handlePasswordReset = (userData?: UserModalData): void => {
-    console.log('Contraseña reseteada para:', userData)
 }
 
 // Lifecycle

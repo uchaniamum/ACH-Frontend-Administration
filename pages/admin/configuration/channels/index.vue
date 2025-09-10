@@ -1,12 +1,12 @@
 <template>
     <div>
-        <XHeader title="Administracion de Canales" :breadcrumb-items="itemsBreadParameters" :show-breadcrumb="true">
+        <XHeader title="Administracion de Canales" :breadcrumb-items="itemsBreadChannels" :show-breadcrumb="true">
             <template #description>
                 <p>Gestiona los canales modificando el centro de procesamiento, las rutas asociadas, los certificados correspondientes y realiza un seguimiento a través del historial de cambios.</p>
             </template>
         </XHeader>
-        <div class="pt-12 flex flex-col gap-20">
-            <div class="flex justify-between gap-4">
+        <div class="flex flex-col gap-12">
+            <div class="pt-20 flex justify-between gap-4">
                 <div class="self-center">
                     <XIconField>
                         <XInputText name="codigo" placeholder="Buscar" v-model="searchChannels"/>
@@ -36,14 +36,14 @@
                                 v-model="filterModel.value"  
                                 type="text" 
                                 @input="filterCallback()" 
-                                class="!w-47" 
+                                class="!min-w-47" 
                                 placeholder="Buscar"
                             />
                             <XInputIcon icon="search" />
                         </IconField>
                     </template>
                 </Column>
-                <Column field="name" header="Nombre" :showFilterMenu="false" class="min-w-[328px]">
+                <Column field="name" header="Nombre" sortable :showFilterMenu="false" class="min-w-[328px]">
                     <template #body="{ data }">
                         {{ data.name }}
                     </template>
@@ -56,12 +56,12 @@
                             optionLabel="label" 
                             optionValue="value"
                             placeholder="Buscar" 
-                            class="w-[300px]" 
+                            class="min-w-[21.429rem]" 
                             :showClear="true"
                         />
                     </template>
                 </Column>
-                <Column field="acronym" header="Sigla" :showFilterMenu="false" class="w-[145px]">
+                <Column field="acronym" header="Sigla" sortable :showFilterMenu="false" class="w-[145px]">
                     <template #body="{ data }">
                         {{ data.acronym }}
                     </template>
@@ -79,7 +79,7 @@
                         />
                     </template>
                 </Column>
-                <Column field="aliases" header="Alias CPD" :showFilterMenu="false" style="width:145px">
+                <Column field="aliases" header="Alias CPD" sortable :showFilterMenu="false" style="width:145px">
                     <template #body="{ data }">
                         <div v-for="(route, index) in data.routes" :key="index">
                             {{ route.alias }}
@@ -99,7 +99,7 @@
                         />
                     </template>
                 </Column>
-                <Column field="updatedAt" header="Última modificación" :showFilterMenu="false" class="!min-w-[189px]">
+                <Column field="updatedAt" header="Última modificación" sortable :showFilterMenu="false" class="!min-w-[189px]">
                     <template #body="{ data }">
                         {{ formatDate(data.updatedAt) }}
                     </template>
@@ -109,7 +109,7 @@
                                 v-model="filterModel.value" 
                                 type="text" 
                                 @input="filterCallback()" 
-                                class="!w-70" 
+                                class="!min-w-70" 
                                 placeholder="Buscar"
                             />
                             <XInputIcon icon="search" />
@@ -119,9 +119,9 @@
                 <Column field="accion" header="Acción" class="!w-[122px]">
                     <template #body="{ data }">
                         <div class="flex gap-4">
-                            <XButton variant="outlined" icon="edit-pencil" @click="navigateToEditChannel(data)" />
-                            <XButton variant="outlined" icon="user" @click="navigateToHistory(data)" />
-                            <XButton variant="outlined" icon="privacy-policy" @click="navigateToCertificates(data)" />
+                            <XButton v-tooltip.bottom="{ value: 'Editar', hideDelay: 300 }" variant="outlined" icon="edit-pencil" @click="navigateToEditChannel(data)" />
+                            <XButton v-tooltip.bottom="{ value: 'Ver Historial Participantes', hideDelay: 300 }" variant="outlined" icon="user" @click="navigateToHistory(data)" />
+                            <XButton v-tooltip.bottom="{ value: 'Ver Historial Certificados', hideDelay: 300 }" variant="outlined" icon="privacy-policy" @click="navigateToCertificates(data)" />
                         </div> 
                     </template>
                 </Column>
@@ -137,6 +137,7 @@ import { useRouteAliases } from '~/componsables/useRouteAliases';
 import { useUniqueValues } from '~/componsables/useUniqueValues';
 import type { ChannelsListItem } from '~/features/channels/type';
 import type { ServiceError } from '~/features/users/types';
+import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { channelsService } from '~/services/channelsService';
 
 // Composables 
@@ -162,6 +163,8 @@ const channelsWithAliases = computed(() => {
     }));
 });
 
+const itemsBreadChannels = getBreadcrumbItems('channels', 'list');
+
 // Filters
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -172,11 +175,6 @@ const filters = ref({
     updatedAt: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-const itemsBreadParameters = ref([
-    { label: 'Inicio', to: '/' },
-    { label: 'Configuracion', to: '/admin/configuration' },
-    { label: 'Canales' }
-])
 
 // Helper function para safe string conversion
 const safeLowerCase = (str: string | null | undefined): string => {
@@ -284,15 +282,15 @@ onMounted(() => {
 
 // Navegación
 const navigateToEditChannel = (channel: ChannelsListItem) => {
-    router.push(`/admin/configuration/canales/EditChannels/${channel.code}`);
+    router.push(`/admin/configuration/channels/EditChannels/${channel.code}`);
 }
 
 const navigateToHistory = (channel: ChannelsListItem) => {
-    router.push(`/admin/configuration/canales/HistorialParticipantes/${channel.code}`);
+    router.push(`/admin/configuration/channels/HistorialParticipantes/${channel.code}`);
 }
 
 const navigateToCertificates = (channel: ChannelsListItem) => {
-    router.push(`/admin/configuration/canales/HistorialCertificados/${channel.code}`);
+    router.push(`/admin/configuration/channels/HistorialCertificados/${channel.code}`);
 }
 
 // Debug para verificar las opciones de alias

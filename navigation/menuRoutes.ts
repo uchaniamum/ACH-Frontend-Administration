@@ -5,7 +5,7 @@ const menuConfigACH: MenuBarAdminConfig = {
         {
             label: 'Dashboard',
             icon: 'house',
-            to: '/admin/dashboard'
+            to: '/'
         },
         {
             label: 'Configuración',
@@ -13,7 +13,7 @@ const menuConfigACH: MenuBarAdminConfig = {
             items: [
                 {
                     label: 'Canales',
-                    to: '/admin/configuration/canales',
+                    to: '/admin/configuration/channels',
                 },
                 {
                     label: 'Contingencia',

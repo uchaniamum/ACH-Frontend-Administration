@@ -31,7 +31,6 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
-      // Usa un prefix específico para tu API
       '/my-api/**': {
         proxy: 'http://10.240.208.143/interbank-core-cortex-api/api/**',
         cors: true,
@@ -41,7 +40,7 @@ export default defineNuxtConfig({
   
   runtimeConfig: {
     public: {
-      apiBase: '/my-api' // ← Cambia a un prefix único
+      apiBase: '/my-api'
     }
   }
 })

@@ -1,8 +1,8 @@
 <template>
     <div>
       <div v-if="channelData" class="flex flex-col gap-8">
-        <XHeader :title="`Editar canal - ${channelData.name}`"  @back-click="goBack"/>
-        <span class="text-normal font-normal">Esta sección te permite modificar el centro de procesamiento, asegúrate de contar con los certificados y respaldos correspondientes.</span>
+        <XHeader :title="`Editar canal - ${channelData.name}`" :breadcrumb-items="itemsBreadChannelsEdit" :show-breadcrumb="true" @back-click="goBack"/>
+        <span class="text-normal font-normal">Registra el certificado del canal y/o modifica el centro de procesamiento.</span>
     
         <div class="pt-12 flex flex-col gap-20">
         <div class="px-[calc((210/14)*1rem)] flex flex-col gap-12 ">
@@ -53,7 +53,7 @@
               </template>
           </XCard>
           <!-- Actions -->
-          <div v-if="hasRouteChanged" class="flex flex-col">
+          <div  class="flex flex-col">
             <XDivider class="mb-6"/>
             <div class="w-full flex flex-row justify-end gap-6">
               <XButton 
@@ -66,6 +66,7 @@
                 label="Guardar" 
                 @click="confirmModalVisible = true"
                 class="w-75"
+                :disabled="!hasRouteChanged"
               />
             </div>
           </div>
@@ -120,6 +121,7 @@ import { channelsService } from '~/services/channelsService';
 import type { ChannelsResponse } from '~/features/channels/type';
 import ChannelsModalConfirm, { type RouteSelection } from '~/features/channels/ChannelsModalConfirm.vue';
 import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertificate.vue';
+import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 
 const route = useRoute();
 const router = useRouter();
@@ -139,6 +141,9 @@ const visibleDialogCertificateRegister = ref(false)
 
 
 const channelCode = computed(() => route.params.code as string)
+
+const itemsBreadChannelsEdit = getBreadcrumbItems('channels', 'edit');
+
 
 // Computed properties
 const processedRoutes = computed(() => {
