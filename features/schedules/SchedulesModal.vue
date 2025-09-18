@@ -21,6 +21,7 @@
         :options="confirmDialogSchedules.options"
     />
 
+    <!-- Toast removido de aquí -->
 </template>
 
 <script setup lang="ts">
@@ -87,7 +88,7 @@ watch(() => props.modelValue, async (newValue) => {
     } else {
         closeModal()
     }
-})
+}) 
 
 // Watch para emitir cambios del modal al padre
 watch(modalSchedule, (newValue) => {
@@ -109,7 +110,7 @@ const pendingFormData = ref<ScheduleFormData | null>(null)
 
 const openConfirmModalSave = (formData: ScheduleFormData): void => {
     pendingFormData.value = formData
-    
+
     
     confirmDialogSchedules.value = {
         visible: true,
@@ -117,7 +118,6 @@ const openConfirmModalSave = (formData: ScheduleFormData): void => {
             title: isEditMode.value ? 'Editar horario extraordinario' : 'Nuevo horario extraordinario',
             icon: 'x:warning-circle',
             iconColor: 'text-yellow-500',
-            confirmLabel: 'Programar',
             message: isEditMode.value
                 ? `¿Estás seguro de guardar los cambios del horario extraordinario? 
                     El horario quedará programado para el <span class="font-semibold">${formatDate(formData.scheduleEffectiveDate)} </span>
@@ -130,7 +130,6 @@ const openConfirmModalSave = (formData: ScheduleFormData): void => {
             }
         }
     };
-
 }
 
 const confirmSave = async (): Promise<void> => {
@@ -139,6 +138,13 @@ const confirmSave = async (): Promise<void> => {
     loading.value = true
     try {
         console.log('Datos COMPLETOS del formulario a guardar:', pendingFormData.value);
+        
+        const toTimeIso = (time: string) => {
+            const date = new Date(`1970-01-01T${time}Z`);
+            return date.toISOString().split("T")[1];
+        };
+
+        console.log('Código para paymentGatewayCode:', pendingFormData.value.code || pendingFormData.value.code);
         
         const requestData: ScheduleExceptionRequest = {
             paymentGatewayCode: pendingFormData.value.code || pendingFormData.value.code || '',
@@ -173,7 +179,7 @@ const confirmSave = async (): Promise<void> => {
             })
         }
         emit('save', requestData)
-        modalSchedule.value = false
+        
         closeModal()
     } catch (error) {
         console.error('Error guardando horario:', error)

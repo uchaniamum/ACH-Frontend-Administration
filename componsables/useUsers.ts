@@ -196,7 +196,7 @@ export function useUserService() {
         }
     }
 
-    const saveResetPassword = async (code: string | undefined): Promise<boolean> => {
+    const saveResetPassword = async (code: string): Promise<boolean> => {
         try {
             const response = await userService.resetPasswordUser(code)
             console.log('Respomse reset: ', response);

@@ -1,5 +1,5 @@
 <template>
-  <div class="px-80 pt-20 gap-20 pb-20">
+  <div class="px-80 pt-20 gap-20">
     <XMenuBar :model="menuItems">
       <template #item="{ item, props }">
         <a

@@ -1,6 +1,6 @@
 import { ref, computed, type Component } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import menuConfigACH from '~/navigation/menuRoutes'
+import menuConfigACH from '~/router/menuRoutes'
 import type { MenuBarAdminItem } from '~/types/admin/menu.types'
 
 interface CurrentComponent {
@@ -11,7 +11,7 @@ interface CurrentComponent {
 export const useMenuNavigation = () => {
   const router = useRouter()
   const route = useRoute()
-
+  
   // Estado reactivo
   const selectedItemKey = ref<string>('')
   const currentComponent = ref<CurrentComponent | null>(null)
@@ -35,7 +35,7 @@ export const useMenuNavigation = () => {
   // Función para aplanar el menú jerárquico y obtener todos los items
   const flattenMenuItems = (items: MenuBarAdminItem[]): MenuBarAdminItem[] => {
     const flattened: MenuBarAdminItem[] = []
-
+    
     const flatten = (menuItems: MenuBarAdminItem[]) => {
       menuItems.forEach(item => {
         const itemWithKey = {
@@ -43,13 +43,13 @@ export const useMenuNavigation = () => {
           key: item.key || generateKeyFromPath(item.to || item.label)
         }
         flattened.push(itemWithKey)
-
+        
         if (item.items) {
           flatten(item.items)
         }
       })
     }
-
+    
     flatten(items)
     return flattened
   }
@@ -95,11 +95,11 @@ export const useMenuNavigation = () => {
   // Inicializar desde la ruta actual
   const initializeFromRoute = () => {
     const currentPath = route.path
-
+    
     // Buscar el item que mejor coincida con la ruta actual
     let matchingItem: MenuBarAdminItem | null = null
     let longestMatch = 0
-
+    
     allItems.value.forEach(item => {
       if (item.to && currentPath.startsWith(item.to)) {
         if (item.to.length > longestMatch) {
@@ -108,7 +108,7 @@ export const useMenuNavigation = () => {
         }
       }
     })
-
+    
     if (matchingItem) {
       const itemKey = matchingItem.key || generateKeyFromPath(matchingItem.to || matchingItem.label)
       selectedItemKey.value = itemKey
@@ -150,7 +150,7 @@ export const useMenuNavigation = () => {
           items: item.items ? filterItems(item.items) : undefined
         }))
     }
-
+    
     return filterItems(menuItems.value)
   })
 

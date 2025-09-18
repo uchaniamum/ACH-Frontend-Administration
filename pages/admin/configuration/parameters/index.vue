@@ -15,7 +15,7 @@
                             <InputText 
                                 v-model="searchTermParameter"
                                 placeholder="Buscar" 
-                                class="!min-w-[250px] text-left"
+                                class="!w-[250px]"
                             />
                             <XInputIcon icon="search"/>
                         </XIconField>
@@ -59,37 +59,37 @@
                                 <span class="flex justify-center">Cargando datos de parámetros. Por favor espere.</span> 
                             </template>
 
-                            <Column field="systemAcronym" header="Canal" sortable style="min-width: 100px;" class="text-left">
+                            <Column field="systemAcronym" header="Canal" sortable style="min-width: 100px;">
                                 <template #body="{ data }">
                                     {{ data.systemAcronym }}
                                 </template>
                             </Column>
 
-                            <Column field="code" header="Código" sortable headerStyle="width: 100px;" bodyStyle="width: 100px;" class="text-left">
+                            <Column field="code" header="Código" sortable headerStyle="width: 100px;" bodyStyle="width: 100px;">
                                 <template #body="{ data }">
                                     {{ data.code }}
                                 </template>
                             </Column>
                         
-                            <Column field="value" header="Valor" sortable style="min-width: 160px;" class="text-left">
+                            <Column field="value" header="Valor" sortable style="min-width: 160px;">
                                 <template #body="{ data }">
                                     {{ data.value }}
                                 </template>
                             </Column>
 
-                            <Column field="dataType" header="Tipo de Dato" sortable style="min-width: 100px;" class="text-left">
+                            <Column field="dataType" header="Tipo de Dato" sortable style="min-width: 100px;">
                                 <template #body="{ data }">
                                     {{ data.dataType }}
                                 </template>
                             </Column> 
 
-                            <Column field="description" header="Descripción" sortable class="min-w-[275px] text-left" >
+                            <Column field="description" header="Descripción" sortable class="min-w-[275px]">
                                 <template #body="{ data }">
                                     {{ data.description }}
                                 </template>
                             </Column>
 
-                            <Column header="Acciones" class="min-w-[210px] text-left">
+                            <Column header="Acciones" class="min-w-[210px]">
                                 <template #body="{ data }">
                                     <div class="flex gap-4">
                                         <XButton 
@@ -108,20 +108,13 @@
                             </Column>
                         </DataTable>
 
-                        <div class="flex justify-center">
-                            <Paginator 
-                                v-if="filteredParameters.length > 0"
-                                v-model:first="first"
-                                v-model:rows="rows"
-                                :totalRecords="filteredParameters.length"
-                                :rowsPerPageOptions="[10, 25, 50, 100]"
-                                template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                            >
-                                <template #start="slotProps">
-                                    Página: {{ slotProps.state.page + 1 }}, Filas: 
-                                </template>
-                            </Paginator>
-                        </div>
+                        <Paginator 
+                            v-if="filteredParameters.length > 0"
+                            v-model:first="first"
+                            v-model:rows="rows"
+                            :totalRecords="filteredParameters.length"
+                            :rowsPerPageOptions="[2, 10, 25, 50, 100]"
+                        />
                     </div>
                 </div>
         </div>
@@ -147,7 +140,6 @@ import ParameterHistorialModal from '~/features/parameters/ParameterHistorialMod
 import ParameterModal from '~/features/parameters/ParameterModal.vue';
 import type { ParameterListItem, ParameterModalData } from '~/features/parameters/types';
 import type { ServiceError } from '~/features/users/types';
-import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { parametersService } from '~/services/parametersService';
 
 // Composables 
@@ -160,7 +152,11 @@ const searchTermParameter = ref('')
 const first = ref(0)
 const rows = ref(10)
 
-const itemsBreadParameters = getBreadcrumbItems('parameters', 'list');
+const itemsBreadParameters = ref([
+    { label: 'Inicio'},
+    { label: 'Configuracion'},
+    { label: 'Parámetros'}
+])
 
 // SelectButton de canales
 const selectedChannel = ref({ value: 'Todos' });

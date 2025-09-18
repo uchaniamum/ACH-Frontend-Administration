@@ -22,6 +22,7 @@
             </template>
         </XCard>
         <XForm @submit="handleSubmit" class="flex flex-col gap-10">
+            
             <XInputText 
                 v-model="formData.value"
                 name="parameterValue"

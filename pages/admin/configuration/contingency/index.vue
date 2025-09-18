@@ -6,24 +6,25 @@
             </template>
         </XHeader>
         <div class="flex flex-col gap-12">
-            <div class="flex justify-end gap-8">
-                <span class="text-gray-700">Definiciones:  </span>
-                <div class="flex items-center gap-4">
-                    <span class="relative inline-flex">
-                        <span class="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-green-500 bg-white shadow-[0.667px_0.667px_2.667px_0_#9CDB7D]">
-                            <span class="h-5 w-5 rounded-full bg-green-500 ring-2 ring-white"></span>
+            <div class="flex justify-end gap-4">
+                Defniciones:  
+                    <div class="flex items-center gap-6">
+                        <span class="relative inline-flex">
+                            <span class="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-green-500 bg-white shadow-[0.667px_0.667px_2.667px_0_#9CDB7D]">
+                                <span class="h-5 w-5 rounded-full bg-green-500 ring-2 ring-white"></span>
+                            </span>
                         </span>
-                    </span>
-                    <span class="text-gray-700">Sin contingencia </span>
-                </div> 
-                <div class="flex items-center gap-4">
-                    <span class="relative inline-flex">
-                        <span class="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-500 bg-white shadow-[0.667px_0.667px_2.667px_0_#F1594E]">
-                            <span class="h-5 w-5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        <span class="text-gray-700">Sin contingencia </span>
+                    </div> 
+
+                    <div class="flex items-center gap-6">
+                        <span class="relative inline-flex">
+                            <span class="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-500 bg-white shadow-[0.667px_0.667px_2.667px_0_#F1594E]">
+                                <span class="h-5 w-5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                            </span>
                         </span>
-                    </span>
-                    <span class="text-gray-700">Con contingencia </span>
-                </div> 
+                        <span class="text-gray-700">Con contingencia </span>
+                    </div> 
             </div>
             <div class="flex flex-row justify-between">
                 <div class="self-center">
@@ -60,7 +61,7 @@
                 @page="onPageChange"
             >
                 <!-- Columna de Checkbox --> 
-                <Column :showFilterMenu="false" class="min-w-[75px] items-start" >
+                <Column :showFilterMenu="false" class="min-w-[75px]" >
                     <template #header>
                         <XCheckBox 
                             :modelValue="isAllSelected"
@@ -98,10 +99,10 @@
                 </Column>
 
                 <!-- Envío de Transferencias Interbancarias Regular -->
-                <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="min-w-[209px] text-left">
+                <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center gap-4">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
                                 <span class="relative inline-flex">
                                     <span :class="[
                                         'relative inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white',
@@ -125,10 +126,10 @@
                 </Column>
 
                 <!-- Envío de Transferencias QR -->
-                <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="min-w-[209px] text-left">
+                <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center gap-4">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
                                 <span class="relative inline-flex">
                                     <span :class="[
                                         'relative inline-flex h-6 w-6 items-center justify-center rounded-full border bg-white',
@@ -152,10 +153,10 @@
                 </Column>
 
                 <!-- Recepción Transferencia Interbancaria Regular -->
-                <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="min-w-[209px] text-left">
+                <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center gap-4">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
                                 <span class="relative inline-flex">
                                     <span :class="[
                                         'relative inline-flex h-6 w-6 items-center justify-center rounded-full border bg-white',
@@ -179,9 +180,9 @@
                 </Column>
 
                 <!-- Recepción de Transferencias QR -->
-                <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="min-w-[209px] text-left">
+                <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
                     <template #body="{ data }">
-                        <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-2">
                                 <span class="relative inline-flex">
                                     <span :class="[
@@ -205,27 +206,20 @@
                     </template>
                 </Column>
             </DataTable>
-            <div class="flex justify-center">
-                <Paginator 
-                    v-if="filteredContingency.length > 0"
-                    v-model:first="paginationContingencyFirst"
-                    v-model:rows="paginationContingencyRows"
-                    :totalRecords="filteredContingency.length"
-                    :rowsPerPageOptions="[10, 25, 50, 100]"
-                    template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                >
-                    <template #start="slotProps">
-                        Página: {{ slotProps.state.page + 1 }}, Filas: 
-                    </template>
-                </Paginator>
-            </div>
+
+            <Paginator 
+                v-if="filteredContingency.length > 0"
+                v-model:first="paginationContingencyFirst"
+                v-model:rows="paginationContingencyRows"
+                :totalRecords="filteredContingency.length"
+                :rowsPerPageOptions="[2, 10, 25, 50, 100]"
+            />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import type { ContingencyTableRow, PaymentGatewayBankList } from '~/features/contingency/type';
-import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { contingencyService } from '~/services/contingencySevice';
 
 // Composables 
@@ -240,7 +234,109 @@ const searchTermContingency = ref('');
 const paginationContingencyFirst = ref(0);
 const paginationContingencyRows = ref(10);
 
-const itemsBreadContingency = getBreadcrumbItems('contingency', 'list');
+const itemsBreadContingency = ref([
+    { label: 'Inicio' },
+    { label: 'Configuración' },
+    { label: 'Contingencia' },
+]);
+
+// const transformContingencyData = (banks: any[]): ContingencyTableRow[] => {
+//     return banks.map(bank => {
+//         const findTransactionByCode = (targetCode: string) => {
+//             return bank.transactions.find(transaction => {
+//                 return transaction.transactionCode === targetCode;
+//             });
+//         };
+
+//         // Buscar cada tipo de transacción por su código
+//         const envioRegular = findTransactionByCode('IASYNC');        // Envío Interbancarias
+//         const envioQR = findTransactionByCode('IQR');                // Envío QR  
+//         const recepcionRegular = findTransactionByCode('OASYNC');    // Recepción Interbancarias
+//         const recepcionQR = findTransactionByCode('OQR');            // Recepción QR
+
+//         // Función para obtener el gateway principal (isPrimary: true)
+//         const getPrimaryGateway = (transaction: any) => {
+//             if (!transaction || !transaction.paymentGateways) return null;
+//             return transaction.paymentGateways.find((gateway: any) => gateway.isPrimary);
+//         };
+
+//         // Función para obtener gateways secundarios (isPrimary: false)
+//         const getSecondaryGateways = (transaction: any) => {
+//             if (!transaction || !transaction.paymentGateways) return [];
+//             return transaction.paymentGateways.filter((gateway: any) => !gateway.isPrimary);
+//         };
+
+//         // Función para calcular contingencia
+//         const calculateContingency = (transaction: any) => {
+//             if (!transaction) return false;
+            
+//             const primaryGateway = getPrimaryGateway(transaction);
+//             const secondaryGateways = getSecondaryGateways(transaction);
+            
+//             // Hay contingencia si:
+//             // 1. El gateway principal NO está operacional O
+//             // 2. Hay algún gateway secundario que esté operacional y temporalmente activo
+//             const primaryNotOperational = primaryGateway && !primaryGateway.isOperational;
+//             const hasActiveSecondary = secondaryGateways.some((gateway: any) => 
+//                 gateway.isOperational && gateway.isTemporarilyActive
+//             );
+            
+//             return primaryNotOperational || hasActiveSecondary;
+//         };
+
+//         // Función para formatear la descripción del gateway
+//         const formatGatewayDescription = (gateway: any) => {
+//             if (!gateway) return 'MLD';
+//             return `${gateway.paymentGatewayAcronym} - ${gateway.isOperational ? 'Operacional' : 'No Operacional'}`;
+//         };
+
+//         // Obtener gateways primarios
+//         const primaryEnvioRegular = getPrimaryGateway(envioRegular);
+//         const primaryEnvioQR = getPrimaryGateway(envioQR);
+//         const primaryRecepcionRegular = getPrimaryGateway(recepcionRegular);
+//         const primaryRecepcionQR = getPrimaryGateway(recepcionQR);
+
+//         // Obtener gateways secundarios (tomamos el primero si existe)
+//         const secondaryEnvioRegular = getSecondaryGateways(envioRegular)[0] || null;
+//         const secondaryEnvioQR = getSecondaryGateways(envioQR)[0] || null;
+//         const secondaryRecepcionRegular = getSecondaryGateways(recepcionRegular)[0] || null;
+//         const secondaryRecepcionQR = getSecondaryGateways(recepcionQR)[0] || null;
+
+//         return {
+//             participantCode: bank.participantCode,
+//             participantName: bank.participantName,
+//             envioRegular: {
+//                 mainGateway: formatGatewayDescription(primaryEnvioRegular),
+//                 secondaryGateway: formatGatewayDescription(secondaryEnvioRegular),
+//                 contingencyEnabled: calculateContingency(envioRegular),
+//                 mainEnabled: primaryEnvioRegular?.isOperational || false,
+//                 secondaryEnabled: secondaryEnvioRegular?.isOperational || false,
+//             },
+//             envioQR: {
+//                 mainGateway: formatGatewayDescription(primaryEnvioQR),
+//                 secondaryGateway: formatGatewayDescription(secondaryEnvioQR),
+//                 contingencyEnabled: calculateContingency(envioQR),
+//                 mainEnabled: primaryEnvioQR?.isOperational || false,
+//                 secondaryEnabled: secondaryEnvioQR?.isOperational || false,
+//             },
+//             recepcionRegular: {
+//                 mainGateway: formatGatewayDescription(primaryRecepcionRegular),
+//                 secondaryGateway: formatGatewayDescription(secondaryRecepcionRegular),
+//                 contingencyEnabled: calculateContingency(recepcionRegular),
+//                 mainEnabled: primaryRecepcionRegular?.isOperational || false,
+//                 secondaryEnabled: secondaryRecepcionRegular?.isOperational || false,
+//             },
+//             recepcionQR: {
+//                 mainGateway: formatGatewayDescription(primaryRecepcionQR),
+//                 secondaryGateway: formatGatewayDescription(secondaryRecepcionQR),
+//                 contingencyEnabled: calculateContingency(recepcionQR),
+//                 mainEnabled: primaryRecepcionQR?.isOperational || false,
+//                 secondaryEnabled: secondaryRecepcionQR?.isOperational || false,
+//             }
+//         };
+//     });
+// };
+
 
 const transformContingencyData = (banks: any[]): ContingencyTableRow[] => {
     return banks.map(bank => {

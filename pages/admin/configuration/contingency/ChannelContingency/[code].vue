@@ -1,41 +1,25 @@
 <template>
-    <div class="flex flex-col gap-68">
+    <div>
         <div class="flex flex-col gap-8">
             <XHeader 
                 :title="isMultipleBanks ? `${pageTitle} - Participantes (${contingencyData.length})` : pageTitle" 
                 @back-click="goBack"
-                :breadcrumb-items="itemsBreadContingencyEdit" 
-                :show-breadcrumb="true"
             />
             <span class="text-normal font-normal">
                 {{ pageDescription }}
             </span>
-            <div class="flex flex-col items-center">
-                <div class="flex flex-col w-[738px] gap-8">
-                    <div v-if="isMultipleBanks" class="flex flex-col items-start gap-4">
-                        <div class="flex flex-row">
-                            <span class="flex flex-row gap-3 items-center text-gray-700"><Icon name="x:bank"/>Ver {{contingencyData.length}} Participantes </span>
-                            <XButton 
-                                variant="text" 
-                                :icon="participantsVisibles ? 'thik-nav-arrow-up' : 'thik-nav-arrow-down'"
-                                @click="participantsVisibles = !participantsVisibles"
-                                class="!bg-transparent text-gray-700 border-none hover:!text-primary-800 hover:!bg-transparent focus:text-primary-600"
-                            />
-                        </div>
-                        <div v-if="participantsVisibles">
-                            <ul class="space-y-2">
-                                <li 
-                                    v-for="(bankName, index) in getBankNamesArray" 
-                                    :key="index"
-                                    class="flex items-start"
-                                >
-                                    <span class="ml-3">• </span>
-                                    <span class="text-gray-800">{{ bankName.trim() }}</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-16">
+            <div class="flex flex-col">
+                <div v-if="isMultipleBanks" class="flex justify-start">
+                    <XButton 
+                        variant="text" 
+                        :label="`Ver ${contingencyData.length} Participantes `"
+                        icon="bank"
+                        @click="showParticipantsModal = true"
+                    />
+                </div>
+
+                <div class="flex flex-col items-center ">
+                    <div class="flex flex-col gap-20 w-[738px]">
                         <!-- SECCIÓN CAMBIO DE CANAL -->
                         <div v-if="isChannelChange" class="flex flex-col justify-center gap-8">
                             <div v-if="hasInconsistentConfigurations && isChannelChange" class="mb-4">
@@ -95,135 +79,110 @@
                             </span>
                             
                             <!-- Cards de transacciones -->
-                            <div class="flex flex-col gap-16">
-                                <div class="flex flex-col gap-8">
-                                    <XCard class="border border-gray-200">
+                            <XCard class="border border-gray-200">
                                 <template #content>
                                     <div class="flex flex-row justify-between">
                                         <div class="self-center">
-                                            <div class="flex flex-col gap-4">
-                                                <div class="flex gap-4">
-                                                    <span>Envío de transferencias interbancarias IASYNC</span>
-                                                    <span v-tooltip="'Salida de transferencias regulares.'">
-                                                        <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <XTag :severity="iasyncContingency ? 'danger' : 'success'" 
-                                                    :value="iasyncContingency ? 'Con contingencia' : 'Sin contingencia'"/>
-                                                </div>
-                                                
+                                            <div class="flex gap-4">
+                                                <span>Envío de transferencias interbancarias IASYNC</span>
+                                                <span v-tooltip="'Salida de transferencias regulares.'">
+                                                    <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                </span>
                                             </div>
+                                            <XTag :severity="iasyncContingency ? 'danger' : 'success'" 
+                                                :value="iasyncContingency ? 'Con contingencia' : 'Sin contingencia'"/>
                                         </div>
                                         <div class="self-center">
                                             <XToggleSwitch v-model="iasyncContingency"/>
                                         </div>
                                     </div>
                                 </template>
-                                    </XCard>
-
-                                    <XCard class="border border-gray-200">
+                            </XCard>
+                            
+                            <XCard class="border border-gray-200">
                                 <template #content>
                                     <div class="flex flex-row justify-between">
                                         <div class="self-center">
-                                            <div class="flex flex-col gap-4">
-                                                <div class="flex gap-4">
-                                                    <span>Envío de transferencias QR IQR</span>
-                                                    <span v-tooltip="'Procesamiento de transacciones de pago por QR.'">
-                                                        <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <XTag :severity="iqrContingency ? 'danger' : 'success'" 
-                                                    :value="iqrContingency ? 'Con contingencia' : 'Sin contingencia'"/>
-                                                </div>
+                                            <div class="flex gap-4">
+                                                <span>Envío de transferencias QR IQR</span>
+                                                <span v-tooltip="'Procesamiento de transacciones de pago por QR.'">
+                                                    <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                </span>
                                             </div>
+                                            <XTag :severity="iqrContingency ? 'danger' : 'success'" 
+                                                :value="iqrContingency ? 'Con contingencia' : 'Sin contingencia'"/>
                                         </div>
                                         <div class="self-center">
                                             <XToggleSwitch v-model="iqrContingency"/>
                                         </div>
                                     </div>
                                 </template>
-                                    </XCard>
-
-                                    <XCard class="border border-gray-200">
+                            </XCard>
+                            
+                            <XCard class="border border-gray-200">
                                 <template #content>
                                     <div class="flex flex-row justify-between">
                                         <div class="self-center">
-                                            <div class="flex flex-col gap-4">
-                                                <div class="flex gap-4">
-                                                    <span>Recepción transferencia interbancaria OASYNC</span>
-                                                    <span v-tooltip="'Salida de transferencias regulares.'">
-                                                        <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <XTag :severity="oasyncContingency ? 'danger' : 'success'" 
-                                                    :value="oasyncContingency ? 'Con contingencia' : 'Sin contingencia'"/>
-                                                </div>
+                                            <div class="flex gap-4">
+                                                <span>Recepción transferencia interbancaria OASYNC</span>
+                                                <span v-tooltip="'Salida de transferencias regulares.'">
+                                                    <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                </span>
                                             </div>
+                                            <XTag :severity="oasyncContingency ? 'danger' : 'success'" 
+                                                :value="oasyncContingency ? 'Con contingencia' : 'Sin contingencia'"/>
                                         </div>
                                         <div class="self-center">
                                             <XToggleSwitch v-model="oasyncContingency"/>
                                         </div>
                                     </div>
                                 </template>
-                                    </XCard>
-
-                                    <XCard class="border border-gray-200">
+                            </XCard>
+                            
+                            <XCard class="border border-gray-200">
                                 <template #content>
                                     <div class="flex flex-row justify-between">
                                         <div class="self-center">
-                                            <div class="flex flex-col gap-4">
-                                                <div class="flex gap-4">
-                                                    <span>Recepción transferencia QR OQR</span>
-                                                    <span v-tooltip="'Procesamiento de transacciones de cobro por QR.'">
-                                                        <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <XTag :severity="oqrContingency ? 'danger' : 'success'" 
-                                                    :value="oqrContingency ? 'Con contingencia' : 'Sin contingencia'"/>
-                                                </div>
+                                            <div class="flex gap-4">
+                                                <span>Recepción transferencia QR OQR</span>
+                                                <span v-tooltip="'Procesamiento de transacciones de cobro por QR.'">
+                                                    <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                </span>
                                             </div>
+                                            <XTag :severity="oqrContingency ? 'danger' : 'success'" 
+                                                :value="oqrContingency ? 'Con contingencia' : 'Sin contingencia'"/>
                                         </div>
                                         <div class="self-center">
                                             <XToggleSwitch v-model="oqrContingency"/>
                                         </div>
                                     </div>
                                 </template>
-                                    </XCard>
-                                </div>
-                                <div class="flex flex-col gap-8">
-                                    <Divider align="left" type="solid">
-                                        <b>Mensaje de respuesta</b>
-                                    </Divider>
-                                    <span class="text-normal font-normal text-gray-700">
-                                        Define un mensaje de rechazo que se mostrará a los usuarios cuando intenten realizar transacciones hacia este participante.                               
-                                    </span>
-                                    <XInputText 
-                                        v-model="titleContingency"
-                                        name="tituloContingencia"
-                                        label="Titulo" 
-                                        label-required
-                                        placeholder="Ingresa el título del mensaje"
-                                        :rules="requiredRule"
-                                    />
-                                    <XTextarea 
-                                        v-model="messageContingency"
-                                        name="clarifications" 
-                                        rows="5" 
-                                        class="w-full" 
-                                        placeholder="Ingresa el contenido del mensaje" 
-                                        label-required 
-                                        label="Mensaje"
-                                        :rules="requiredRule"
-                                    />
-                                </div>
-                            </div>
-                            
+                            </XCard>
                         
-                            
+                            <Divider align="left" type="solid">
+                                <b>Mensaje de respuesta</b>
+                            </Divider>
+                            <span class="text-normal font-normal text-gray-700">
+                                Comunica a los externos sobre el cambio de canal.                                
+                            </span>
+                            <XInputText 
+                                v-model="titleContingency"
+                                name="tituloContingencia"
+                                label="Titulo" 
+                                label-required
+                                placeholder="Ingresa el título del mensaje"
+                                :rules="requiredRule"
+                            />
+                            <XTextarea 
+                                v-model="messageContingency"
+                                name="clarifications" 
+                                rows="5" 
+                                class="w-full" 
+                                placeholder="Ingresa el contenido del mensaje" 
+                                label-required 
+                                label="Mensaje"
+                                :rules="requiredRule"
+                            />
                         </div>
                         
                         <!-- JUSTIFICACIÓN -->
@@ -232,21 +191,18 @@
                                 <b>Aclaraciones</b>
                             </Divider>
                             <span class="text-normal font-normal text-gray-700">
-                                Detalla el motivo del cambio. 
+                                Detalla el motivo del cambio y adjunta el respaldo correspondiente.
                             </span>
-                            <div class="flex flex-col gap-[0.357rem]">
-                                <XTextarea 
-                                    v-model="justification"
-                                    name="clarifications" 
-                                    rows="5" 
-                                    class="w-full" 
-                                    :placeholder="isChannelChange ? 'Describe el motivo del cambio de canal' : 'Describe el motivo de la contingencia'" 
-                                    label-required 
-                                    label="Justificación"
-                                    :rules="requiredRule"
-                                />
-                                <span class="text-gray-600 text-sm">Por razones de seguridad, este campo es requerido.</span>
-                            </div>
+                            <XTextarea 
+                                v-model="justification"
+                                name="clarifications" 
+                                rows="5" 
+                                class="w-full" 
+                                :placeholder="isChannelChange ? 'Describe el motivo del cambio de canal' : 'Describe el motivo de la contingencia'" 
+                                label-required 
+                                label="Justificación"
+                                :rules="requiredRule"
+                            />
                         </div>
                     </div>
                 </div>
@@ -254,8 +210,8 @@
         </div> 
         
         <!-- BOTONES DE ACCIÓN -->
-        <div class="flex flex-col gap-12">
-            <XDivider/>
+        <div class="flex flex-col pt-20">
+            <XDivider class="mb-6"/>
             <div class="w-full flex flex-row justify-end gap-6">
                 <XButton 
                     variant="outlined" 
@@ -268,24 +224,102 @@
                     @click="handleSaveClick"
                     class="w-75"
                     :loading="saving"
-                    :disabled="!isFormContingencyValid"
                 />
             </div>
         </div>
 
-        <ConfirmDialogWrapper
-            v-model="confirmDialog.visible"
-            :options="confirmDialog.options"
-        />
+        <!-- MODALES -->
+        <XDialog 
+            :visible="showParticipantsModal"
+            @update:visible="showParticipantsModal = $event"
+            header="Participantes seleccionados"
+            :style="{ width: '500px' }"
+            :closable="true"
+            :modal="true"
+        >
+            <div class="space-y-4">
+                <div>
+                    <ul class="space-y-2">
+                        <li 
+                            v-for="(bankName, index) in getBankNamesArray" 
+                            :key="index"
+                            class="flex items-start"
+                        >
+                            <span>•</span>
+                            <span class="text-gray-900">{{ bankName.trim() }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-700">
+                        Total de participantes: {{ contingencyData.length }}
+                    </p>
+                </div>
+            </div>
+        </XDialog>
+
+        <XConfirmDialog
+            v-model="visibleChangeCanal"
+            icon="x:warning-circle"
+            icon-color="text-yellow-500"
+            :closable="false"
+            title="Cambiar de canal">
+            <template #message>
+                <div class="space-y-2">
+                    <p>
+                        <span class="font-medium text-gray-700">¿Estás seguro de que deseas cambiar el canal del </span>
+                        <span class="font-semibold">{{ getBankNames }}</span>
+                        <span class="font-medium text-gray-700"> a </span>
+                        <span class="font-semibold">{{ getSelectedChannelFromTable }}?</span>
+                    </p>
+                </div>
+            </template>
+            <template #buttons>
+                <div class="flex gap-3">
+                    <XButton label="Cancelar" outlined @click="visibleChangeCanal = false"/>
+                    <XButton label="Cambiar" @click="saveConfirm" :loading="saving" />
+                </div>
+            </template>  
+        </XConfirmDialog>
+
+        <XConfirmDialog
+            v-model="visibleContingency"
+            icon="x:warning-circle"
+            icon-color="text-yellow-500"
+            :closable="false"
+            title="Establecer contingencia">
+            <template #message>
+                <div class="space-y-2">
+                    <p>
+                        <span class="font-medium text-gray-700">¿Estás seguro de establecer modo contingencia para </span>
+                        <span v-if="isMultipleBanks" class="font-semibold">los bancos seleccionados</span>
+                        <span v-else class="font-semibold">{{ getBankNames }}</span>
+                        <span class="font-medium text-gray-700">?</span>
+                    </p>
+                    <div v-if="isMultipleBanks" class="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Bancos afectados:</p>
+                        <ul class="text-sm text-gray-600">
+                            <li v-for="bank in contingencyData" :key="bank.participantCode">
+                                • {{ bank.participantName || bank.name }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+            <template #buttons>
+                <div class="flex gap-3">
+                    <XButton label="Cancelar" outlined @click="visibleContingency = false"/>
+                    <XButton label="Establecer" @click="saveConfirm" :loading="saving" />
+                </div>
+            </template>  
+        </XConfirmDialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { useOptions } from '~/componsables/useOptions';
 import type { PaymentGatewayBankDetail } from '~/features/contingency/type';
 import type { ValidationRuleResult } from '~/features/users/options.types';
-import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { contingencyService } from '~/services/contingencySevice';
 
 // Composables
@@ -302,20 +336,7 @@ const contingencyData = ref<PaymentGatewayBankDetail[]>([]);
 // Estados de modales
 const visibleChangeCanal = ref(false);
 const visibleContingency = ref(false);
-
-const confirmDialog = ref({
-    visible: false,
-    options: {
-        title: '',
-        message: '',
-        icon: 'x:warning-circle',
-        iconColor: 'text-yellow-500',
-        confirmLabel: 'Guardar',
-        cancelLabel: 'Cancelar',
-        onConfirm: async () => {},
-        onCancel: () => {}
-    }
-})
+const showParticipantsModal = ref(false);
 
 // Estados del formulario
 const justification = ref('');
@@ -330,10 +351,6 @@ const oqrContingency = ref(false);
 const hasContingencyInconsistencies = ref(false);
 const contingencyStats = ref({});
 
-//Para los participantes desplegados
-const participantsVisibles = ref(false);
-
-const itemsBreadContingencyEdit = getBreadcrumbItems('contingency', 'edit');
 
 const transactionData = ref([
     {
@@ -351,66 +368,6 @@ const transactionData = ref([
         gateways: {}
     }
 ])
-
-const isFormContingencyValid = computed(() => {
-    const baseValidation = justification.value?.trim()
-    
-    // if (!isChannelChange.value) {
-    //     // Para contingencia también validar título y mensaje
-    //     return baseValidation && 
-    //         titleContingency.value?.trim() && 
-    //         messageContingency.value?.trim()
-    // }
-    
-    // Para cambio de canal solo justificación
-    return baseValidation
-})
-
-
-const openChannelChangeModal = (): void => {
-    const entityText = contingencyData.value.length > 1 
-        ? `${contingencyData.value.length} entidades` 
-        : `${contingencyData.value.length} entidad`
-
-    confirmDialog.value = {
-        visible: true,
-        options: {
-            title: 'Cambiar de canal',
-            icon: 'x:warning-circle',
-            iconColor: 'text-yellow-500',
-            confirmLabel: 'Guardar',
-            cancelLabel: 'Cancelar',
-            message: `¿Estás seguro de cambiar de canal <span class="font-semibold">${entityText}</span>? Esta modificación podrá ser ajustada en el futuro.`,
-            onConfirm: async () => {
-                await saveConfirm()
-            },
-            onCancel: () => {
-                // Lógica adicional si es necesaria al cancelar
-            }
-        }
-    }
-}
-
-// Método para abrir modal de contingencia
-const openContingencyModal = (): void => {
-    confirmDialog.value = {
-        visible: true,
-        options: {
-            title: 'Configurar contingencia',
-            icon: 'x:warning-circle',
-            iconColor: 'text-yellow-500',
-            confirmLabel: 'Guardar',
-            cancelLabel: 'Cancelar',
-            message: `¿Estás seguro de guardar la configuración para <span class="font-semibold">${getBankNames.value}</span>? Esta modificación podrá ser ajustada en el futuro.`,
-            onConfirm: async () => {
-                await saveConfirm()
-            },
-            onCancel: () => {
-                // Lógica adicional si es necesaria al cancelar
-            }
-        }
-    }
-}
 
 // Usar el composable y cargar opciones
 const { 
@@ -573,6 +530,7 @@ const getSelectedChannelFromTable = computed(() => {
     return selectedGateway ? selectedGateway.label : '';
 });
 
+
 const onGatewayChange = (transactionRow, gatewayValue, event) => {
     // FIX: PrimeVue Checkbox a veces no envía event.checked correctamente
     const isChecked = event?.checked ?? event?.target?.checked ?? !transactionRow.gateways[gatewayValue];
@@ -609,9 +567,9 @@ const onGatewayChange = (transactionRow, gatewayValue, event) => {
 // FUNCIÓN PARA MANEJAR CLICK EN GUARDAR/CAMBIAR
 const handleSaveClick = () => {
     if (isChannelChange.value) {
-        openChannelChangeModal()
+        visibleChangeCanal.value = true;
     } else {
-        openContingencyModal()
+        visibleContingency.value = true;
     }
 };
 
@@ -623,6 +581,8 @@ const initializeDefaultValues = () => {
         console.log('Canal por defecto establecido:', selectedChannelValue.value);
     }
 };
+
+
 
 // FUNCIONES DE VALIDACIÓN - Agregar antes de marcarCheckboxesAutomaticamente
 const validateGatewayState = (gateway) => {
@@ -1198,16 +1158,16 @@ const saveConfirm = async () => {
              console.log('\n🚀 === INICIANDO CAMBIO DE CANAL CON ORDEN CORRECTO ===');
             
             // Validar selecciones
-            //const validation = validateSelectionBeforePayload();
-            // if (!validation.isValid) {
-            //     toast.add({
-            //         severity: 'error',
-            //         summary: 'Error de validación',
-            //         detail: 'Debe seleccionar exactamente un canal para cada transacción',
-            //         life: 5000
-            //     });
-            //     return;
-            // }
+            const validation = validateSelectionBeforePayload();
+            if (!validation.isValid) {
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error de validación',
+                    detail: 'Debe seleccionar exactamente un canal para cada transacción',
+                    life: 5000
+                });
+                return;
+            }
 
             // Generar payload con orden correcto
             const payload = generateOrderedPayload();
@@ -1218,16 +1178,16 @@ const saveConfirm = async () => {
             console.log('\n📋 PAYLOAD FINAL CON ORDEN CORRECTO:');
             console.log(JSON.stringify(payload, null, 2));
 
-            const responseChannel = await contingencyService.updateChangeChannel(payload);
-            console.log('Respuesta canal: ',responseChannel);
-            if(responseChannel){
-                toast.add({
-                    severity: 'success',
-                    summary: 'Éxito',
-                    detail: 'Canal cambiado exitosamente',
-                    life: 5000
-                });
-            }
+            // const responseChannel = await contingencyService.updateChangeChannel(payload);
+            // console.log('Respuesta canal: ',responseChannel);
+            // if(responseChannel){
+            //     toast.add({
+            //         severity: 'success',
+            //         summary: 'Éxito',
+            //         detail: 'Canal cambiado exitosamente',
+            //         life: 5000
+            //     });
+            // }
             
         }else {
                     // Mapeo de switches a códigos de transacción
