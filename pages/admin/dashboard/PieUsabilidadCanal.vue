@@ -6,16 +6,27 @@
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full mb-4 gap-3 titulo-botones"
     >
-      <h3
-        class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2"
-      >
-        Usabilidad por Canal
-        <Icon
-          name="x:paste-clipboard"
-          class="text-[#0A44C6] w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:text-[#0C55F8]"
-          @click="handleCopiar"
-        />
-      </h3>
+   <h3 class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2 relative">
+  Usabilidad por Canal
+
+  <!-- Contenedor del ícono --> 
+  <div class="relative">
+    <Icon
+      name="x:paste-clipboard"
+      class="text-[#0A44C6] w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:text-[#0C55F8]"
+      @click="handleCopiar()"
+    />
+
+    <!-- Mensaje “copiado” debajo del ícono sin moverlo -->
+    <span
+      v-if="copiado"
+      class="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20"
+    >
+      Copiado
+    </span>
+  </div>
+</h3>
+
 
       <!-- Botones -->
       <div
@@ -44,7 +55,7 @@
         ref="verCifras"
         class="flex items-center cursor-pointer transition-all"
       >
-        <XRadioButton
+        <XCheckBox
           v-model="seleccionado"
           name="mostrarValoresPie"
           value="seleccionarDatos"
@@ -53,7 +64,7 @@
             'border-[#0C55F8]': seleccionado === 'seleccionarDatos',
           }"
         />
-        <span class="font-normal text-[12px]">Ver todas las cifras</span>
+        <span class="font-normal text-[12px] ml-2">Ver todas las cifras</span>
       </div>
     </div>
 
@@ -109,13 +120,7 @@
       </div>
     </div>
 
-    <!-- Mensaje “copiado” -->
-    <span
-      v-if="copiado"
-      class="absolute top-2 right-2 bg-blue-500 text-white text-xs sm:text-sm px-2 py-1 rounded z-20"
-    >
-      Copiado
-    </span>
+
   </div>
 </template>
 
@@ -124,6 +129,7 @@ import { defineComponent, nextTick, ref } from "vue";
 import { Chart as ChartJS, Title, Tooltip, ArcElement } from "chart.js";
 import { Pie } from "vue-chartjs";
 import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
+import { XCheckBox } from "#components";
 
 ChartJS.register(
   Title,
@@ -141,7 +147,7 @@ export default defineComponent({
 
     const handleCopiar = () => {
       if (graficoContenido.value) {
-        copiarGrafico(graficoContenido.value); // ✅ solo gráfico + detalle
+        copiarGrafico(graficoContenido.value); // 
       }
     };
 

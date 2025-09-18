@@ -18,6 +18,12 @@
           Total Transacciones por Bancos (Expresado en Dólares)
           <Icon name="x:paste-clipboard" @click="handleCopiar"
             class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]" />
+                <span
+      v-if="copiado"
+      class="mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20"
+    >
+      Copiado
+    </span>
         </h3>
 
         <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
@@ -35,18 +41,13 @@
       </div>
     </div>
 
-    <!-- Mensaje “copiado” -->
-    <span v-if="copiado" class="absolute top-2 right-2 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20">
-      Copiado
-    </span>
-
-    <!-- Contenedor del gráfico con scroll vertical -->
+   <!-- Contenedor del gráfico con scroll vertical -->
     <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto;">
       <!-- Botón Ver todas las cifras -->
       <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10">
-<XRadioButton  v-model="seleccionado"  name="mostrarValoresHorizontal" value="seleccionarDatos" @click="toggleValores"
+<XCheckBox  v-model="seleccionado"  name="mostrarValoresHorizontal" value="seleccionarDatos" @click="toggleValores"
   :class="{'border-[#0C55F8]': seleccionado === 'seleccionarDatos'  }"/>
- <span class="font-normal text-[12px]">Ver todas las cifras</span>
+ <span class="font-normal text-[12px] ml-2">Ver todas las cifras</span>
         <Icon name="x:sort" class="text-[#0C55F8] w-7 h-7 ml-2 cursor-pointer" @click="handleOrdenar" />
       </div>
 
@@ -79,7 +80,7 @@ const mostrarValoresPluginHorizontal = {
 
         ctx.save();
         ctx.fillStyle = color;
-        ctx.font = '9px Work Sans';
+        ctx.font = '12px Work Sans';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(value + 'M', (bar.x + bar.base) / 2, bar.y);
@@ -103,9 +104,9 @@ export default defineComponent({
     const chartData = ref({
       labels: ['paraguay', 'Bolivia', 'Sudameris', 'Contínental', 'Itaú', 'GNB', 'Atlas', 'Ueno', 'BASA', 'Bancop', 'Río', 'Zeta'],
       datasets: [
-        { label: "QR", data: [150, 200, 150, 120, 80, 160, 200, 60, 120, 60, 200, 145], backgroundColor: "#A6C4F6", barPercentage: 0.9, categoryPercentage: 0.8 },
+        { label: "QR", data: [150, 200, 150, 120, 80, 160, 200, 60, 120, 60, 200, 145], backgroundColor: "#0C55F8", barPercentage: 0.9, categoryPercentage: 0.8 },
         { label: "Express", data: [50, 450, 200, 180, 60, 140, 250, 50, 80, 120, 980, 60], backgroundColor: "#6F8CCE", barPercentage: 0.9, categoryPercentage: 0.8 },
-        { label: "Asincrono", data: [456, 500, 150, 100, 60, 180, 160, 120, 150, 60, 80, 150], backgroundColor: "#0C55F8", barPercentage: 0.9, categoryPercentage: 0.8 }
+        { label: "Asincrono", data: [456, 500, 150, 100, 60, 180, 160, 120, 150, 60, 80, 150], backgroundColor:"#A6C4F6" , barPercentage: 0.9, categoryPercentage: 0.8 }
       ]
     });
 
@@ -121,6 +122,7 @@ export default defineComponent({
         legend: {
           position: 'top',
           align: 'end',
+          onClick:null,
           labels: {
             usePointStyle: true,
             pointStyle: 'circle',
