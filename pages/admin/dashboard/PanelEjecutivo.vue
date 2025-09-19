@@ -159,8 +159,8 @@
       </div>
       <div class="flex gap-4 flex-col sm:flex-row">
         <div class="flex-1 p-4 bg-white border border-gray-200 flex flex-col rounded-none sm:rounded-b-2xl">
-          <div class="px-8 py-4 bg-[#F5A623] text-white rounded-xl font-bold text-center text-lg mb-4">
-            <!-- valor -->
+          <div class="px-8 py-4 text-white rounded-xl font-bold text-center text-lg mb-4">
+            <AdminDashboardPanelEjecutivoEfficiencyChart :percentage="10" />
           </div>
           <div class="p-2 bg-white border border-gray-200 rounded-2xl flex flex-col justify-center gap-2 min-h-[80px]">
             <div class="flex justify-between items-center w-full">
