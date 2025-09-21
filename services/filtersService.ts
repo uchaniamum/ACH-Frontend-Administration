@@ -3,7 +3,7 @@ import type { Currencies, FiltersResponse, Periods } from "~/features/dashboard/
 
 class FiltersService {
   public baseURL = API_CONFIG.BASE_URL;
-  
+
 
   private formatCodeToLabel(code: string): string {
     return code
@@ -18,7 +18,7 @@ class FiltersService {
     options: RequestInit = {}
   ): Promise<T> {
     try {
-      const url = `${this.baseUrl}/${endpoint}`;
+      const url = `${this.baseURL}/${endpoint}`;
       const response = await fetch(url, {
         ...options,
         headers: {
@@ -39,7 +39,7 @@ class FiltersService {
   }
 
   async getOptions(): Promise<FiltersResponse> {
-    const endpoint = "/analytics/options";
+    const endpoint = "analytics/options";
     return this.request<FiltersResponse>(endpoint);
   }
 
@@ -69,15 +69,15 @@ class FiltersService {
     }
   }
 
-    mapPeriodsToSelectOptions(periods: Periods[]) {
-          return periods
-              .sort((a, b) => a.order - b.order)
-              .map(period => ({
-                  // label: this.formatCodeToLabel(status.code),
-                  label: period.displayName,
-                  value: period.code,
-              }))
-      }
-  
+  mapPeriodsToSelectOptions(periods: Periods[]) {
+    return periods
+      .sort((a, b) => a.order - b.order)
+      .map(period => ({
+        // label: this.formatCodeToLabel(status.code),
+        label: period.displayName,
+        value: period.code,
+      }))
+  }
+
 }
 export const filtersService = new FiltersService();

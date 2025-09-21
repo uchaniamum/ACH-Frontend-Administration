@@ -1,11 +1,13 @@
 import type { MenuBarAdminConfig } from "~/types/admin/menu.types";
 
+
+
 const menuConfigACH: MenuBarAdminConfig = {
     items: [
         {
             label: 'Dashboard',
             icon: 'house',
-            to: 'admin/dashboard'
+            to: '/admin/dashboard'
         },
         {
             label: 'Configuración',
@@ -40,6 +42,7 @@ const menuConfigACH: MenuBarAdminConfig = {
         {
             label: 'Reportes',
             icon: 'reports',
+            to: '/admin/reports'
         },
         {
             label: 'Usuarios',

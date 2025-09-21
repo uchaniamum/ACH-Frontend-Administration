@@ -45,6 +45,18 @@ export function useAnalyticsOptions() {
         }
       };
 
+        const resetOptions = () => {
+        periodsOptions.value = []
+        error.value = null
+    }
+       return {
+    periodsOptions: readonly(periodsOptions),
+    periodsFilterOptions: readonly(periodsFilterOptions),
+    loading: readonly(loading),
+    error: readonly(error),
+    loadperiodsOptions
+  }
+
     
 
 }

@@ -10,8 +10,6 @@
       </h2>
        <XSelect 
             name="periodo"
-            label="Periodo" 
-            label-required
             :options="periodsOptions" 
             optionLabel="label" 
             optionValue="value"
@@ -191,22 +189,21 @@ import { ref, onMounted } from 'vue'
 import { useAnalyticsOptions } from '~/componsables/useAnalyticsOptions'
 
 // Usar el composable de opciones
-/*const { 
+const { 
     periodsOptions, 
     loading: optionsLoading, 
     error: optionsError,
     loadperiodsOptions 
-} = useAnalyticsOptions()*/
+} = useAnalyticsOptions()
 
 
 
 // Cargar opciones al montar el componente
 onMounted(async () => {
-   // await loadperiodsOptions()
-    
-    // Manejo de errores
-   /* if (optionsError.value) {
+    await loadperiodsOptions()
+       // Manejo de errores
+    if (optionsError.value) {
         console.warn('No se pudieron cargar las opciones de periodos:', optionsError.value)
-    }*/
+    }
   });
 </script>

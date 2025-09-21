@@ -43,5 +43,14 @@ export default defineNuxtConfig({
     public: {
       apiBase: '/my-api' // ← Cambia a un prefix único
     }
+  },
+  modules: [
+    '@primevue/nuxt-module', // módulo PrimeVue para Nuxt 3
+  ],
+  primevue: {
+    theme: 'saga-blue', // tema oficial de PrimeVue 4.x
+    ripple: true,
+    inputStyle: 'outlined'
   }
+
 })

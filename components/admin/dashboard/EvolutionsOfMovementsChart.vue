@@ -117,7 +117,8 @@ const puntosColorYDatos = {
 
         const value = dataset.data[index] + 'M'
         ctx.save()
-        ctx.translate(point.x, point.y - 25) // desplazado un poco más arriba
+        ctx.translate(point.x, point.y - 25) // desplazado un poco más arriba movetou y
+    
         ctx.rotate(-Math.PI / 3) // ROTADO AL OTRO LADO
 
         const padding = 6

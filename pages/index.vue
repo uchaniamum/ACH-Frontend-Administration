@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import AdminDashboardIndex from '~/components/admin/dashboard/index.vue'
+</script>
+
 <template>
-    <h1>Dashboard</h1>
-</template>
+  <AdminDashboardIndex />
+</template>s
