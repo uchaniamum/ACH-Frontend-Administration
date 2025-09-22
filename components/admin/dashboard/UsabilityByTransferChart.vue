@@ -5,19 +5,17 @@
       <h3 class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2 relative">
         Usabilidad por Transferencia
 
-        <!-- Contenedor del ícono -->
         <div class="relative">
           <Icon name="x:paste-clipboard"
             class="text-[#0A44C6] w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:text-[#0C55F8]"
             @click="handleCopiar()" />
-
-          <!-- Mensaje “copiado” debajo del ícono sin moverlo -->
           <span v-if="copiado"
             class="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20">
             Copiado
           </span>
         </div>
       </h3>
+
       <div class="flex gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto justify-center">
         <button @click="accion1"
           class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[90px] sm:min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-xs sm:text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
@@ -41,12 +39,10 @@
 
     <!-- Contenedor que se copiará (gráfico + labels) -->
     <div ref="graficoContenido" class="w-full flex flex-col items-center gap-4 sm:gap-6">
-      <!-- Gráfico Pie -->
       <div class="flex justify-center items-center w-[400px] h-[400px] sm:w-[420px] sm:h-[460px]">
         <PieChart ref="grafico" :data="chartData" :options="chartOptions" />
       </div>
 
-      <!-- Contenedor de labels -->
       <div
         class="flex flex-col gap-2 sm:gap-3 border border-[#92ACE5] p-3 rounded-lg bg-white w-[90%] sm:w-[55%] mx-auto">
         <div class="text-[13px] sm:text-[14px] font-semibold text-[#5F6A7B] mb-1 sm:mb-2 text-left">Enviados</div>
@@ -63,14 +59,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Mensaje “copiado” -->
-
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, computed } from "vue"; // ✅ agregado computed
+<script lang="ts">
+import { defineComponent, ref,  computed } from "vue";
+import type { Ref } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, ArcElement } from "chart.js";
 import { Pie } from "vue-chartjs";
 import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
@@ -83,15 +77,27 @@ ChartJS.register(
   useChartUtilitarios().mostrarTooltipBurbujaPlugin
 );
 
+// Interfaces para tipar el gráfico
+interface ChartDataSet {
+  label: string;
+  data: number[];
+  backgroundColor: string[];
+}
+
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataSet[];
+}
+
 export default defineComponent({
   name: "PieUsabilidadTransferencia",
   components: { PieChart: Pie, XCheckBox },
   setup() {
     const { copiarGrafico, copiado } = useChartUtilitarios();
-    const graficoContenido = ref(null);
-    const grafico = ref(null); 
-    const mostrarValoresPie = ref(false); 
-    const seleccionado = ref(null); // ✅ agregado
+    const graficoContenido: Ref<HTMLElement | null> = ref(null);
+    const grafico: Ref<any> = ref(null);
+    const mostrarValoresPie = ref(false);
+    const seleccionado = ref<string | null>(null);
 
     const handleCopiar = () => {
       if (graficoContenido.value) {
@@ -99,7 +105,7 @@ export default defineComponent({
       }
     };
 
-    const chartData = ref({
+    const chartData: Ref<ChartData> = ref({
       labels: ["Qr", "Express", "Asincrono"],
       datasets: [
         {
@@ -124,35 +130,40 @@ export default defineComponent({
     const toggleValores = () => {
       mostrarValoresPie.value = !mostrarValoresPie.value;
       if (grafico.value?.chart) {
-        grafico.value.chart.options.plugins.mostrarValoresPie =
-          mostrarValoresPie.value;
+        grafico.value.chart.options.plugins.mostrarValoresPie = mostrarValoresPie.value;
         grafico.value.chart.update();
       }
     };
 
-    const accion1 = () => alert("Botón Enviados presionado");
-    const accion2 = () => alert("Botón Recibidos presionado");
+    const accion1 = () => {
+      // Aquí puedes actualizar el chartData con datos reales "sent"
+      chartData.value.datasets[0].data = [35, 35, 10, 10, 5, 5];
+      chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS", "USSD"];
+    };
 
-    const total = computed(() =>
-      chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0)
-    );
+    const accion2 = () => {
+      // Aquí puedes actualizar el chartData con datos reales "received"
+      chartData.value.datasets[0].data = [40, 30, 15, 10, 5];
+      chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS"];
+    };
+
+    const total = computed(() => chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
 
     return {
-      chartData,
-      chartOptions,
-      grafico,
       graficoContenido,
+      grafico,
       handleCopiar,
       copiado,
+      chartData,
+      chartOptions,
+      toggleValores,
       accion1,
       accion2,
-      toggleValores,
-      seleccionado, 
+      seleccionado,
       total,
     };
   },
 });
 </script>
-
 
 <style scoped></style>

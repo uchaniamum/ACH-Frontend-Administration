@@ -41,6 +41,7 @@
 import BarChartVertical from './TotalTransactionsByBancksChart.vue'   // tu gráfico vertical
 import BarChartHorizontal from './TransactionByRegionChart.vue' // tu gráfico horizontal
 import LineChart from './EvolutionsOfMovementsChart.vue'
+
 import PieChartUsabilidadCanal from './UsabilityByChannelChart.vue'
 import PieChartUsabilidadTransferencia from './UsabilityByTransferChart.vue'
 import PanelEjecutivo from './panelEjecutivo/ExecutivePanel.vue'

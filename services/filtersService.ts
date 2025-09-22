@@ -1,9 +1,12 @@
 import { API_CONFIG } from "~/config/api";
-import type { Currencies, FiltersResponse, Periods } from "~/features/dashboard/options.types";
+import type {
+  Currencies,
+  FiltersRespuesta,
+  Periods,
+} from "~/features/dashboard/options.types";
 
 class FiltersService {
   public baseURL = API_CONFIG.BASE_URL;
-
 
   private formatCodeToLabel(code: string): string {
     return code
@@ -26,7 +29,6 @@ class FiltersService {
           ...options.headers,
         },
       });
-      console.log("Esta es un URL", url);
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
@@ -38,16 +40,18 @@ class FiltersService {
     }
   }
 
-  async getOptions(): Promise<FiltersResponse> {
+  async getOptions(): Promise<FiltersRespuesta> {
     const endpoint = "analytics/options";
-    return this.request<FiltersResponse>(endpoint);
+    return this.request<FiltersRespuesta>(endpoint);
   }
 
   async getFilterCurrencies(): Promise<Currencies[]> {
     try {
       const response = await this.getOptions();
-      if (response.currencies) {
-        return response.currencies.filter((currencies) => currencies.isActive);
+      if (response.Filters?.currencies) {
+        return response.Filters.currencies.filter(
+          (currencies) => currencies.isActive
+        );
       }
       return [];
     } catch (error) {
@@ -56,11 +60,12 @@ class FiltersService {
     }
   }
 
-  async getFilterPeriods(): Promise<Currencies[]> {
+  async getFilterPeriods(): Promise<Periods[]> {
     try {
       const response = await this.getOptions();
-      if (response.periods) {
-        return response.periods.filter((periods) => periods.isActive);
+      console.log("mis peridos son", response);
+      if (response.Filters?.periods) {
+        return response.Filters.periods.filter((periods) => periods.isActive);
       }
       return [];
     } catch (error) {
@@ -70,14 +75,14 @@ class FiltersService {
   }
 
   mapPeriodsToSelectOptions(periods: Periods[]) {
+    console.log("mis datos de peridos son", periods);
     return periods
       .sort((a, b) => a.order - b.order)
-      .map(period => ({
+      .map((period) => ({
         // label: this.formatCodeToLabel(status.code),
         label: period.displayName,
-        value: period.code,
-      }))
+        value: this.formatCodeToLabel(period.code),
+      }));
   }
-
 }
 export const filtersService = new FiltersService();

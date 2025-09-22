@@ -1,6 +1,10 @@
 
 
-export interface FiltersResponse {
+export interface FiltersRespuesta {
+  Filters: Filters;
+}
+
+export interface Filters {
   currencies: Currencies[];
   customerIdentifiers: CustomerIdentifiers[];
   externalParticipants: ExternalParticipants[];

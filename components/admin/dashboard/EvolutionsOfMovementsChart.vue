@@ -81,6 +81,9 @@ import {
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useChartUtilitarios } from '~/componsables/useChartUtilitarios'
+import { seriesService } from '~/services/dashboard/seriesService';
+//import { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
+
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale)
 
@@ -149,8 +152,7 @@ const puntosColorYDatos = {
 }
 
 
-
-    const chartData = ref({
+const chartData = ref({
       labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0')),
       datasets: [
         {
@@ -228,6 +230,10 @@ const puntosColorYDatos = {
       chartRef.value?.chart?.update()
     })
 
+
+
+
+    
     return {
       chartRef,
       chartData,

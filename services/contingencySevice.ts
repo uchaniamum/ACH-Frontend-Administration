@@ -17,8 +17,7 @@ class ContingencyService {
                 }
             });
 
-            console.log('Esta es un URL', url);
-
+            console.log("Esta es un URL", url);
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} ${response.statusText}`);
             }
