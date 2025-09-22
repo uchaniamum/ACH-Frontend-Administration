@@ -12,12 +12,13 @@ export function useDates() {
               day: '2-digit',
           })
       } catch (error) {
+          console.error('Error in function formatDate: ', error);
           return dateString
       }
   }
 
 
-  const formatTime = (time: string | Date | null | undefined): string => {
+  const formatTime = (time: string | Date | null | undefined): string | Date => {
     if (!time) return 'No disponible'
 
     try {
@@ -39,7 +40,8 @@ export function useDates() {
         })
       }
     } catch (error) {
-      return 'Hora inválida'
+      console.error('Error in function formatTime: ', error);
+      return time
     }
   }
 
@@ -57,9 +59,11 @@ export function useDates() {
         // Formatear hora como HH:MM
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
         
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     } catch (error) {
+        console.error('Error in function formatDateTimeDirect: ', error);
         return dateTimeString;
     }
 }

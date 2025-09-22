@@ -20,7 +20,7 @@ export function useUserModal() {
     // Computed
     const isEditMode = computed(() => mode.value === 'edit')
     const modalTitle = computed(() =>
-        isEditMode.value ? 'Editar Usuario' : 'Agregar nuevo usuario'
+        isEditMode.value ? 'Editar Usuario' : 'Crear nuevo usuario'
     )
 
     // Methods

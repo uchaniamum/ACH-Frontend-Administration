@@ -1,10 +1,12 @@
 import type { ToastMessageOptions } from "primevue";
-import type { ParameterDetailResponse, ParameterListItem, ParameterRequest, ParameterSaveResponse } from "~/features/parameters/types"
+import type { ParameterDetailResponse, ParameterHistoryItem, ParameterListItem, ParameterRequest, ParameterSaveResponse } from "~/features/parameters/types"
 import type { ServiceError } from "~/features/users/types"
 import { parametersService } from "~/services/parametersService"
 
 export function useParameterService() {
     const parameters = ref<ParameterListItem[]>([]);
+    const parameterHistory = ref<ParameterHistoryItem[]>([]);
+
     const loading = ref(false);
     const error = ref<string | null>(null);
 
@@ -55,7 +57,7 @@ export function useParameterService() {
         }
     }
 
-        const updateParameter = async (parameterData: ParameterRequest): Promise<ParameterSaveResponse> => {
+    const updateParameter = async (parameterData: ParameterRequest): Promise<ParameterSaveResponse> => {
         try {
             const response = await parametersService.updateParameter(parameterData)
             
@@ -84,6 +86,32 @@ export function useParameterService() {
         }
     }
 
+    const loadHistorialParameter = async (): Promise<any> => {
+        loading.value = true
+        error.value = null
+        try {
+            const response = await parametersService.getHistoryParameter()
+            parameterHistory.value = response.historicalParameters
+            console.log(response.historicalParameters);
+            return { data: response.historicalParameters };
+        } catch (err) {
+            const serviceError = err as ServiceError
+
+            error.value = serviceError.message || 'Error loading parameters'
+
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: serviceError.message || 'Error al cargar los parámetros',
+                life: 5000
+            })
+
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
     return {
         // State
         parameters,
@@ -93,6 +121,7 @@ export function useParameterService() {
         loadParameters,
         loadParameterDetails,
         updateParameter,
+        loadHistorialParameter,
         //Toast
         showToast
     }

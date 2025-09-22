@@ -4,9 +4,9 @@ export interface ColumnConfigHistory{
     style?: string;
     class?: string;
     sortable?: boolean;
-    formatter?: (value: any) => string;
+    formatter?: (value: any, rowData?: any) => string;
     template?: (value: any, rowData?: any) => string; 
-    searchFormatter?: (value: any) => string;
+    searchFormatter?: (value: any, rowData?: any) => string;
 }
 
 export interface HistoryConfig<T = any>{

@@ -27,4 +27,6 @@ export type ModulesMenu =
     | 'processes'
     | 'historyContingency'
     | 'historyUser'
+    | 'historyParameter'
+    | 'historyChannels'
     ;

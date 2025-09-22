@@ -78,6 +78,27 @@ export interface UserModalData {
     isActive?: boolean;
 }
 
+export interface UserHistoryItem{
+    userCode: string;
+    changeNumber: number;
+    email: string;
+    fullname: string;
+    alias: string;
+    countryCode: string;
+    phoneNumber: string;
+    isActive: boolean;
+    userSituation: string;
+    userRole: string;
+    isProtected: boolean;
+    createdAt: string;
+    createdByUser: string;
+    updatedAt: string;
+    updatedByUser: string
+}
+
+export interface UserHistoryListItem {
+    users: UserHistoryItem[]
+}
 
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error'
 export type ModalMode = 'create' | 'edit'

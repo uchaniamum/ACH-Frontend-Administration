@@ -71,9 +71,22 @@ export const breadcrumbConfig = {
         historyUser:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitacora Usuarios ' }
+                { label: 'Bitácora - Usuarios' }
             ] 
-        }
+        },
+        //HistoryParameter
+        historyParameter:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora - Parámetros' }
+            ] 
+        },
+        historyChannels:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora - Administrador canales' }
+            ] 
+        },
     }
 } as const;
 

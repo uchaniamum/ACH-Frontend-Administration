@@ -64,10 +64,10 @@ export function useHistoryTable<T>(config: HistoryConfig<T>) {
 
                             if (column?.searchFormatter) {
                                 // Usar searchFormatter personalizado
-                                searchValue = column.searchFormatter(rawValue);
+                                searchValue = column.searchFormatter(rawValue, item);
                             } else if (column?.formatter) {
                                 // Usar formatter regular como fallback
-                                searchValue = column.formatter(rawValue);
+                                searchValue = column.formatter(rawValue, item);
                             } else {
                                 // Usar valor original
                                 searchValue = rawValue?.toString() || '';
@@ -87,7 +87,7 @@ export function useHistoryTable<T>(config: HistoryConfig<T>) {
                             })
                         } catch (fieldError) {
                             console.error('Error during filtering:', fieldError);
-                            return false;
+                            return data.value;
                         }
         }
         return filtered;

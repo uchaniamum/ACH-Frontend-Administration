@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Bitacora - Usuarios" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true">
+        <XHeader title="Bitácora - Usuarios" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true">
             <template #description>
                 <p>Texto descriptivo de la sección .</p>
             </template>
@@ -18,33 +18,33 @@
 import HistoryModule from '~/components/historical/HistoryModule.vue';
 import type { HistoryConfig } from '~/componsables/historical/type';
 import { useDates } from '~/componsables/useDates';
-import type { ServiceError } from '~/features/users/types';
+import type { ServiceError, UserHistoryItem } from '~/features/users/types';
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { userService } from '~/services/userService';
 
 const { formatDateTimeDirect } = useDates();
 const loading = ref(false);
 
-const userHistory = ref<any[]>([]);
+const userHistory = ref<UserHistoryItem[]>([]);
 
-const itemsBreadHistoricalContingency = getBreadcrumbItems('historyContingency', 'list');
+const itemsBreadHistoricalContingency = getBreadcrumbItems('historyUser', 'list');
 
 const userConfig: HistoryConfig<any> = {
     columns: [
-        { field: 'userCode', header: 'Codigo', style: 'min-width: 75px;', class: 'text-left'},
-        { field: 'fullname', header: 'Nombre', style: 'min-width: 195px;', class: 'text-left'},
-        { field: 'email', header: 'Email', style: 'min-width: 150px;', class: 'text-left' },
+        { field: 'userCode', header: 'Código', style: 'min-width: 75px;', class: 'text-left'},
+        { field: 'fullname', header: 'Nombre', style: 'min-width: 160px;', class: 'text-left'},
+        { field: 'email', header: 'Correo electrónico', style: 'min-width: 150px !important;', class: 'text-left' },
         { field: 'alias', header: 'Alias', style: 'min-width: 100px;', class: 'text-left'},
         { field: 'userRole', header: 'Roles', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'phoneNumber', header: 'Celular', style: 'min-width: 150px;', class: 'text-left'},
-        { field: 'updatedByUser', header: 'Estado', style: 'min-width: 85px;', class: 'text-left',
-            searchFormatter: (value: boolean) => getStatusUserSearchText(value),
-            template: (value: boolean) => statusUserTag(value),
+        { field: 'phoneNumber', header: 'Celular', style: 'min-width: 160px;', class: 'text-left',
+            formatter: (value: string, rowData: any) => getCellPhoneSearchText(value, rowData)
         },
+        { field: 'userSituation', header: 'Estado', style: 'min-width: 85px;', class: 'text-left',},
         { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 100px;', class: 'text-left'},
         { field: 'changeNumber', header: 'N° de Cambio', style: 'min-width: 75px;', class: 'text-left'},
         { field: 'updatedAt', header: 'Últ. fecha de modif.', style: 'min-width: 90px;', class: 'text-left', 
-            formatter: (value: string) => formatDateTimeDirect(value)
+            formatter: (value: string) => formatDateTimeDirect(value),
+            searchFormatter: (value: string) => formatDateTimeDirect(value)
         },
     ],
     searchFields: ['userCode', 'fullname', 'email', 'alias', 'userRole', 'phoneNumber', 'isActive', 'updatedByUser', 'changeNumber', 'updatedAt'],
@@ -71,14 +71,10 @@ const userConfig: HistoryConfig<any> = {
     }
 }
 
-const statusUserTag = (isActive: boolean): { severity: string, value: string } => {
-    return {
-        severity: isActive ? "success" : "danger",
-        value: isActive ? 'Activo' : 'Inactivo'
-    };
-};
 
-const getStatusUserSearchText = (isActive: boolean): string => {
-    return isActive ? 'Activo' : 'Inactivo';
+
+const getCellPhoneSearchText = (cellPhone: string, rowData:  any): string => {
+    const countryCode = rowData.countryCode ? `(${rowData.countryCode})` : '';
+    return `${countryCode} ${cellPhone}`.trim();
 };
 </script>

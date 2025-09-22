@@ -71,23 +71,23 @@ const menuConfigACH: MenuBarAdminConfig = {
             items: [
                 {
                     key:'historicalChannels',
-                    label: 'Bitacora Canales',
-                    to: '/admin/configuration/channels',
+                    label: 'Bitácora Canales',
+                    to: '/admin/configuration/channels/HistoricalChannel',
                 },
                 {
-                    key:'contingency',
-                    label: 'Contingencia',
-                    to: '/admin/configuration/contingency',
+                    key:'historicalContingency',
+                    label: 'Bitácora Contingencias',
+                    to: '/admin/configuration/contingency/HistoricalContingency',
                 },
                 {
                     key:'participants',
-                    label: 'Participantes',
+                    label: 'Bitácora Participantes',
                     to: '/admin/configuration/participants',
                 },
                 {
-                    key:'parameters',
-                    label: 'Parámetros',
-                    to: '/admin/configuration/parameters',
+                    key:'historicalParameters',
+                    label: 'Bitácora Parámetros',
+                    to: '/admin/configuration/parameters/HistoricalParameters',
                 },
                 {
                     key:'schedules',
@@ -96,7 +96,7 @@ const menuConfigACH: MenuBarAdminConfig = {
                 },
                 {
                     key:'historicalUsers',
-                    label: 'Bitacora Usuarios',
+                    label: 'Bitácora Usuarios',
                     to: '/admin/security/users/HistoricalUser'
                 }
 

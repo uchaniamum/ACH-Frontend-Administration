@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type {  ChangeChannelRequest, ContingencyRequest, Participant, ParticipantListResponse, PaymentGatewayContingencyRequest, paymentGatewaysOpeListResponse, PaymentGatewayUpdateResponse } from "~/features/contingency/type";
+import type {  ChangeChannelRequest, ContingencyRequest, ParticipantContingencyListItem, Participant, ParticipantListResponse, PaymentGatewayContingencyRequest, paymentGatewaysOpeListResponse, PaymentGatewayUpdateResponse } from "~/features/contingency/type";
 
 
 class ContingencyService {
@@ -84,9 +84,14 @@ class ContingencyService {
     }
 
     //Service history contingency participants
-    async getHistoryContingencyParticipants(): Promise<any> {
+    async getHistoryContingencyParticipants(): Promise<ParticipantContingencyListItem> {
         const endpoint = 'participants/route-maps/historical';
-        return this.request<any>(endpoint);
+        return this.request<ParticipantContingencyListItem>(endpoint);
+    }
+
+    async getHistoryContingencyChannels(): Promise<ParticipantContingencyListItem> {
+        const endpoint = 'participants/operational-maps/historical';
+        return this.request<ParticipantContingencyListItem>(endpoint);
     }
 }
 

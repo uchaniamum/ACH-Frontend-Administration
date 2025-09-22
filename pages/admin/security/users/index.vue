@@ -269,7 +269,8 @@ const confirmDialog = ref({
     options: {
         title: '',
         message: '',
-        onConfirm: () => {}
+        onConfirm: () => {},
+        onCancel: () => {}
     }
 })
 
@@ -279,12 +280,17 @@ const openRevertPassModal = (userData: UserModalData): void => {
         options: {
             title: 'Reseteo de contraseña',
             icon: 'x:warning-circle',
+            confirmLabel: 'Resetear',
+            cancelLabel: 'Cancelar',
             iconColor: 'text-yellow-500',
             message: `¿Estás seguro de resetear la contraseña de ${userData.fullname}? 
-                        Se enviará la nueva contraseña a su correo electrónico 
+                        Se enviará la nueva contraseña al correo electrónico 
                         <span class="font-semibold">${userData.email}</span>`,
             onConfirm: async () => {
                 await saveResetPassword(userData.code)
+            },
+            onCancel: () => {
+                // Lógica adicional si es necesaria al cancelar
             }
         }
     }

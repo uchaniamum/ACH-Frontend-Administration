@@ -145,8 +145,8 @@ export function useUserService() {
             if (response) {
                 showToast({
                     severity: 'success',
-                    summary: 'Contraseña reseteada',
-                    detail: 'Se ha enviado un correo con la nueva contraseña.',
+                    summary: 'Reseteo exitoso',
+                    detail: 'Se envió la nueva contraseña al correo electrónico del usuario.',
                     life: 4000
                 })
                 return true

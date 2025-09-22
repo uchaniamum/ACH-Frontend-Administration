@@ -23,7 +23,7 @@
                     class="font-medium"
                 />
                 <span v-else-if="column.formatter">
-                    {{ column.formatter(getNestedValue(rowData, column.field)) }}
+                    {{ column.formatter(getNestedValue(rowData, column.field), rowData) }}
                 </span>
                 <span v-else>
                     {{ getNestedValue(rowData, column.field) }}
