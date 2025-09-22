@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { BankFilters, BankUpdateRequest, PaymentGatewayBankDetail, PaymentGatewayBankList, PaymentGatewayUpdateResponse } from "~/features/contingency/type";
+import type {  ChangeChannelRequest, ContingencyRequest, Participant, ParticipantListResponse, PaymentGatewayContingencyRequest, paymentGatewaysOpeListResponse, PaymentGatewayUpdateResponse } from "~/features/contingency/type";
 
 
 class ContingencyService {
@@ -17,8 +17,6 @@ class ContingencyService {
                 }
             });
 
-            console.log('Esta es un URL', url);
-
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} ${response.statusText}`);
             }
@@ -32,8 +30,7 @@ class ContingencyService {
     }
 
     // Endpoint 1: Obtener lista de bancos
-    async getBanks(filters?: BankFilters): Promise<PaymentGatewayBankList> {
-        //let endpoint = 'payment-gateways-transaction/contingency';
+    async getBanks(filters?: any): Promise<ParticipantListResponse> {
         let endpoint = 'participants/route-maps-xxx';
         if (filters) {
             const params = new URLSearchParams();
@@ -48,43 +45,52 @@ class ContingencyService {
             }
         }
 
-        console.log('Esta es un URL contingency list', this.request<PaymentGatewayBankList>(endpoint));
-        return this.request<PaymentGatewayBankList>(endpoint);
+        return this.request<ParticipantListResponse>(endpoint);
     }
 
-
-    async getParticipantsByCode(participantCodes: string[]): Promise<any> {
-    console.log('📤 ENVIANDO AL BACKEND:', { participantCodes });
-    
-    return this.request<any>(`participants/route-maps/matching-xxx`, {
-        method: 'POST', // o el método que uses
-        body: JSON.stringify({
-            participantCodes: participantCodes
-        })
-    });
-}
-
-    async getBankByCodeAnterior(participantCode: string): Promise<PaymentGatewayBankDetail> {
-        if (!participantCode) {
-            throw new Error('Participant code is required');
-        }
-        return this.request<PaymentGatewayBankDetail>(`payment-gateways-transaction-contingency/${participantCode}`);
+    async getParticipantsByCode(participantCodes: string[]): Promise<Participant> {
+        return this.request<Participant>(`participants/route-maps/matching-xxx`, {
+            method: 'POST',
+            body: JSON.stringify({
+                participantCodes: participantCodes
+            })
+        });
     }
 
-    async updateChangeChannel(bankData: any): Promise<PaymentGatewayUpdateResponse> {
+    async updateChangeChannel(bankData: ChangeChannelRequest): Promise<PaymentGatewayUpdateResponse> {
         return this.request<PaymentGatewayUpdateResponse>('participants/route-maps/operational-gateway-xxx', {
             method: 'PUT',
             body: JSON.stringify(bankData)
         });
     }
 
-    async updateContingency(bankData: any): Promise<PaymentGatewayUpdateResponse> {
+    async updateContingency(bankData: ContingencyRequest): Promise<PaymentGatewayUpdateResponse> {
         return this.request<PaymentGatewayUpdateResponse>('participants/route-maps/contingency-xxx', {
             method: 'PUT',
             body: JSON.stringify(bankData)
         });
     }
+
+    async getPaymentGatewayRoutes(): Promise<any> {
+        const endpoint = 'payment-gateways/route-maps-operational';
+        return this.request<paymentGatewaysOpeListResponse>(endpoint);
+    }
+
+    async updatePaymentGateway(dataPaymentGateway: PaymentGatewayContingencyRequest, paymentGatewayCode: string | undefined): Promise<PaymentGatewayUpdateResponse> {
+        return this.request<PaymentGatewayUpdateResponse>(`payment-gateways/${paymentGatewayCode}/route-maps-operational`, {
+            method: 'PATCH',
+            body: JSON.stringify(dataPaymentGateway)
+        });
+    }
+
+    //Service history contingency participants
+    async getHistoryContingencyParticipants(): Promise<any> {
+        const endpoint = 'participants/route-maps/historical';
+        return this.request<any>(endpoint);
+    }
 }
 
 
 export const contingencyService = new ContingencyService();
+
+

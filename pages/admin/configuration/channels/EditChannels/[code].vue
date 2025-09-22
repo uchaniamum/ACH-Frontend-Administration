@@ -64,7 +64,7 @@
               />
               <XButton 
                 label="Guardar" 
-                @click="confirmModalVisible = true"
+                @click="openConfirmEditModal"
                 class="w-75"
                 :disabled="!hasRouteChanged"
               />
@@ -76,12 +76,9 @@
     
       <Toast position="top-right" />
 
-    <ChannelsModalConfirm
-      v-model="confirmModalVisible"
-      :current-selection="selectedRouteData"
-      :previous-selection="previousRouteData"
-      @confirm="handleConfirmChange"
-      @cancel="handleCloseCertificateModal"
+    <ConfirmDialogWrapper
+      v-model="confirmDialogEditChannel.visible"
+      :options="confirmDialogEditChannel.options"
     />
 
     <ChannelsModalCertificate
@@ -116,26 +113,22 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useToast } from 'primevue/usetoast';
-import { channelsService } from '~/services/channelsService';
-import type { ChannelsResponse } from '~/features/channels/type';
-import ChannelsModalConfirm, { type RouteSelection } from '~/features/channels/ChannelsModalConfirm.vue';
+import type { RouteSelection } from '~/features/channels/type';
 import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertificate.vue';
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
+import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
+import { useChannelService } from '~/componsables/channels/useChannels';
+//Composable
+const { channelData, loading, error, loadChannelsDetails, updateChannel } = useChannelService();
 
 const route = useRoute();
 const router = useRouter();
 
-const toast = useToast();
-
-// Estados
-const loading = ref(true)
+// State
 const saving = ref(false)
-const error = ref<string | null>(null)
-const channelData = ref<ChannelsResponse | null>(null)
+
 const selectedRouteAlias = ref<string>('')
 const originalSelectedRoute = ref<string>('')
-const confirmModalVisible = ref(false)
 const visibleDialogCertificate = ref(false)
 const visibleDialogCertificateRegister = ref(false)
 
@@ -144,6 +137,15 @@ const channelCode = computed(() => route.params.code as string)
 
 const itemsBreadChannelsEdit = getBreadcrumbItems('channels', 'edit');
 
+const confirmDialogEditChannel = ref({
+    visible: false,
+    options: {
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        onCancel: () =>{}
+    }
+})
 
 // Computed properties
 const processedRoutes = computed(() => {
@@ -180,41 +182,39 @@ const hasRouteChanged = computed(() => {
 })
 
 const loadChannelData = async () => {
-    try {
-        loading.value = true
-        error.value = null
-        
-        const response = await channelsService.getChannelsByCode(channelCode.value)
-        if(response){
-          channelData.value = response
-          
-          if (channelData.value.routes && channelData.value.routes.length > 0) {
-            const activeRoute = channelData.value.routes.find(r => r.isActive)
-            if (activeRoute?.alias) {
-                selectedRouteAlias.value = activeRoute.alias
-                originalSelectedRoute.value = activeRoute.alias
-            } else if (channelData.value.routes.length > 0) {
-                selectedRouteAlias.value = ''
-                originalSelectedRoute.value = ''
-            }
+  const response = await loadChannelsDetails(channelCode.value)
+    
+    if (response?.routes && response.routes.length > 0) {
+        const activeRoute = response.routes.find(r => r.isActive)
+        if (activeRoute?.alias) {
+            selectedRouteAlias.value = activeRoute.alias
+            originalSelectedRoute.value = activeRoute.alias
+        } else if (response.routes.length > 0) {
+            selectedRouteAlias.value = ''
+            originalSelectedRoute.value = ''
         }
-      }
-    } catch (err: any) {
-        console.error('Error loading channel data:', err)
-        error.value = err.message || 'Error al cargar la información del canal'
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: error.value,
-            life: 5000
-        })
-    } finally {
-        loading.value = false
     }
 };
 
-const showToast = (message: any) => {
-    toast.add(message)
+const openConfirmEditModal = () => {
+  confirmDialogEditChannel.value = {
+      visible: true,
+      options: {
+            title: 'Confirmar cambio de CPD ',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            message: `¿Estás seguro de cambiar de ${ previousRouteData.value?.alias }? 
+                        a
+                        <span class="font-semibold">${ selectedRouteData.value?.alias }</span>
+                        con ruta <span class="font-semibold">${ selectedRouteData?.value?.urls.join(', ') }</span>?`,
+            onConfirm: async () => {
+                await handleConfirmChange()
+            },
+            onCancel: () => {
+              console.log('Usuario canceló la acción');
+            }
+      }
+    }
 }
 
 // NAVEGACIÓN
@@ -242,47 +242,18 @@ const handleConfirmChange = async () => {
     }
 
     console.log('Update Data:', updateData);
-    const response = await channelsService.updateChannels(updateData);
-    console.log('Response Channels: ', response);
-    
+
+    const response = await updateChannel(updateData);
     if (response) {
-      console.log('Operación exitosa');
-      
       originalSelectedRoute.value = selectedRouteAlias.value;
-      showToast({ 
-        severity: 'success', 
-        summary: 'Éxito',
-        detail: `Nuevo CPD ${selectedRouteAlias.value} asignado correctamente`, 
-        life: 3000 
-      });
-      
-      // Opcional: Recargar los datos para sincronizar con el servidor
       await loadChannelData();
-      
-    } else {
-      // Manejar respuesta no exitosa del servidor
-      console.log('Respuesta no exitosa del servidor');
-      showToast({ 
-        severity: 'error', 
-        summary: 'Error',
-        detail: 'Error al procesar la solicitud', 
-        life: 3000 
-      });
-    }
-    
-  } catch (err: any) {
+    }    
+  } catch (err) {
     console.error('Error updating channel:', err)
-    showToast({
-      severity: 'error',
-      summary: 'Error',
-      detail: err.message || 'Error al guardar los cambios',
-      life: 5000
-    })
   } finally {
     saving.value = false
-    confirmModalVisible.value = false
-  }
-}
+    confirmDialogEditChannel.value.visible = false
+}}
 
 const resetSelection = () => {
   selectedRouteAlias.value = originalSelectedRoute.value
@@ -297,11 +268,6 @@ const handleCertificateRegistered = () => {
 
     visibleDialogCertificate.value = true;
   }
-}
-
-const handleCloseCertificateModal = async () => {
-  visibleDialogCertificate.value = false
-  await loadChannelData()
 }
 
 

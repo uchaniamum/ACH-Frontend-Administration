@@ -36,19 +36,6 @@ class OptionsService {
         '8': 'Expired'
     }
 
-    private getKeyFromMapping(textValue: string, mapping: Record<string, string>): string {
-        // Normalizar el texto para comparación (case insensitive)
-        const normalizedText = textValue.toLowerCase().trim();
-
-        // Buscar la clave cuyo valor mapeado coincida (también normalizado)
-        const entry = Object.entries(mapping).find(([key, val]) =>
-            val.toLowerCase() === normalizedText
-        );
-
-        return entry ? entry[0] : textValue; // Devolver la clave numérica si se encuentra
-    }
-
-
     private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
         try {
             const url = `${this.baseUrl}/${endpoint}`;
@@ -164,8 +151,7 @@ class OptionsService {
             }))
     }
 
-        // Nuevos métodos para PaymentGateways
-    mapPaymentGatewaysToSelectOptions(gateways: PaymentGatewayOp[]) {
+    mapPaymentGatewaysToSelectButtonOptions(gateways: PaymentGatewayOp[]) {
         return gateways
             .sort((a, b) => a.order - b.order)
             .map(gateway => ({

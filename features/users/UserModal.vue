@@ -31,8 +31,9 @@
 </template>
 <script setup lang="ts">
 import type { ModalMode, UserModalData, UserRequest } from './types';
-import { useUserModal, useUserService } from '~/componsables/useUsers';
+import { useUserService } from '~/componsables/user/useUsers';
 import UserForm from './UserForm.vue';
+import { useUserModal } from '~/componsables/user/useUserModal';
 
 interface Props {
     modelValue: boolean

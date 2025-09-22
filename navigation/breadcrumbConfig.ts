@@ -35,12 +35,12 @@ export const breadcrumbConfig = {
         contingency:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Contingencia' }
+                { label: 'Enrutamiento y operabilidad' }
             ],
             edit: [
                 { label: 'Inicio',  route: '/' },
                 { 
-                    label: 'Contingencia', 
+                    label: 'Enrutamiento y operabilidad', 
                     route: '/admin/configuration/contingency' 
                 },
                 { label: 'Cambiar Canal' }
@@ -50,7 +50,29 @@ export const breadcrumbConfig = {
         users:{
             list:[
                 { label: 'Inicio', route: '/' },
+                { label: 'Usuario' }
             ]
+        },
+        //Processes
+        processes:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Procesos' }
+            ]
+        },
+        //HistoryContingency
+        historyContingency:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitacora Contingencia' }
+            ] 
+        },
+        //HistoryUser
+        historyUser:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitacora Usuarios ' }
+            ] 
         }
     }
 } as const;

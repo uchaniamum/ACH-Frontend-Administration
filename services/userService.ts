@@ -70,6 +70,12 @@ class UserService {
             method: 'PATCH'
         });
     }
+
+    //Historical User
+    async getHistoryUser(): Promise<any> {
+        const endpoint = 'users/historical';
+        return this.request<any>(endpoint);
+    }
 }
 
 

@@ -24,3 +24,7 @@ export type ModulesMenu =
     | 'channels'
     | 'parameters'
     | 'schedule'
+    | 'processes'
+    | 'historyContingency'
+    | 'historyUser'
+    ;

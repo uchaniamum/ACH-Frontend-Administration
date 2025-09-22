@@ -11,14 +11,14 @@ export interface ParametersListResponse {
 }
 
 export interface ParameterModalData {
-    systemAcronym?: string
-    code?: string
-    value?: string
-    dataType?: string
-    description?: string
+    systemAcronym?: string |  undefined;
+    code: string;
+    value?: string | undefined;
+    dataType?: string | undefined;
+    description?: string | undefined;
 }
 
-//Datos para editar 
+//Datos para Editar Parametros 
 export interface ParameterRequest {
     code: string;
     value: string;
@@ -48,6 +48,7 @@ export interface ParameterSaveResponse {
     traceId: string
 }
 
+//Datos para Historial de Parametros 
 export interface ParameterDetailHisto {
     updatedAt: string;
     updatedByUser: string;

@@ -46,7 +46,6 @@ class ParameterService {
     }
 
     async updateParameter(parameterData: { code: string; value: string }): Promise<ParameterSaveResponse> {
-        console.log('Updating parameter with data:', parameterData);
         return this.request<ParameterSaveResponse>('parameters', {
             method: 'PATCH',
             body: JSON.stringify(parameterData)

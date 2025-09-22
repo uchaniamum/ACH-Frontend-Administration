@@ -69,13 +69,13 @@ export interface UserFormData {
 }
 
 export interface UserModalData {
-    code?: string
-    fullname?: string
-    email?: string
-    alias?: string
-    roleCode?: string
-    phoneNumber?: PhoneNumber
-    isActive?: boolean
+    code: string;
+    fullname?: string;
+    email?: string;
+    alias?: string;
+    roleCode?: string;
+    phoneNumber?: PhoneNumber;
+    isActive?: boolean;
 }
 
 

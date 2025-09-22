@@ -47,7 +47,6 @@ class ChannelsService {
     }
 
     async updateChannels(channelsData: { code: string }): Promise<ChannelsSaveResponse> {
-        console.log('Updating parameter with data:', channelsData);
         return this.request<ChannelsSaveResponse>('payment-gateways', {
             method: 'PUT',
             body: JSON.stringify(channelsData)

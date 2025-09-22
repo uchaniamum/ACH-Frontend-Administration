@@ -33,24 +33,24 @@
             />
 
             <div class="flex flex-col gap-4 col-span-2">
-            <XDivider />
-            <div class="flex justify-end gap-4">
-                <XButton 
-                    label="Cancelar" 
-                    variant="outlined" 
-                    class="!w-[130px]" 
-                    @click="handleCancel" 
-                    :disabled="loading"
-                />
-                <XButton 
-                    label="Guardar" 
-                    class="!w-[130px]" 
-                    type="submit"
-                    :loading="loading"
-                    :disabled="!isFormValid || !hasValueChanged"
-                />
+                <XDivider />
+                <div class="flex justify-end gap-4">
+                    <XButton 
+                        label="Cancelar" 
+                        variant="outlined" 
+                        class="!w-[130px]" 
+                        @click="handleCancel" 
+                        :disabled="loading"
+                    />
+                    <XButton 
+                        label="Guardar" 
+                        class="!w-[130px]" 
+                        type="submit"
+                        :loading="loading"
+                        :disabled="!isFormValid || !hasValueChanged"
+                    />
+                </div>
             </div>
-        </div>
         </XForm>
     </div>
     </XDialog>
@@ -58,9 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { parametersService } from '~/services/parametersService'
 import type { ParameterDetailResponse, ParameterModalData, ParameterRequest } from './types'
-import { useParameterService } from '~/componsables/useParameters'
+import { useParameterService } from '~/componsables/parameters/useParameters'
 import type { ValidationRuleResult } from '../users/options.types'
 
 
@@ -72,7 +71,6 @@ interface Props {
 interface Emits {
     (event: 'update:modelValue', value: boolean): void
     (event: 'save', parameterData: ParameterModalData): void
-    (event: 'success', message: string): void
     (event: 'error', message: string): void
 }
 
@@ -92,7 +90,7 @@ const formData = ref<ParameterRequest>({
     value: ''
 })
 
-const { loadParameterDetails } = useParameterService()
+const { loadParameterDetails, updateParameter } = useParameterService()
 
 // Computed para validar si el formulario es válido
 const isFormValid = computed(() => {
@@ -170,7 +168,7 @@ const loadFullParameterDetails = async (code: string): Promise<void> => {
 const handleSubmit = async (): Promise<void> => {
     loading.value = true
     try {
-        const response = await parametersService.updateParameter(formData.value)
+        const response = await updateParameter(formData.value)
         if (response.wasSaved) {
             // toast.add({
             //     severity: 'success',
@@ -178,19 +176,13 @@ const handleSubmit = async (): Promise<void> => {
             //     detail: 'Parámetro actualizado correctamente',
             //     life: 5000
             // })
-            emit('success', 'Parámetro actualizado correctamente')
+            //emit('success', 'Parámetro actualizado correctamente')
             emit('save', formData.value)
             handleCancel()
         } 
     } catch (error) {
         console.error('Error saving parameter:', error)
         emit('error', 'Error al actualizar el parámetro')
-        // toast.add({
-        //     severity: 'error',
-        //     summary: 'Error',
-        //     detail: 'Error al actualizar el parámetro',
-        //     life: 5000
-        // })
     } finally {
         loading.value = false
     }

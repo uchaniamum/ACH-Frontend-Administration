@@ -1,4 +1,3 @@
-// composables/useFileValidation.ts
 import { ref } from 'vue'
 
 export function useFileValidation() {

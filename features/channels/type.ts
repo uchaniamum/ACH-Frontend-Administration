@@ -48,3 +48,9 @@ export interface CertificateVerificationResponse{
   ValidFrom: string,
   ValidTo: string
 }
+
+export interface RouteSelection {
+  alias: string
+  isActive: boolean
+  urls: string[]
+}

@@ -12,6 +12,7 @@ export function useOptions() {
 
     const paymentGatewayOptions = ref<{ label: string; value: string }[]>([])
     const paymentGatewayFilterOptions = ref<{ label: string; value: string }[]>([])
+    const paymentGatewaySelectButtonOptions = ref<{ value: string }[]>([])
 
     const loading = ref(false)
     const error = ref<string | null>(null)
@@ -67,20 +68,22 @@ export function useOptions() {
             loading.value = true
             error.value = null
             const gateways = await optionsService.getPaymentGateways()
-            paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(gateways)
+
+            // Para Select normal
+            paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(gateways)
+
+            // Para SelectButton específicamente
+            paymentGatewaySelectButtonOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(gateways)
+
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar las pasarelas de pago'
             console.error('Error loading payment gateway options:', err)
-            // Fallback en caso de error
-            paymentGatewayOptions.value = [
-                { label: 'PayPal', value: 'PAYPAL' },
-                { label: 'Stripe', value: 'STRIPE' }
-            ]
         } finally {
             loading.value = false
         }
     }
+
 
     const loadAllOptions = async () => {
         try {
@@ -109,9 +112,9 @@ export function useOptions() {
                 const activeGateways = response.paymentGateways.paymentGatewaysActive.filter(
                     (gateway: PaymentGatewayOp) => gateway.isActive
                 )
-                paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(activeGateways)
-                paymentGatewayFilterOptions.value = optionsService.mapPaymentGatewaysToFilterOptions(activeGateways)
-                console.log('Payment Gateway Options: ', paymentGatewayOptions.value);
+
+                // Para SelectButton - usar el método correcto
+                paymentGatewayFilterOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(activeGateways)
             }
 
         } catch (err) {
@@ -119,13 +122,6 @@ export function useOptions() {
             error.value = serviceError.message || 'Error al cargar las opciones'
             console.error('Error loading options:', err)
 
-            // Fallback options
-            roleOptions.value = [{ label: 'Administrador', value: 'ADMIN' }]
-            statusOptions.value = [{ label: 'Activo', value: 'ACTIVE' }]
-            paymentGatewayOptions.value = [
-                { label: 'PayPal', value: 'PAYPAL' },
-                { label: 'Stripe', value: 'STRIPE' }
-            ]
         } finally {
             loading.value = false
         }
@@ -155,6 +151,8 @@ export function useOptions() {
         // Methods
         loadRoleOptions,
         loadStatusOptions,
+        loadPaymentGatewayOptions,
+        paymentGatewaySelectButtonOptions,
         loadAllOptions,
         resetOptions
     }

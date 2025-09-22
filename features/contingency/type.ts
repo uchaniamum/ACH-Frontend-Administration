@@ -1,149 +1,147 @@
-// Tipos base para las transacciones
+// Tipos base
+// Tipo para un gateway de pago individual
+export interface PaymentGateway{
+  paymentGatewayCode: string;
+  paymentGatewayAcronym: string;
+  isPrimary: boolean;
+  isOperational: boolean;
+  contingencyTitle: string;
+  contingencyDetail: string;
+  isTemporarilyActive: boolean;
+  changeReason: string;
+}
+
 export interface Transaction {
-    transactionCode: string;
-    transactionDescription: string;
-    incoming: boolean;
-    mainPaymentGatewayCode: string;
-    mainPaymentGatewayCodeDescription: string;
-    mainPaymentGatewayEnabled: boolean;
-    secondaryPaymentGatewayCode: string;
-    secondaryPaymentGatewayDescription: string;
-    secondaryPaymentGatewayEnabled: boolean;
-    contingencyEnabled: boolean;
+  transactionCode: string;
+  IsInbound: boolean;
+  isInContigency: boolean;
+  isPaymentGatewayChanged: boolean;
+  paymentGateways: PaymentGateway[];
 }
 
-// Tipo para un banco individual
-export interface PaymentGatewayBank {
-    participantCode?: string;
-    participantName?: string;
-    Transactions?: Transaction[];
+export interface Participant{
+  participantCode: string;
+  participantName: string;
+  canChangePaymentGateway: boolean;
+  canManageContingency: boolean;
+  transactions: Transaction[];
+}
+ 
+// Tipo para el listado de contingenci y que muestre los participantes (route-maps)
+export interface ParticipantListResponse{
+  participants: Participant[];
 }
 
-// Tipo para la lista de bancos (endpoint 1)
-export type PaymentGatewayBankList = PaymentGatewayBank[];
+// Tipo para obtener el dato de un participante (matching)
+export type ParticipantDetailResponse = Participant;
 
-// Tipo para obtener un solo banco (endpoint 2)
-export type PaymentGatewayBankDetail = PaymentGatewayBank;
-
-// Tipos para el endpoint de edición (PUT)
-
-// Request para editar bancos
-export interface BankUpdateRequest {
-    participants: BankUpdate[];
+export interface TransactionStatus {
+  mainGateway: string;
+  secondaryGateway?: string;
+  contingencyEnabled: boolean;
+  canChangeChannel: boolean;
+  isOperational: boolean;
+  contingencyTitle?: string;
+  contingencyDetail?: string;
+  usingSecondaryChannel?: boolean;
+  primaryChannelName?: string;
+  secondaryChannelName?: string;
 }
 
-export interface BankUpdate {
-    transactionCode: string;
-    operationalClearingHouseModified: boolean;
-    operationalPaymentGatewayCode: string;
-    operationalPaymentGatewayCodeDescription: string;
-    contingencyEnabled: boolean;
-    contingencyDescription: string;
+export interface ContingencyTableRow {
+    participantCode: string;
+    participantName: string;
+    canChangePaymentGateway: boolean;
+    canManageContingency: boolean;
+    envioRegular: TransactionStatus;
+    envioQR: TransactionStatus;  
+    recepcionRegular: TransactionStatus;
+    recepcionQR: TransactionStatus;
 }
 
-// Response del endpoint de edición
 export interface PaymentGatewayUpdateResponse {
     wasSaved: boolean;
     wasNew: boolean;
     summary: string;
     description: string;
     savedBy: string;
-    savedAt: string; // ISO date string
+    savedAt: string;
     traceId: string;
 }
 
-
-// Para manejar estados de loading y error
-export interface ApiResponse<T> {
-    data?: T;
-    loading: boolean;
-    error?: string;
+export interface EnhancedTransactionStatus extends TransactionStatus {
+    statusType: 'operational' | 'contingency' | 'offline-primary' | 'unavailable';
+    statusLabel: string;
+    showSecondary: boolean;
+    activeGateway: string;
+    primaryGateway: string;
+    secondaryGateway: string | undefined;
 }
 
-// Para filtros o búsquedas
-export interface BankFilters {
-    participantCode?: string;
-    participantName?: string;
-    transactionType?: 'incoming' | 'outgoing' | 'all';
+export interface TransactionRowData{
+  id: number;
+  transaction: string;
+  transactionCode: string;
+  tooltip: string;
+  gateways: Record<string, boolean>;
 }
 
-// Para el estado de una transacción individual (útil para toggles)
-export interface TransactionState {
-    transactionCode: string;
-    mainGatewayEnabled: boolean;
-    secondaryGatewayEnabled: boolean;
-    contingencyEnabled: boolean;
+export interface GatewayAnalysis{
+    label: string;
+    estados: string[];
+    puedeSeleccionarse: boolean[];
+    countDisponible: number;
+    countPrimarioActivo: number;
 }
 
-export interface TransactionStatus {
-    mainGateway: string;
-    secondaryGateway: string;
-    contingencyEnabled: boolean;
-    mainEnabled: boolean;
-    secondaryEnabled: boolean;
+//Particpants Request
+interface TransactionUpdateRequest {
+  transactionCode: string;
+  paymentGatewayCode: string;
 }
 
-export interface ContingencyTableRow {
-    participantCode: string;
-    participantName: string;
-    envioRegular: TransactionStatus;
-    envioQR: TransactionStatus;
-    recepcionRegular: TransactionStatus;
-    recepcionQR: TransactionStatus;
+interface ContingencyTransactionRequest extends TransactionUpdateRequest {
+  isInContigency: boolean;
+}
+
+interface ParticipantUpdateRequest {
+  participantCode: string;
+  transactions: TransactionUpdateRequest[];
+}
+
+interface ContingencyParticipantRequest {
+  participantCode: string;
+  transactions: ContingencyTransactionRequest[];
+}
+
+export interface ChangeChannelRequest {
+  participants: ParticipantUpdateRequest[];
+  changeReason: string;
+}
+
+export interface ContingencyRequest {
+  contingencyTitle: string;
+  contingencyDetail: string;
+  changeReason: string;
+  participants: ContingencyParticipantRequest[];
 }
 
 
-//Nueva version
-// Constants
-export const GATEWAY_CODE_MAP = {
-  'ACL': '1426001',
-  'MLD': '1000',
-  'LIP': '900', 
-  'UNI': '995'
-} as const;
 
-export const TRANSACTION_CONFIG = {
-  IASYNC: {
-    label: 'Envío de transferencias interbancarias IASYNC',
-    tooltip: 'Información sobre transferencias interbancarias',
-    switchRef: 'iasyncContingency' as const
-  },
-  IQR: {
-    label: 'Envío de transferencias QR IQR',
-    tooltip: 'Información sobre transferencias QR',
-    switchRef: 'iqrContingency' as const
-  },
-  OASYNC: {
-    label: 'Recepción transferencia interbancaria OASYNC',
-    tooltip: 'Salida de transferencias regulares.',
-    switchRef: 'oasyncContingency' as const
-  },
-  OQR: {
-    label: 'Recepción transferencia QR OQR',
-    tooltip: 'Procesamiento de transacciones de cobro por QR.',
-    switchRef: 'oqrContingency' as const
-  }
-} as const;
-
-export const TRANSACTION_DATA = Object.entries(TRANSACTION_CONFIG).map(([code, config], index) => ({
-  id: index + 1,
-  transaction: config.label,
-  transactionCode: code,
-  tooltip: config.tooltip,
-  gateways: {}
-}));
-
-// Types
-export interface GatewayState {
-  isPrimary?: boolean;
-  isOperational?: boolean;
-  isTemporarilyActive?: boolean;
-  paymentGatewayAcronym?: string;
-  paymentGatewayCode?: string;
+//Channels Contingency
+export interface PaymentGatewayOperational {
+  code: string;
+  name: string;
+  acronym: string;
+  isOperational: boolean;
+}
+export interface paymentGatewaysOpeListResponse {
+  paymentGatewayOperationalRouteMaps: PaymentGatewayOperational[];
 }
 
-export interface ValidationResult {
-  estado: string;
-  isContingency: boolean;
-  descripcion: string;
+export interface PaymentGatewayContingencyRequest {
+  isOperational: boolean;
+  contingencyTitle: string;
+  contingencyDetail: string;
+  changeReason: string;
 }

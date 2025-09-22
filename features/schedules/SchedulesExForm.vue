@@ -58,7 +58,6 @@
                         icon="clock"
                     />
                 </div>
-
                 
                 <!--<span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
             
