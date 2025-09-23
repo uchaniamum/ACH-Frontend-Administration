@@ -53,7 +53,7 @@
               </template>
           </XCard>
           <!-- Actions -->
-          <div  class="flex flex-col">
+          <div v-if="hasRouteChanged" class="flex flex-col">
             <XDivider class="mb-6"/>
             <div class="w-full flex flex-row justify-end gap-6">
               <XButton 
@@ -203,8 +203,8 @@ const openConfirmEditModal = () => {
             title: 'Confirmar cambio de CPD ',
             icon: 'x:warning-circle',
             iconColor: 'text-yellow-500',
-            message: `¿Estás seguro de cambiar de ${ previousRouteData.value?.alias }? 
-                        a
+            message: `¿Estás seguro de cambiar del ${ previousRouteData.value?.alias }
+                        al
                         <span class="font-semibold">${ selectedRouteData.value?.alias }</span>
                         con ruta <span class="font-semibold">${ selectedRouteData?.value?.urls.join(', ') }</span>?`,
             onConfirm: async () => {

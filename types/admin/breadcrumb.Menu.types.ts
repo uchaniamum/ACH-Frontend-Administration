@@ -21,6 +21,7 @@ export type CommonActions = 'list' | 'create' | 'edit' | 'detail';
 export type ModulesMenu =
     | 'contingency'
     | 'users' 
+    | 'roles'
     | 'channels'
     | 'parameters'
     | 'schedule'
@@ -29,4 +30,5 @@ export type ModulesMenu =
     | 'historyUser'
     | 'historyParameter'
     | 'historyChannels'
+    | 'historySchedule'
     ;

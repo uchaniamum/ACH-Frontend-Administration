@@ -83,8 +83,8 @@ export function useChannelService() {
                 
                 showToast({ 
                     severity: 'success', 
-                    summary: 'Éxito',
-                    detail: `Nuevo CPD ${activeAlias} asignado correctamente`, 
+                    summary: `Nuevo CPD ${activeAlias} asignado correctamente`,
+                    // detail: `Nuevo CPD ${activeAlias} asignado correctamente`, 
                     life: 3000 
                 });
                 

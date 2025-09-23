@@ -125,7 +125,6 @@ class OptionsService {
         return statuses
             .sort((a, b) => a.order - b.order)
             .map(status => ({
-                // label: this.formatCodeToLabel(status.code),
                 label: status.displayName,
                 value: status.code,
             }))
@@ -137,7 +136,7 @@ class OptionsService {
             .sort((a, b) => a.order - b.order)
             .map(role => ({
                 label: role.displayName,
-                value: this.formatCodeToLabel(role.code),
+                value: role.displayName,
             }))
     }
 
@@ -147,7 +146,7 @@ class OptionsService {
             .map(status => ({
                 // label: this.formatCodeToLabel(status.code),
                 label: status.displayName,
-                value: this.formatCodeToLabel(status.code),// Usar la clave numérica para el value
+                value: status.displayName,
             }))
     }
 

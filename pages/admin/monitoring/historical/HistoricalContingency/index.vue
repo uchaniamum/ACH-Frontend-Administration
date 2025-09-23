@@ -1,54 +1,52 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Bitácora - Contingencias" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true">
+        <XHeader title="Bitácora - Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true">
             <template #description>
                 <p>Texto descriptivo de la sección .</p>
             </template>
         </XHeader>
         <div class="flex flex-col gap-12">
-                            <XTabs value="0" class="flex gap-16">
-                    <XTabList :pt="{
-                        root: { class: '!border-b-0 p-tab-extended-line' },
-                        tabList: {
-                            root: ({ context }) => ({
-                                class: [
-                                    'relative z-10',
-                                    context.active 
-                                        ? 'border-b-[4px] border-primary text-primary' 
-                                        : 'border-b-0 text-gray-900'
-                                ]
-                            }),
-                            action: { class: 'pb-4' }
-                        }
-                    }">
-                        <XTab value="0">
-                            <div class="flex gap-4 items-center">
-                                <span class="font-bold whitespace-nowrap">Participantes</span>
-                            </div>
-                        </XTab>
-                        <XTab value="1">
-                            <div class="flex gap-4 items-center">
-                                <span class="font-bold whitespace-nowrap">Canal</span>
-                            </div>
-                        </XTab>
-                    </XTabList>
-                    <XTabPanels class="!p-0">
-                        <XTabPanel value="0">
-                            <HistoryModule
-                                :config="contingenciParticipantConfig"
-                                search-placeholder="Buscar"
-                            />
-                        </XTabPanel>
-                        <XTabPanel value="1">
-                            <HistoryModule
-                                :config="contingencyChannelConfig"
-                                search-placeholder="Buscar"
-                            />
-                        </XTabPanel>
-                    </XTabPanels>
-                </XTabs>
-
-            
+            <XTabs value="0" class="flex gap-16">
+                <XTabList :pt="{
+                    root: { class: '!border-b-0 p-tab-extended-line' },
+                    tabList: {
+                        root: ({ context }) => ({
+                            class: [
+                                'relative z-10',
+                                context.active 
+                                    ? 'border-b-[4px] border-primary text-primary' 
+                                    : 'border-b-0 text-gray-900'
+                            ]
+                        }),
+                        action: { class: 'pb-4' }
+                    }
+                }">
+                    <XTab value="0">
+                        <div class="flex gap-4 items-center">
+                            <span class="font-bold whitespace-nowrap">Participantes</span>
+                        </div>
+                    </XTab>
+                    <XTab value="1">
+                        <div class="flex gap-4 items-center">
+                            <span class="font-bold whitespace-nowrap">Canal</span>
+                        </div>
+                    </XTab>
+                </XTabList>
+                <XTabPanels class="!p-0">
+                    <XTabPanel value="0">
+                        <HistoryModule
+                            :config="contingenciParticipantConfig"
+                            search-placeholder="Buscar"
+                        />
+                    </XTabPanel>
+                    <XTabPanel value="1">
+                        <HistoryModule
+                            :config="contingencyChannelConfig"
+                            search-placeholder="Buscar"
+                        />
+                    </XTabPanel>
+                </XTabPanels>
+            </XTabs>
         </div>
     </div>
 </template>

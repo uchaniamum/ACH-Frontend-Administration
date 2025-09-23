@@ -75,7 +75,7 @@ const channlsCertificateHistory = ref<PaymentGatewayCertificatesHistoryItem[]>([
 const channelsConfig: HistoryConfig<any> = {
     columns: [
         { field: 'paymentGatewayCode', header: 'Código', style: 'min-width: 90px;', class: 'text-left'},
-        { field: 'description', header: 'Canales ', style: 'min-width: 360px;', class: 'text-left'},
+        { field: 'description', header: 'Canales ', style: 'min-width: 320px;', class: 'text-left'},
         { field: 'paymentGatewayAcronym', header: 'Sigla', style: 'min-width: 130px;', class: 'text-left' },
         { field: 'alias', header: 'Alias CPD', style: 'min-width: 130px;', class: 'text-left'},
         { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 130px;', class: 'text-left'},
@@ -114,7 +114,7 @@ const channelsCertificateConfig: HistoryConfig<any> = {
     columns: [
         { field: 'paymentGatewayCode', header: 'Canal ', style: 'min-width: 100px;', class: 'text-left'},
         { field: 'acronym', header: 'Identificador', style: 'min-width: 110px;', class: 'text-left' },
-        { field: 'serialNumber', header: 'Nro. serie', style: 'min-width: 160px;', class: 'text-left'},
+        { field: 'serialNumber', header: 'Nro. serie', style: 'min-width: 100px;', class: 'text-left'},
         { field: 'validFrom', header: 'Val. desde', style: 'min-width: 100px;', class: 'text-left',
             formatter: (value: string) =>  formatDate(value),
             searchFormatter: (value: string) => formatDate(value),

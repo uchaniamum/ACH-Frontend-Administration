@@ -14,32 +14,32 @@ const menuConfigACH: MenuBarAdminConfig = {
             icon: 'setting',
             items: [
                 {
-                    key:'channels',
+                    key: 'channels',
                     label: 'Canales',
                     to: '/admin/configuration/channels',
                 },
                 {
-                    key:'contingency',
+                    key: 'contingency',
                     label: 'Contingencia',
                     to: '/admin/configuration/contingency',
                 },
                 {
-                    key:'participants',
+                    key: 'participants',
                     label: 'Participantes',
                     to: '/admin/configuration/participants',
                 },
                 {
-                    key:'parameters',
+                    key: 'parameters',
                     label: 'Parámetros',
                     to: '/admin/configuration/parameters',
                 },
                 {
-                    key:'schedules',
+                    key: 'schedules',
                     label: 'Horarios',
                     to: '/admin/configuration/schedules'
                 },
                 {
-                    key:'alerts',
+                    key: 'alerts',
                     label: 'Alertas',
                     to: '/admin/configuration/alertas'
                 }
@@ -52,54 +52,65 @@ const menuConfigACH: MenuBarAdminConfig = {
             icon: 'reports',
             items: [
                 {
-                    key:'processes',
+                    key: 'historical',
+                    label: 'Bitácora',
+                    items: [
+                        {
+                            key: 'historicalChannels',
+                            label: 'Canales',
+                            to: '/admin/monitoring/historical/HistoricalChannel',
+                        },
+                        {
+                            key: 'historicalContingency',
+                            label: 'Contingencias',
+                            to: '/admin/monitoring/historical/HistoricalContingency',
+                        },
+                        {
+                            key: 'participants',
+                            label: 'Participantes',
+                            to: '/admin/monitoring/historical/participants',
+                        },
+                        {
+                            key: 'historicalParameters',
+                            label: 'Parámetros',
+                            to: '/admin/monitoring/historical/HistoricalParameters',
+                            // pages\admin\monitoring\historical\HistoricalParameters\index.vue
+                        },
+                        {
+                            key: 'historicalSchedules',
+                            label: 'Horarios',
+                            to: '/admin/monitoring/historical/HistoricalSchedule'
+                        },
+                        {
+                            key: 'historicalUsers',
+                            label: 'Usuarios',
+                            to: '/admin/monitoring/historical/HistoricalUser'
+                        }
+
+                    ]
+                },
+                {
+                    key: 'processes',
                     label: 'Procesos',
                     to: '/admin/monitoring/processes',
                 }
             ]
         },
         {
-            key: 'users',
-            label: 'Usuarios',
+            key: 'security',
+            label: 'Seguridad',
             icon: 'user',
-            to: '/admin/security/users'
-        },
-        {
-            key: 'historical',
-            label: 'Bitacora',
-            icon: 'setting',
             items: [
                 {
-                    key:'historicalChannels',
-                    label: 'Bitácora Canales',
-                    to: '/admin/configuration/channels/HistoricalChannel',
+                    key: 'users',
+                    label: 'Usuarios',
+                    to: '/admin/security/users',
                 },
                 {
-                    key:'historicalContingency',
-                    label: 'Bitácora Contingencias',
-                    to: '/admin/configuration/contingency/HistoricalContingency',
+                    key: 'roles',
+                    label: 'Acceso y Roles',
+                    to: '/admin/security/roles',
                 },
-                {
-                    key:'participants',
-                    label: 'Bitácora Participantes',
-                    to: '/admin/configuration/participants',
-                },
-                {
-                    key:'historicalParameters',
-                    label: 'Bitácora Parámetros',
-                    to: '/admin/configuration/parameters/HistoricalParameters',
-                },
-                {
-                    key:'schedules',
-                    label: 'Horarios',
-                    to: '/admin/configuration/schedules'
-                },
-                {
-                    key:'historicalUsers',
-                    label: 'Bitácora Usuarios',
-                    to: '/admin/security/users/HistoricalUser'
-                }
-
             ]
         },
     ]

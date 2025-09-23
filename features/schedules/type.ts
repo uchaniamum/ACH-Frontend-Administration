@@ -9,7 +9,7 @@ export interface Schedule {
     description: string;
     scheduleType: string;
     scheduleExceptions?: ScheduleExceptions[];
-    isInbound?: boolean,
+    isInbound?: boolean;
     exceptionCounter?: number
 }
 
@@ -110,4 +110,58 @@ export interface ScheduleInActiveException {
     transactionCode: string;
     scheduleEfectiveDate: string;
     isActive: boolean
+}
+
+export interface SheduleRegularHistoryItem {
+    paymentGatewayCode: string;
+    paymentGatewayAcronym: string;
+    paymentGatewayName: string;
+    transactionCode: string;
+    isMondayAvailable: boolean;
+    isTuesdayAvailable: boolean;
+    isWednesdayAvailable: boolean;
+    isThursdayAvailable: boolean;
+    isFridayAvailable: boolean;
+    isSaturdayAvailable: boolean;
+    isSundayAvailable: boolean;
+    startTime: string;
+    endTime: string;
+    isFullDay: boolean;
+    description: string;
+    isActive: boolean;
+    createdAt: string;
+    createdByUser: string;
+    lastChangeNumber: number;
+    updatedAt: string;
+    updatedByUser: number;
+    isInbound: boolean;
+    transactionDescription: string;
+}
+
+export interface ScheduleRegularHistoryListItem{
+    historicalPaymentGatewayCertificates: SheduleRegularHistoryItem[]
+}
+
+export interface ScheduleExceptionHistoryItem{
+    paymentGatewayCode: string;
+    paymentGatewayAcronym: string;
+    paymentGatewayName: string;
+    transactionCode: string;
+    isInbound: boolean;
+    effectiveOn: string;
+    changeNumber: number;
+    code: string;
+    startTime: string;
+    endTime: string;
+    isFullDay: boolean;
+    description: string;
+    isActive: boolean;
+    createdAt: string;
+    createdByUser: string;
+    updatedAt: string;
+    updatedByUser: string
+}
+
+export interface ScheduleExceptionHistoryListItem{
+    historicalPaymentGatewayScheduleExceptions : ScheduleExceptionHistoryItem[]
 }

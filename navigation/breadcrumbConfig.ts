@@ -53,6 +53,13 @@ export const breadcrumbConfig = {
                 { label: 'Usuario' }
             ]
         },
+        // AccessandRoles
+        roles:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Accesos y roles' }
+            ]
+        },
         //Processes
         processes:{
             list:[
@@ -85,6 +92,12 @@ export const breadcrumbConfig = {
             list:[
                 { label: 'Inicio', route: '/' },
                 { label: 'Bitácora - Administrador canales' }
+            ] 
+        },
+        historySchedule:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora - Horarios de atención' }
             ] 
         },
     }

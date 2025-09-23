@@ -3,7 +3,7 @@ export function useDates() {
 
   const formatDate = (dateString: string): string => {
       if (!dateString) return 'N/A'
-
+      console.log('dateString', dateString);
       try {
           const date = new Date(dateString)
           return date.toLocaleDateString('es-ES', {
@@ -17,33 +17,33 @@ export function useDates() {
       }
   }
 
-
-  const formatTime = (time: string | Date | null | undefined): string | Date => {
-    if (!time) return 'No disponible'
-
-    try {
-      if (typeof time === 'string') {
-        if (time.includes(':')) {
-          return time.substring(0, 5)
-        }
-        const dateObj = new Date(time)
-        return dateObj.toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
-      } else {
-        return time.toLocaleTimeString('es-ES', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
+  const formatTime = (time: string | Date | null | undefined): string => {
+      if (!time) return 'No disponible';
+  
+      try {
+          const dateObj = time instanceof Date ? time : new Date(time);
+          
+          if (isNaN(dateObj.getTime())) {
+              // Intentar extraer hora de string como "14:30:45"
+              if (typeof time === 'string' && time.includes(':')) {
+                  const [hours, minutes, seconds] = time.split(':');
+                  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+              }
+              return 'Hora inválida';
+          }
+  
+          return dateObj.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+          });
+  
+      } catch (error) {
+          console.error('Error in function formatTime: ', error);
+          return 'Hora inválida';
       }
-    } catch (error) {
-      console.error('Error in function formatTime: ', error);
-      return time
-    }
-  }
+  };
 
   const formatDateTimeDirect = (dateTimeString: string): string => {
     if (!dateTimeString) return 'N/A'

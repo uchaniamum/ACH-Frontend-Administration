@@ -49,7 +49,6 @@
                         :rowsPerPageOptions="[10, 25, 50, 100]"
                         :loading="loading || optionsLoading"
                         dataKey="id"
-                        filterDisplay="row"
                         :globalFilterFields="['email', 'fullname', 'roleDescription', 'code', 'statusDescription']"
                     >
                         <template #empty> 
@@ -64,7 +63,7 @@
                             <template #body="{ data }">
                                 {{ data.code }}
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -75,14 +74,14 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
                         <Column field="fullname" header="Nombre" sortable class="min-w-[280px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.fullname }}
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -93,14 +92,14 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
                         <Column field="email" header="Correo Electrónico" sortable class="min-w-[225px] text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.email }}
                             </template>
-                            <template #filter="{ filterModel , filterCallback}">
+                            <!-- <template #filter="{ filterModel , filterCallback}">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -111,7 +110,7 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
                         <Column field="roleDescription" header="Rol" sortable class="min-w-[158px]" :showFilterMenu="false">
@@ -121,7 +120,7 @@
                                     severity="neutral"
                                 />
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <XSelect 
                                     name="filterRole"
                                     v-model="filterModel.value" 
@@ -133,7 +132,7 @@
                                     class="!w-56" 
                                     :showClear="true"
                                 />
-                            </template>
+                            </template> -->
                         </Column>
                     
                         <Column field="statusDescription" header="Estado" sortable class="min-w-[158px] text-left" :showFilterMenu="false">
@@ -143,7 +142,7 @@
                                     :severity="data.isActive ? 'success' : 'danger'"
                                 />
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <XSelect 
                                     name="filterIsActive"
                                     v-model="filterModel.value" 
@@ -155,7 +154,7 @@
                                     class="!w-56" 
                                     :showClear="true"
                                 />
-                            </template>
+                            </template> -->
                         </Column>
                         <Column header="Acciones" class="min-w-[133px] text-left">
                             <template #body="{ data }">

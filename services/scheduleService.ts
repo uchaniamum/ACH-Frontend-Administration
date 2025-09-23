@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { ScheduleDetailReponse, ScheduleExceptionRequest, ScheduleInActiveException, ScheduleResponseList } from "~/features/schedules/type";
+import type { ScheduleDetailReponse, ScheduleExceptionHistoryListItem, ScheduleExceptionRequest, ScheduleInActiveException, ScheduleRegularHistoryListItem, ScheduleResponseList } from "~/features/schedules/type";
 import type { UserSaveResponse } from "~/features/users/types";
 
 class ScheduleService {
@@ -31,7 +31,7 @@ class ScheduleService {
 
     async getSchedule(filters?: { search?: string }): Promise<ScheduleResponseList[]> {
         let endpoint = 'payment-gateways-transaction-schedule';
-    
+
         if (filters?.search) {
             const params = new URLSearchParams({ search: filters.search })
             endpoint += `?${params.toString()}`
@@ -60,18 +60,29 @@ class ScheduleService {
         });
     }
 
-    async editScheduleRegular(scheduleDataRegular: any):Promise<UserSaveResponse>{
+    async editScheduleRegular(scheduleDataRegular: any): Promise<UserSaveResponse> {
         return this.request<any>('payment-gateways-transaction-schedule', {
             method: 'PUT',
             body: JSON.stringify(scheduleDataRegular)
         });
     }
 
-    async inActivScheduleException(scheduleExceptionRegular: ScheduleInActiveException):Promise<UserSaveResponse>{
+    async inActivScheduleException(scheduleExceptionRegular: ScheduleInActiveException): Promise<UserSaveResponse> {
         return this.request<any>('payment-gateways-transaction-schedule/exception', {
             method: 'PATCH',
             body: JSON.stringify(scheduleExceptionRegular)
         });
+    }
+
+    async getHistoryScheduleRegular(): Promise<ScheduleRegularHistoryListItem> {
+        const endpoint = 'payment-gateways-transaction-schedule/historical';
+        return this.request<ScheduleRegularHistoryListItem>(endpoint);
+    }
+
+    
+    async getHistoryScheduleException(): Promise<ScheduleExceptionHistoryListItem> {
+        const endpoint = 'payment-gateways-transaction-schedule-exception/historical';
+        return this.request<ScheduleExceptionHistoryListItem>(endpoint);
     }
 }
 

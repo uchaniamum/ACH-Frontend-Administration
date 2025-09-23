@@ -1,6 +1,6 @@
 <template>
     <div>
-        <XHeader title="Administracion de Canales" :breadcrumb-items="itemsBreadChannels" :show-breadcrumb="true">
+        <XHeader title="Administración de canales" :breadcrumb-items="itemsBreadChannels" :show-breadcrumb="true">
             <template #description>
                 <p>Gestiona los canales modificando el centro de procesamiento, las rutas asociadas, los certificados correspondientes y realiza un seguimiento a través del historial de cambios.</p>
             </template>
@@ -19,7 +19,7 @@
                     :value="paginatedItems" 
                     :loading="loading"
                     dataKey="id"
-                    filterDisplay="row"
+                    
                     :rows="rowsPagination"
                     :first="firstPagination"
                     @page="onPage"
@@ -34,11 +34,11 @@
                     </span> 
                 </template>
 
-                <Column field="code" header="Codigo" sortable :showFilterMenu="false" class="min-w-[143px]">
+                <Column field="code" header="Codigo" :showFilterMenu="false" class="min-w-[143px]">
                     <template #body="{ data }">
                         {{ data.code }}
                     </template>
-                    <template #filter="{ filterModel, filterCallback }">
+                    <!-- <template #filter="{ filterModel, filterCallback }">
                         <IconField>
                             <InputText 
                                 v-model="filterModel.value"  
@@ -49,13 +49,13 @@
                             />
                             <XInputIcon icon="search" />
                         </IconField>
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="name" header="Nombre" sortable :showFilterMenu="false" class="min-w-[328px]">
+                <Column field="name" header="Nombre" :showFilterMenu="false" class="min-w-[328px]">
                     <template #body="{ data }">
                         {{ data.name }}
                     </template>
-                    <template #filter="{ filterModel, filterCallback }" >
+                    <!-- <template #filter="{ filterModel, filterCallback }" >
                         <XSelect 
                             name="filterRole"
                             v-model="filterModel.value" 
@@ -67,13 +67,13 @@
                             class="min-w-[21.429rem]" 
                             :showClear="true"
                         />
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="acronym" header="Sigla" sortable :showFilterMenu="false" class="w-[145px]">
+                <Column field="acronym" header="Sigla" :showFilterMenu="false" class="w-[145px]">
                     <template #body="{ data }">
                         {{ data.acronym }}
                     </template>
-                    <template #filter="{ filterModel, filterCallback }" >
+                    <!-- <template #filter="{ filterModel, filterCallback }" >
                         <XSelect 
                             name="filterRole"
                             v-model="filterModel.value" 
@@ -85,15 +85,15 @@
                             class="!min-w-48" 
                             :showClear="true"
                         />
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="aliases" header="Alias CPD" sortable :showFilterMenu="false" style="width:145px">
+                <Column field="aliases" header="Alias CPD" :showFilterMenu="false" style="width:145px">
                     <template #body="{ data }">
                         <div v-for="(route, index) in data.routes" :key="index">
                             {{ route.alias }}
                         </div>
                     </template>
-                    <template #filter="{ filterModel, filterCallback }">
+                    <!-- <template #filter="{ filterModel, filterCallback }">
                         <XSelect 
                             name="filterAlias"
                             v-model="filterModel.value" 
@@ -105,13 +105,13 @@
                             class="!min-w-47" 
                             :showClear="true"
                         />
-                    </template>
+                    </template> -->
                 </Column>
-                <Column field="updatedAt" header="Última modificación" sortable :showFilterMenu="false" class="!min-w-[189px]">
+                <Column field="updatedAt" header="Última modificación" :showFilterMenu="false" class="!min-w-[189px]">
                     <template #body="{ data }">
                         {{ formatDate(data.updatedAt) }}
                     </template>
-                    <template #filter="{ filterModel, filterCallback }">
+                    <!-- <template #filter="{ filterModel, filterCallback }">
                         <IconField>
                             <InputText 
                                 v-model="filterModel.value" 
@@ -122,7 +122,7 @@
                             />
                             <XInputIcon icon="search" />
                         </IconField>
-                    </template>
+                    </template> -->
                 </Column>
                 <Column field="accion" header="Acción" class="!w-[122px]">
                     <template #body="{ data }">
