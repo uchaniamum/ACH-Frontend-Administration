@@ -3,8 +3,7 @@
     <!-- Encabezado con título y botones -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mb-4 titulo-botones gap-2">
       <h3 class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2 relative">
-        Usabilidad por Transferencia
-
+        {{ usabilityTransferData?.panel || 'No hay descripción disponible' }}
         <div class="relative">
           <Icon name="x:paste-clipboard"
             class="text-[#0A44C6] w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:text-[#0C55F8]"
@@ -45,7 +44,8 @@
 
       <div
         class="flex flex-col gap-2 sm:gap-3 border border-[#92ACE5] p-3 rounded-lg bg-white w-[90%] sm:w-[55%] mx-auto">
-        <div class="text-[13px] sm:text-[14px] font-semibold text-[#5F6A7B] mb-1 sm:mb-2 text-left">Enviados</div>
+        <div class="text-[13px] sm:text-[14px] font-semibold text-[#5F6A7B] mb-1 sm:mb-2 text-left">
+          {{ chartData.datasets[0].label }}</div>
         <div v-for="(label, index) in chartData.labels" :key="index"
           class="flex justify-between items-center w-full p-1 flex-wrap">
           <div class="flex items-center gap-1 sm:gap-2 min-w-[120px] sm:min-w-[140px] flex-1">
@@ -62,13 +62,16 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref,  computed } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import type { Ref } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, ArcElement } from "chart.js";
-import { Pie } from "vue-chartjs";
+import { Pie as PieChart } from "vue-chartjs";
 import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
 import { XCheckBox } from "#components";
+import type { SerieUsabilityTransferResponse } from "~/features/dashboard/serieUsabilityTransfer.types";
+import { useToast } from "#imports";
+import { seriesService } from "~/services/dashboard/seriesService";
 
 ChartJS.register(
   Title,
@@ -89,80 +92,138 @@ interface ChartData {
   datasets: ChartDataSet[];
 }
 
-export default defineComponent({
-  name: "PieUsabilidadTransferencia",
-  components: { PieChart: Pie, XCheckBox },
-  setup() {
-    const { copiarGrafico, copiado } = useChartUtilitarios();
-    const graficoContenido: Ref<HTMLElement | null> = ref(null);
-    const grafico: Ref<any> = ref(null);
-    const mostrarValoresPie = ref(false);
-    const seleccionado = ref<string | null>(null);
+// Composable
+const { copiarGrafico, copiado } = useChartUtilitarios();
+// Refs
+const graficoContenido: Ref<HTMLElement | null> = ref(null);
+const verCifras: Ref<HTMLElement | null> = ref(null);
+const grafico: Ref<any> = ref(null);
+const mostrarValoresPie = ref(false);
+const seleccionado = ref<string | null>(null);
 
-    const handleCopiar = () => {
-      if (graficoContenido.value) {
-        copiarGrafico(graficoContenido.value);
-      }
-    };
+const usabilityTransferData = ref<SerieUsabilityTransferResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
 
-    const chartData: Ref<ChartData> = ref({
-      labels: ["Qr", "Express", "Asincrono"],
-      datasets: [
-        {
-          label: "Enviados",
-          data: [50, 25, 25],
-          backgroundColor: ["#0C55F8", "#073395", "#9EBBFC"],
-        },
-      ],
-    });
+// Chart data
+const chartData: Ref<ChartData> = ref({
+  labels: [],
+  datasets: [
+    {
+      label: "",
+      data: [],
+      backgroundColor: ["#0C55F8", "#073395", "#9EBBFC"],
+    },
+  ],
+});
 
-    const chartOptions = ref({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        mostrarValoresPie: false,
-      },
-      layout: { padding: 20 },
-      elements: { arc: { borderWidth: 4, radius: "80%" } },
-    });
-
-    const toggleValores = () => {
-      mostrarValoresPie.value = !mostrarValoresPie.value;
-      if (grafico.value?.chart) {
-        grafico.value.chart.options.plugins.mostrarValoresPie = mostrarValoresPie.value;
-        grafico.value.chart.update();
-      }
-    };
-
-    const accion1 = () => {
-      // Aquí puedes actualizar el chartData con datos reales "sent"
-      chartData.value.datasets[0].data = [35, 35, 10, 10, 5, 5];
-      chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS", "USSD"];
-    };
-
-    const accion2 = () => {
-      // Aquí puedes actualizar el chartData con datos reales "received"
-      chartData.value.datasets[0].data = [40, 30, 15, 10, 5];
-      chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS"];
-    };
-
-    const total = computed(() => chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
-
-    return {
-      graficoContenido,
-      grafico,
-      handleCopiar,
-      copiado,
-      chartData,
-      chartOptions,
-      toggleValores,
-      accion1,
-      accion2,
-      seleccionado,
-      total,
-    };
+// Chart options
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    mostrarValoresPie: false,
   },
+  layout: { padding: 20 },
+  elements: { arc: { borderWidth: 4, radius: "80%" } },
+});
+
+// Computed
+const total = computed(() =>
+  chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0)
+);
+
+// Methods
+const handleCopiar = () => {
+  if (graficoContenido.value) {
+    copiarGrafico(graficoContenido.value);
+  }
+};
+
+const toggleValores = () => {
+  mostrarValoresPie.value = !mostrarValoresPie.value;
+  if (grafico.value?.chart) {
+    grafico.value.chart.options.plugins.mostrarValoresPie = mostrarValoresPie.value;
+    grafico.value.chart.update();
+  }
+};
+
+/*const accion1 = () => {
+  // Aquí puedes actualizar el chartData con datos reales "sent"
+  chartData.value.datasets[0].data = [35, 35, 10, 10, 5, 5];
+  chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS", "USSD"];
+};
+
+const accion2 = () => {
+  // Aquí puedes actualizar el chartData con datos reales "received"
+  chartData.value.datasets[0].data = [40, 30, 15, 10, 5];
+  chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS"];
+};*/
+
+const accion1 = (): void => {
+  if (!usabilityTransferData.value) return;
+  actualizarChart('sent');
+};
+const accion2 = (): void => {
+  if (!usabilityTransferData.value) return;
+  actualizarChart('received');
+};
+
+
+const loadUsabilityTransferData = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await seriesService.getSerieUsabilityByTransferByCode("1M");
+    console.log("mis usabilidad es", response);
+    if (response) usabilityTransferData.value = response;
+
+    // Inicializa gráfico con "Enviados"
+    actualizarChart('sent');
+  } catch (err: any) {
+    console.error('Error loading channel data:', err);
+    error.value = err.message || 'Error al cargar la información del canal';
+    toast.add({ severity: 'error', summary: 'Error', detail: error.value, life: 5000 });
+  } finally {
+    loading.value = false;
+  }
+};
+
+
+const actualizarChart = (tipo: 'sent' | 'received') => {
+  if (!usabilityTransferData.value) return; // asegura que hay datos
+
+  const items = tipo === 'sent' ? usabilityTransferData.value.sent.items : usabilityTransferData.value.received.items;
+
+  // Actualizamos reactivo
+  chartData.value = {
+    labels: items.map(item => item.transactionCode),
+    datasets: [
+      {
+        label: tipo === 'sent' ? 'Enviados' : 'Recibidos',
+        data: items.map(item => item.percent),
+        backgroundColor: [
+          "#0C55F8", "#073395", "#9EBBFC", "#6F8CCE", "#021132", "#F2A900"
+        ],
+      },
+    ],
+  };
+};
+
+onMounted(async () => {
+  await loadUsabilityTransferData();
+  // Manejo de errores
+  if (error.value) {
+    console.warn('No se pudieron cargar los datos de usabilidad de transferencia:', error.value)
+  }
+});
+
+
+// Component name (optional in setup syntax, but useful for debugging)
+defineOptions({
+  name: "PieUsabilidadTransferencia"
 });
 </script>
 

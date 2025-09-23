@@ -1,4 +1,4 @@
-export interface serieUsabilityTransferResponse {
+export interface SerieUsabilityTransferResponse {
   panel: string;
   dateRange: DateRange;
   basis: string;

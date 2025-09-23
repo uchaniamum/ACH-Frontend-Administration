@@ -67,8 +67,9 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, watch } from 'vue'
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import {
   Chart as ChartJS,
   Title,
@@ -78,177 +79,220 @@ import {
   PointElement,
   CategoryScale,
   LinearScale
-} from 'chart.js'
-import { Line } from 'vue-chartjs'
-import { useChartUtilitarios } from '~/componsables/useChartUtilitarios'
+} from 'chart.js';
+import { Line as LineChart } from 'vue-chartjs';
+import { useChartUtilitarios } from '~/componsables/useChartUtilitarios';
+import { XRadioButton } from "#components";
 import { seriesService } from '~/services/dashboard/seriesService';
-//import { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
+import type { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
+import { useToast } from '#imports';
+// import { seriesService } from '~/services/dashboard/seriesService';
+// import { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
 
-
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale)
-
-export default defineComponent({
-  name: 'LineExample',
-  components: { LineChart: Line },
-  setup() {
-    const chartRef = ref(null)
-    const seleccionado = ref('') // por defecto no mostrar valores
-
-
-const puntosColorYDatos = {
-  id: 'puntosColorYDatos',
-  afterDatasetsDraw(chart) {
-    const { ctx } = chart
-    chart.data.datasets.forEach((dataset) => {
-      const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset))
-      if (!meta) return
-
-      meta.data.forEach((point, index) => {
-        // Dibujar círculo
-        ctx.save()
-        ctx.beginPath()
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI)
-        ctx.fillStyle = 'white'
-        ctx.fill()
-        ctx.lineWidth = 2
-        ctx.strokeStyle = dataset.borderColor
-        ctx.stroke()
-        ctx.restore()
-
-        // Dibujar tooltip solo si hay selección
-        if (!seleccionado.value || dataset.label !== seleccionado.value) return
-
-        const value = dataset.data[index] + 'M'
-        ctx.save()
-        ctx.translate(point.x, point.y - 25) // desplazado un poco más arriba movetou y
-    
-        ctx.rotate(-Math.PI / 3) // ROTADO AL OTRO LADO
-
-        const padding = 6
-        const textWidth = ctx.measureText(value).width
-        const width = textWidth + padding * 2
-        const height = 18
-
-        // Burbuja curvada
-        ctx.beginPath()
-        ctx.moveTo(-width / 2 + 5, -height / 2)
-        ctx.bezierCurveTo(-width / 2, -height / 2, -width / 2, height / 2, -width / 2 + 5, height / 2)
-        ctx.lineTo(width / 2 - 5, height / 2)
-        ctx.bezierCurveTo(width / 2, height / 2, width / 2, -height / 2, width / 2 - 5, -height / 2)
-        ctx.closePath()
-        ctx.fillStyle = '#6F8CCE'
-        ctx.fill()
-
-        // Texto
-        ctx.fillStyle = 'white'
-        ctx.font = '10px Work Sans'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(value, 0, 0)
-        ctx.restore()
-      })
-    })
-  }
+// Interfaces para tipar el gráfico
+interface ChartDataSet {
+  label: string;
+  data: number[];
+  borderColor: string;
+  backgroundColor: string;
+  tension: number;
+  fill: boolean;
+  borderWidth: number;
+  pointRadius: number;
+  pointHoverRadius: number;
+  hidden?: boolean;
 }
 
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataSet[];
+}
 
-const chartData = ref({
-      labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0')),
-      datasets: [
-        {
-          label: 'QR',
-          data: [200, 190, 170, 160, 140, 120, 110, 95, 90, 0, 120, 100, 140, 160, 180, 200, 205, 230, 240, 200, 190, 170, 150, 140, 120, 90, 98, 200, 205, 220],
-          borderColor: '#0C55F8',
-          backgroundColor: '#0C55F8',
-          tension: 0.8,
-          fill: true,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 8
-        },
-        {
-          label: 'Express',
-          data: [500, 450, 300, 380, 380, 360, 450, 480, 400, 300, 350, 450, 600, 540, 330, 220, 450, 320, 450, 320, 150, 200, 250, 300, 350, 400, 450, 500, 550],
-          borderColor: '#6F8CCE',
-          backgroundColor: '#6F8CCE',
-          tension: 0.5,
-          fill: true,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 8
-        },
-        {
-          label: 'Asincrono',
-          data: [150, 100, 60, 180, 160, 120, 150, 60, 80, 150, 180, 200, 250, 60, 80, 140, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800],
-          borderColor: '#A6C4F6',
-          backgroundColor: '#A6C4F6',
-          tension: 0.9,
-          fill: true,
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHoverRadius: 8
-        }
-      ]
-    })
+// Registrar Chart.js
+ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
 
-    const chartOptions = ref({
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: 0 },
-      scales: {
-        x: { ticks: { font: { size: 10 } } },
-        y: {
-          beginAtZero: true,
-          suggestedMax: 1000,
-          ticks: {
-            stepSize: 100,
-            precision: 0,
-            callback: value => value + 'M'
-          }
-        }
-      },
-      plugins: {
-        legend: { display: false }
-      }
-    })
+// Composable
+const { copiado, copiarGrafico } = useChartUtilitarios();
 
-    const { copiado, copiarGrafico } = useChartUtilitarios()
-    const handleCopiar = () => copiarGrafico(chartRef.value.$el)
+// Refs
+const chartRef: Ref<any> = ref(null);
+const seleccionado = ref(''); // por defecto no mostrar valores
 
-    const accion1 = () => alert('Botón Enviados presionado')
-    const accion2 = () => alert('Botón Recibidos presionado')
-    const accionFiltro1 = () => alert('Filtro por Monto')
-    const accionFiltro2 = () => alert('Filtro por Cantidad')
+// Plugin personalizado
+const puntosColorYDatos = {
+  id: 'puntosColorYDatos',
+  afterDatasetsDraw(chart: any) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((dataset: any) => {
+      const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
+      if (!meta) return;
 
-    // Mostrar solo el dataset seleccionado en el gráfico
-    watch(seleccionado, (nuevoValor) => {
-      chartData.value.datasets.forEach(ds => {
-        ds.hidden = ds.label !== nuevoValor && nuevoValor !== ''
-      })
+      meta.data.forEach((point: any, index: number) => {
+        // Dibujar círculo
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = dataset.borderColor;
+        ctx.stroke();
+        ctx.restore();
 
-      // Actualizar gráfico para mostrar valores del plugin
-      chartRef.value?.chart?.update()
-    })
+        // Dibujar tooltip solo si hay selección
+        if (!seleccionado.value || dataset.label !== seleccionado.value) return;
 
+        const value = dataset.data[index] + 'M';
+        ctx.save();
+        ctx.translate(point.x, point.y - 25); // desplazado un poco más arriba
+        ctx.rotate(-Math.PI / 3); // ROTADO AL OTRO LADO
 
+        const padding = 6;
+        const textWidth = ctx.measureText(value).width;
+        const width = textWidth + padding * 2;
+        const height = 18;
 
+        // Burbuja curvada
+        ctx.beginPath();
+        ctx.moveTo(-width / 2 + 5, -height / 2);
+        ctx.bezierCurveTo(-width / 2, -height / 2, -width / 2, height / 2, -width / 2 + 5, height / 2);
+        ctx.lineTo(width / 2 - 5, height / 2);
+        ctx.bezierCurveTo(width / 2, height / 2, width / 2, -height / 2, width / 2 - 5, -height / 2);
+        ctx.closePath();
+        ctx.fillStyle = '#6F8CCE';
+        ctx.fill();
 
-    
-    return {
-      chartRef,
-      chartData,
-      chartOptions,
-      //puntosColorLinea,
-      handleCopiar,
-      copiado,
-      accion1,
-      accion2,
-      accionFiltro1,
-      accionFiltro2,
-      seleccionado,
-      puntosColorYDatos
-      //puntosDatos
-    }
+        // Texto
+        ctx.fillStyle = 'white';
+        ctx.font = '10px Work Sans';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(value, 0, 0);
+        ctx.restore();
+      });
+    });
   }
-})
+};
+
+// Chart data
+const chartData: Ref<ChartData> = ref({
+  labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0')),
+  datasets: [
+    {
+      label: 'QR',
+      data: [200, 190, 170, 160, 140, 120, 110, 95, 90, 0, 120, 100, 140, 160, 180, 200, 205, 230, 240, 200, 190, 170, 150, 140, 120, 90, 98, 200, 205, 220],
+      borderColor: '#0C55F8',
+      backgroundColor: '#0C55F8',
+      tension: 0.8,
+      fill: true,
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 8
+    },
+    {
+      label: 'Express',
+      data: [500, 450, 300, 380, 380, 360, 450, 480, 400, 300, 350, 450, 600, 540, 330, 220, 450, 320, 450, 320, 150, 200, 250, 300, 350, 400, 450, 500, 550],
+      borderColor: '#6F8CCE',
+      backgroundColor: '#6F8CCE',
+      tension: 0.5,
+      fill: true,
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 8
+    },
+    {
+      label: 'Asincrono',
+      data: [150, 100, 60, 180, 160, 120, 150, 60, 80, 150, 180, 200, 250, 60, 80, 140, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800],
+      borderColor: '#A6C4F6',
+      backgroundColor: '#A6C4F6',
+      tension: 0.9,
+      fill: true,
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 8
+    }
+  ]
+});
+
+// Chart options
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  layout: { padding: 0 },
+  scales: {
+    x: { ticks: { font: { size: 10 } } },
+    y: {
+      beginAtZero: true,
+      suggestedMax: 1000,
+      ticks: {
+        stepSize: 100,
+        precision: 0,
+        callback: (value: any) => value + 'M'
+      }
+    }
+  },
+  plugins: {
+    legend: { display: false }
+  }
+});
+
+// Methods
+const handleCopiar = () => {
+  if (chartRef.value?.$el) {
+    copiarGrafico(chartRef.value.$el);
+  }
+};
+
+const accion1 = () => alert('Botón Enviados presionado');
+const accion2 = () => alert('Botón Recibidos presionado');
+const accionFiltro1 = () => alert('Filtro por Monto');
+const accionFiltro2 = () => alert('Filtro por Cantidad');
+const evolutionsMovementsData = ref<SeriesEvolutivaResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
+
+const loadEvolutionsMovementsData = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await seriesService.getSerieEvolutivaByCode("1M");
+    console.log("mis usabilidad es", response);
+    if (response) evolutionsMovementsData.value = response;
+
+    // Inicializa gráfico con "Enviados"
+    //actualizarChart('sent');
+  } catch (err: any) {
+    console.error('Error loading channel data:', err);
+    error.value = err.message || 'Error al cargar la información del canal';
+    toast.add({ severity: 'error', summary: 'Error', detail: error.value, life: 5000 });
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  await loadEvolutionsMovementsData();
+  // Manejo de errores
+  if (error.value) {
+    console.warn('No se pudieron cargar los datos de evolución de movimientos:', error.value)
+  }
+});
+
+
+
+// Watcher para mostrar solo el dataset seleccionado en el gráfico
+watch(seleccionado, (nuevoValor) => {
+  chartData.value.datasets.forEach(ds => {
+    ds.hidden = ds.label !== nuevoValor && nuevoValor !== '';
+  });
+
+  // Actualizar gráfico para mostrar valores del plugin
+  chartRef.value?.chart?.update();
+});
+
+// Component name (opcional pero útil para debugging)
+defineOptions({
+  name: "LineExample"
+});
 </script>

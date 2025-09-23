@@ -12,7 +12,6 @@
           Cantidad
         </button>
       </div>
-
       <div class="flex items-center justify-between w-full mb-2">
         <h3 class="text-black font-bold text-[20px] m-0 flex items-center gap-2">
           Transacciones por Región (Expresado en Dólares)
@@ -22,7 +21,6 @@
             Copiado
           </span>
         </h3>
-
         <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
           <button @click="accion1"
             class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
@@ -52,8 +50,10 @@
     </div>
   </div>
 </template>
-<script>
-import { defineComponent, ref } from "vue"
+
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import type { Ref } from 'vue';
 import {
   Chart as ChartJS,
   Title,
@@ -62,22 +62,36 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from "chart.js"
-import { Bar } from "vue-chartjs"
-import { useChartUtilitarios } from "~/componsables/useChartUtilitarios"
+} from "chart.js";
+import { Bar as BarChart } from "vue-chartjs";
+import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
+import { XCheckBox } from "#components";
+import { seriesService } from "~/services/dashboard/seriesService";
+import type { SerieTotalTransactionsResponse } from "~/features/dashboard/serieTotalTransactions.types";
+import { useToast } from "#imports";
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+// Interfaces para tipar el gráfico
+interface ChartDataSet {
+  label: string;
+  data: number[];
+  backgroundColor: string;
+}
 
-// 🔹 Plugin para mostrar valores
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataSet[];
+}
+
+// Plugin para mostrar valores
 const mostrarValoresPlugin = {
   id: "mostrarValoresPlugin",
-  afterDatasetsDraw(chart) {
+  afterDatasetsDraw(chart: any) {
     if (!chart.$mostrarValores) return;
     const ctx = chart.ctx;
     const lastDatasetIndex = chart.data.datasets.length - 1;
-    chart.data.labels.forEach((_, i) => {
+    chart.data.labels.forEach((_: any, i: number) => {
       let sum = 0;
-      chart.data.datasets.forEach((dataset, idx) => {
+      chart.data.datasets.forEach((dataset: any, idx: number) => {
         const meta = chart.getDatasetMeta(idx);
         const bar = meta.data[i];
         const value = dataset.data[i];
@@ -109,89 +123,122 @@ const mostrarValoresPlugin = {
   },
 };
 
-ChartJS.register(mostrarValoresPlugin)
+// Registrar Chart.js y plugins
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  mostrarValoresPlugin
+);
 
-export default defineComponent({
-  name: "BarVertical",
-  components: { BarChart: Bar },
+// Composable
+const { copiarGrafico, copiado } = useChartUtilitarios();
 
-  setup() {
-    const grafico = ref(null)
-    const mostrarValores = ref(false)
-    const seleccionado = ref(null)
+// Refs
+const grafico: Ref<any> = ref(null);
+const mostrarValores = ref(false);
+const seleccionado = ref<string | null>(null);
 
-    const { copiarGrafico, copiado } = useChartUtilitarios()
-    const handleCopiar = () => copiarGrafico(grafico.value.$el)
+// Chart data
+const chartData: Ref<ChartData> = ref({
+  labels: ["ASU", "CON", "SAN", "COR", "GUA", "CAZ", "CZA", "ITA", "MIS", "PAR", "ALT", "CNE", "ÑEE", "AMM", "CAN", "PTE", "BOQ", "ALP"],
+  datasets: [
+    { label: "QR", data: [150, 100, 60, 180, 160, 120, 150, 60, 80, 150, 180, 200, 250, 60, 80, 140, 150, 200], backgroundColor: "#0C55F8" },
+    { label: "Express", data: [200, 180, 60, 140, 250, 50, 80, 120, 980, 60, 120, 50, 150, 180, 200, 150, 160, 80], backgroundColor: "#6F8CCE" },
+    { label: "Asincrono", data: [150, 120, 80, 160, 200, 60, 120, 60, 200, 145, 145, 45, 60, 120, 150, 80, 70, 80], backgroundColor: "#A6C4F6" },
+  ],
+});
 
-    const chartData = ref({
-      labels: ["ASU", "CON", "SAN", "COR", "GUA", "CAZ", "CZA", "ITA", "MIS", "PAR", "ALT", "CNE", "ÑEE", "AMM", "CAN", "PTE", "BOQ", "ALP"],
-      datasets: [
-        { label: "QR", data: [150, 100, 60, 180, 160, 120, 150, 60, 80, 150, 180, 200, 250, 60, 80, 140, 150, 200], backgroundColor: "#0C55F8" },
-        { label: "Express", data: [200, 180, 60, 140, 250, 50, 80, 120, 980, 60, 120, 50, 150, 180, 200, 150, 160, 80], backgroundColor: "#6F8CCE" },
-        { label: "Asincrono", data: [150, 120, 80, 160, 200, 60, 120, 60, 200, 145, 145, 45, 60, 120, 150, 80, 70, 80], backgroundColor: "#A6C4F6" },
-      ],
-    })
-
-    const chartOptions = ref({
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: { stacked: true, ticks: { font: { size: 10 } } },
-        y: {
-          stacked: true,
-          beginAtZero: true,
-          suggestedMax: 1000,
-          ticks: { stepSize: 100, callback: (v) => v + "M" },
-        },
+// Chart options
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: { stacked: true, ticks: { font: { size: 10 } } },
+    y: {
+      stacked: true,
+      beginAtZero: true,
+      suggestedMax: 1000,
+      ticks: { stepSize: 100, callback: (v: any) => v + "M" },
+    },
+  },
+  plugins: {
+    legend: {
+      position: "top" as const,
+      align: "end" as const,
+      onClick: null,
+      labels: {
+        usePointStyle: true,
+        pointStyle: "circle" as const,
+        boxWidth: 12,
+        boxHeight: 12,
+        padding: 15,
+        font: { size: 10, family: "Work Sans", weight: "400" },
+        color: "#5F6A7B",
       },
-      plugins: {
-        legend: {
-          position: "top",
-          align: "end",
-          onClick: null,
-          labels: {
-            usePointStyle: true,
-            pointStyle: "circle",
-            boxWidth: 12,
-            boxHeight: 12,
-            padding: 15,
-            font: { size: 10, family: "Work Sans", weight: "400" },
-            color: "#5F6A7B",
-          },
-        },
-      },
-    })
+    },
+  },
+});
 
-    // Arreglo de toggleValores (sin this)
-    const toggleValores = () => {
-      mostrarValores.value = !mostrarValores.value
-      if (grafico.value?.chart) {
-        grafico.value.chart.$mostrarValores = mostrarValores.value
-        grafico.value.chart.update()
-      }
-    }
-
-    // 🔹 placeholder de acciones (evita errores en runtime)
-    const accion1 = () => console.log("accion1")
-    const accion2 = () => console.log("accion2")
-    const accionFiltro1 = () => console.log("accionFiltro1")
-    const accionFiltro2 = () => console.log("accionFiltro2")
-
-    return { 
-      grafico,
-      chartData, 
-      chartOptions, 
-      mostrarValores, 
-      toggleValores, 
-      seleccionado, 
-      copiado, 
-      handleCopiar,
-      accion1,
-      accion2,
-      accionFiltro1,
-      accionFiltro2
-    }
+// Methods
+const handleCopiar = () => {
+  if (grafico.value?.$el) {
+    copiarGrafico(grafico.value.$el);
   }
-})
-</script>
+};
 
+const toggleValores = () => {
+  mostrarValores.value = !mostrarValores.value;
+  if (grafico.value?.chart) {
+    grafico.value.chart.$mostrarValores = mostrarValores.value;
+    grafico.value.chart.update();
+  }
+};
+
+// Placeholder de acciones (evita errores en runtime)
+const accion1 = () => console.log("accion1");
+const accion2 = () => console.log("accion2");
+const accionFiltro1 = () => console.log("accionFiltro1");
+const accionFiltro2 = () => console.log("accionFiltro2");
+
+const totalTransactionsData = ref<SerieTotalTransactionsResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
+
+const loadTotalTransactionsBanckData = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await seriesService.getSerieTotalTransactionsByCode("1M");
+    console.log("mis transacciones totales son", response);
+    if (response) totalTransactionsData.value = response;
+
+    // Inicializa gráfico con "Enviados"
+    //actualizarChart('sent');
+  } catch (err: any) {
+    console.error('Error loading channel data:', err);
+    error.value = err.message || 'Error al cargar la información del canal';
+    toast.add({ severity: 'error', summary: 'Error', detail: error.value, life: 5000 });
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  await loadTotalTransactionsBanckData();
+  // Manejo de errores
+  if (error.value) {
+    console.warn('No se pudieron cargar los datos de transacciones totales:', error.value)
+  }
+});
+
+
+// Component name (opcional pero útil para debugging)
+defineOptions({
+  name: "BarVertical"
+});
+</script>

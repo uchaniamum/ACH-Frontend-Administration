@@ -1,6 +1,10 @@
 import { API_CONFIG } from "~/config/api";
-import type { SeriesEvolutivaResponse } from "~/features/dashboard/serieEvolutiva.type";
+import type { SeriesEvolutivaResponse } from "~/features/dashboard/serieEvolutiva.types";
 import type { SerieUsabilityChannelResponse } from "~/features/dashboard/serieUsabilityChannel.types";
+import type { SerieUsabilityTransferResponse } from "~/features/dashboard/serieUsabilityTransfer.types";
+import type { SerieTotalTransactionsResponse } from "~/features/dashboard/serieTotalTransactions.types";
+import type { SerieTotalTransactionsRegionResponse } from "~/features/dashboard/serieTotalTransaccionsRegion.types";
+
 
 class SeriesService {
   public baseURL = API_CONFIG.BASE_URL;
@@ -46,14 +50,51 @@ class SeriesService {
     if (!code) {
       throw new Error("User code is required");
     }
-
     const response = await this.request<SerieUsabilityChannelResponse>(
       `analytics/dashboard/transfers/usability/payment-channel/period/${code}`
     );
-
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
-
     return response;
   }
+
+  async getSerieUsabilityByTransferByCode(
+    code: string
+  ): Promise<SerieUsabilityTransferResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    const response = await this.request<SerieUsabilityTransferResponse>(
+      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta 
+    );
+    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
+    return response;
+  }
+
+    async getSerieTotalTransactionsByCode(
+    code: string
+  ): Promise<SerieTotalTransactionsResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    const response = await this.request<SerieTotalTransactionsResponse>(
+      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta
+    );
+    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
+    return response;
+  }
+
+     async getSerieTotalTransactionsRegionByCode(
+    code: string
+  ): Promise<SerieTotalTransactionsRegionResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    const response = await this.request<SerieTotalTransactionsRegionResponse>(
+      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta
+    );
+    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
+    return response;
+  }
+
 }
 export const seriesService = new SeriesService();
