@@ -16,11 +16,11 @@
       </h3>
 
       <div class="flex gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto justify-center">
-        <button @click="accion1"
+        <button @click="Enviados"
           class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[90px] sm:min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-xs sm:text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
           <Icon name="x:arrow-tr-circle" class="text-[#5F6A7B] w-6 h-6 sm:w-7 sm:h-7" /> Enviados
         </button>
-        <button @click="accion2"
+        <button @click="Recibidos"
           class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 min-w-[90px] sm:min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-xs sm:text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
           <Icon name="x:arrow-br-circle" class="text-[#5F6A7B] w-6 h-6 sm:w-7 sm:h-7" /> Recibidos
         </button>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import type { Ref } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, ArcElement } from "chart.js";
 import { Pie as PieChart } from "vue-chartjs";
@@ -94,19 +94,15 @@ interface ChartData {
 
 // Composable
 const { copiarGrafico, copiado } = useChartUtilitarios();
-// Refs
 const graficoContenido: Ref<HTMLElement | null> = ref(null);
 const verCifras: Ref<HTMLElement | null> = ref(null);
 const grafico: Ref<any> = ref(null);
 const mostrarValoresPie = ref(false);
 const seleccionado = ref<string | null>(null);
-
 const usabilityTransferData = ref<SerieUsabilityTransferResponse | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const toast = useToast();
-
-// Chart data
 const chartData: Ref<ChartData> = ref({
   labels: [],
   datasets: [
@@ -117,6 +113,9 @@ const chartData: Ref<ChartData> = ref({
     },
   ],
 });
+const total = computed(() =>chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
+const periodo = useState<string | null>('periodo')
+
 
 // Chart options
 const chartOptions = ref({
@@ -131,9 +130,6 @@ const chartOptions = ref({
 });
 
 // Computed
-const total = computed(() =>
-  chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0)
-);
 
 // Methods
 const handleCopiar = () => {
@@ -150,37 +146,28 @@ const toggleValores = () => {
   }
 };
 
-/*const accion1 = () => {
-  // Aquí puedes actualizar el chartData con datos reales "sent"
-  chartData.value.datasets[0].data = [35, 35, 10, 10, 5, 5];
-  chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS", "USSD"];
-};
 
-const accion2 = () => {
-  // Aquí puedes actualizar el chartData con datos reales "received"
-  chartData.value.datasets[0].data = [40, 30, 15, 10, 5];
-  chartData.value.labels = ["WEB", "TELLER", "MOBILE", "ATM", "POS"];
-};*/
-
-const accion1 = (): void => {
+const Enviados = (): void => {
   if (!usabilityTransferData.value) return;
   actualizarChart('sent');
 };
-const accion2 = (): void => {
+const Recibidos = (): void => {
   if (!usabilityTransferData.value) return;
   actualizarChart('received');
 };
 
-
-const loadUsabilityTransferData = async () => {
+ watch(periodo, (newVal) => {
+      if (newVal) {
+loadUsabilityTransferData(newVal)
+      }
+    })
+const loadUsabilityTransferData = async (periodo:string) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await seriesService.getSerieUsabilityByTransferByCode("1M");
+    const response = await seriesService.getSerieUsabilityByTransferByCode(periodo);
     console.log("mis usabilidad es", response);
     if (response) usabilityTransferData.value = response;
-
-    // Inicializa gráfico con "Enviados"
     actualizarChart('sent');
   } catch (err: any) {
     console.error('Error loading channel data:', err);
@@ -194,10 +181,7 @@ const loadUsabilityTransferData = async () => {
 
 const actualizarChart = (tipo: 'sent' | 'received') => {
   if (!usabilityTransferData.value) return; // asegura que hay datos
-
   const items = tipo === 'sent' ? usabilityTransferData.value.sent.items : usabilityTransferData.value.received.items;
-
-  // Actualizamos reactivo
   chartData.value = {
     labels: items.map(item => item.transactionCode),
     datasets: [
@@ -220,8 +204,6 @@ onMounted(async () => {
   }
 });
 
-
-// Component name (optional in setup syntax, but useful for debugging)
 defineOptions({
   name: "PieUsabilidadTransferencia"
 });

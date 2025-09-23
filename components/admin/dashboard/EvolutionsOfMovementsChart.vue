@@ -3,11 +3,11 @@
     <!-- Botones Monto / Cantidad -->
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
-        <button @click="accionFiltro1"
+        <button @click="Monto"
           class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
           Monto
         </button>
-        <button @click="accionFiltro2"
+        <button @click="Cantidad"
           class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
           Cantidad
         </button>
@@ -117,9 +117,15 @@ const chartData: Ref<ChartData> = ref({
   datasets: [],
 });
 // Refs
-const chartRef: Ref<any> = ref(null);
-
+const chartRef: Ref<any> = ref(null);  
 const seleccionado = ref(''); // por defecto no mostrar valores
+const evolutionsMovementsData = ref<SeriesEvolutivaResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
+const currentMode = ref<"sent" | "received">("sent");
+const periodo = useState<string | null>('periodo')
+
 
 // Plugin personalizado
 const puntosColorYDatos = {
@@ -205,36 +211,44 @@ const handleCopiar = () => {
   }
 };
 
-
-const accionFiltro1 = () => alert('Filtro por Monto');
-const accionFiltro2 = () => alert('Filtro por Cantidad');
-const evolutionsMovementsData = ref<SeriesEvolutivaResponse | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const toast = useToast();
-const currentMode = ref<"sent" | "received">("sent");
-
 // Reemplaza los métodos vacíos
 const Enviados = () => {
   if (evolutionsMovementsData.value) {
     currentMode.value = "sent";
-    chartData.value = buildChartData(evolutionsMovementsData.value.sent.series);
+    chartData.value = buildChartData(evolutionsMovementsData.value.sent.series,evolutionsMovementsData.value.granularity);
   }
 };
 
 const Recibidos = () => {
   if (evolutionsMovementsData.value) {
     currentMode.value = "received";
-    chartData.value = buildChartData(evolutionsMovementsData.value.received.series);
+    chartData.value = buildChartData(evolutionsMovementsData.value.received.series,evolutionsMovementsData.value.granularity);
+  }
+};
+
+watch(periodo, (newVal) => {
+  if (newVal) {
+    loadEvolutionsMovementsData(newVal)
+  }
+})
+const Monto = () => {
+  if (periodo.value) {
+    loadEvolutionsMovementsData(periodo.value);
+  }
+};
+
+const Cantidad = () => {
+  if (periodo.value) {
+    loadEvolutionsMovementsCountData(periodo.value);
   }
 };
 
 
-const loadEvolutionsMovementsData = async () => {
+const loadEvolutionsMovementsData = async (periodo:string) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await seriesService.getSerieEvolutivaByCode("1M");
+    const response = await seriesService.getSerieEvolutivaByCode(periodo);
     console.log("mis usabilidad es", response);
     if (response) evolutionsMovementsData.value = response;
     chartData.value = buildChartData(response.sent.series, response.granularity // 'day', 'month' o 'year'
@@ -249,6 +263,26 @@ const loadEvolutionsMovementsData = async () => {
   }
 };
 
+const loadEvolutionsMovementsCountData = async (periodo:string) => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await seriesService.getSerieEvolutivaCountByCode(periodo);
+    console.log("mis usabilidad  contador es", response);
+    if (response) evolutionsMovementsData.value = response;
+    chartData.value = buildChartData(response.sent.series, response.granularity // 'day', 'month' o 'year'
+    );    // Inicializa gráfico con "Enviados"
+    //actualizarChart('sent');
+  } catch (err: any) {
+    console.error('Error loading channel data:', err);
+    error.value = err.message || 'Error al cargar la información del canal';
+    toast.add({ severity: 'error', summary: 'Error', detail: error.value, life: 5000 });
+  } finally {
+    loading.value = false;
+  }
+};
+
+
 
 const buildChartData = (series: any[], granularity: string) => {
   // Función para obtener label según la granularidad
@@ -258,14 +292,10 @@ const buildChartData = (series: any[], granularity: string) => {
     if (granularity === 'year') return p.date.slice(0, 4);  // YYYY
     return p.date; // fallback
   };
-
-  // Tomamos labels del primer dataset
   const labels = series[0]?.points.map((p: any) => getLabel(p)) || [];
-
-  // Construimos datasets
   const datasets = series.map((s: any) => ({
     label: s.transactionCode,
-    data: s.points.map((p: any) => p.value / 1000000), // ajusta según necesites
+    data: s.points.map((p: any) => p.value / 1000000), 
     borderColor:
       s.transactionCode === 'QR'
         ? '#0C55F8'
@@ -285,28 +315,24 @@ const buildChartData = (series: any[], granularity: string) => {
 
   return { labels, datasets };
 };
+watch(seleccionado, (nuevoValor) => {
+  chartData.value.datasets.forEach(ds => {
+    ds.hidden = nuevoValor !== '' ? ds.label !== nuevoValor : false;
+  });
+  chartRef.value?.chart?.update();
+});
+
+
 
 onMounted(async () => {
-  await loadEvolutionsMovementsData();
-  // Manejo de errores
+ if (periodo.value) {
+    loadEvolutionsMovementsData(periodo.value);
+  }
   if (error.value) {
     console.warn('No se pudieron cargar los datos de evolución de movimientos:', error.value)
   }
 });
 
-
-watch(seleccionado, (nuevoValor) => {
-  chartData.value.datasets.forEach(ds => {
-    // Mostrar solo el dataset seleccionado, ocultar los demás
-    ds.hidden = nuevoValor !== '' ? ds.label !== nuevoValor : false;
-  });
-
-  // Actualiza el gráfico
-  chartRef.value?.chart?.update();
-});
-
-
-// Component name (opcional pero útil para debugging)
 defineOptions({
   name: "LineExample"
 });

@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
 import {
   Chart as ChartJS,
@@ -162,10 +162,7 @@ ChartJS.register(
   mostrarValoresPlugin
 );
 
-// Composable
 const { copiarGrafico, copiado } = useChartUtilitarios();
-
-// Refs
 const grafico: Ref<any> = ref(null);
 const mostrarValores = ref(false);
 const seleccionado = ref<string | null>(null);
@@ -173,10 +170,15 @@ const chartData: Ref<ChartData> = ref({
   labels: [],
   datasets: [],
 });
+const totalTransactionsRegionData =
+  ref<SerieTotalTransactionsRegionResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
+const periodo = useState<string | null>('periodo')
+const currentMode = ref<"sent" | "received">("sent");
 
 
-
-// Chart options
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -235,7 +237,6 @@ const chartOptions = ref({
   },
 });
 
-// Methods
 const handleCopiar = () => {
   if (grafico.value?.$el) {
     copiarGrafico(grafico.value.$el);
@@ -254,21 +255,18 @@ const toggleValores = () => {
 const accionFiltro1 = () => console.log("accionFiltro1");
 const accionFiltro2 = () => console.log("accionFiltro2");
 
-const totalTransactionsRegionData =
-  ref<SerieTotalTransactionsRegionResponse | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const toast = useToast();
+watch(periodo, (newVal) => {
+  if (newVal) {
+    loadTotalTransactionsRegionData(newVal)
+  }
+})
 
-const loadTotalTransactionsRegionData = async () => {
+
+const loadTotalTransactionsRegionData = async (periodo:string) => {
   try {
     loading.value = true;
     error.value = null;
-
-    const response = await seriesService.getSerieTotalTransactionsRegionByCode(
-      "1M"
-    );
-
+    const response = await seriesService.getSerieTotalTransactionsRegionByCode(periodo);
     if (response) {
       totalTransactionsRegionData.value = response;
       // 👇 inicializamos con "sent" (Enviados)
@@ -287,29 +285,6 @@ const loadTotalTransactionsRegionData = async () => {
     loading.value = false;
   }
 };
-
-// Estado para controlar si mostramos enviados o recibidos
-const currentMode = ref<"sent" | "received">("sent");
-
-// Reemplaza los métodos vacíos
-const Enviados = () => {
-  if (totalTransactionsRegionData.value) {
-    currentMode.value = "sent";
-    chartData.value = buildChartData(
-      totalTransactionsRegionData.value.sent.regions
-    );
-  }
-};
-
-const Recibidos = () => {
-  if (totalTransactionsRegionData.value) {
-    currentMode.value = "received";
-    chartData.value = buildChartData(
-      totalTransactionsRegionData.value.received.regions
-    );
-  }
-};
-
 const buildChartData = (participants: any[]) => {
   const labels = participants.map((p: any) => p.code);
 
@@ -337,6 +312,24 @@ const buildChartData = (participants: any[]) => {
     ],
   };
 };
+
+const Enviados = () => {
+  if (totalTransactionsRegionData.value) {
+    currentMode.value = "sent";
+    chartData.value = buildChartData(
+      totalTransactionsRegionData.value.sent.regions
+    );
+  }
+};
+const Recibidos = () => {
+  if (totalTransactionsRegionData.value) {
+    currentMode.value = "received";
+    chartData.value = buildChartData(
+      totalTransactionsRegionData.value.received.regions
+    );
+  }
+};
+
 
 onMounted(async () => {
   await loadTotalTransactionsRegionData();

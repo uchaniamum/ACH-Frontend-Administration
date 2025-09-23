@@ -4,34 +4,29 @@
     <div style="width: 100%;">
       <PanelEjecutivo />
     </div>
-
     <!-- Line Chart -->
     <div style="width: 100%;">
       <LineChart />
     </div>
-
     <!-- Barra Vertical -->
     <div style="width: 100%;">
       <BarChartVertical />
     </div>
-
     <!-- PieCharts lado a lado -->
     <div class="flex flex-wrap gap-4 w-full justify-center">
       <!-- Primer PieChart -->
       <div class="flex-1 flex flex-col items-center chart-wrapper">
         <UsabilityByChannelChart />
       </div>
-
       <!-- Segundo PieChart -->
       <div class="flex-1 flex flex-col items-center chart-wrapper">
         <PieChartUsabilidadTransferencia />
       </div>
     </div>
-
     <!-- Barra Horizontal -->
-<div style="width: 100%; margin-bottom: 50px;">
-  <BarChartHorizontal />
-</div>
+    <div style="width: 100%; margin-bottom: 50px;">
+      <BarChartHorizontal />
+    </div>
 
   </div>
 </template>
@@ -60,18 +55,21 @@ export default {
 }
 
 .chart-wrapper .grafico-pie {
-  flex: 1 1 auto; /* ocupa todo el espacio disponible para el gráfico */
+  flex: 1 1 auto;
+  /* ocupa todo el espacio disponible para el gráfico */
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px; /* espacio con los labels */
+  margin-bottom: 10px;
+  /* espacio con los labels */
 }
 
 .chart-wrapper .labels-container {
-  flex: 0 0 auto; /* altura solo para el contenido de labels */
-  width: 100%;    /* ocupa todo el ancho del contenedor */
+  flex: 0 0 auto;
+  /* altura solo para el contenido de labels */
+  width: 100%;
+  /* ocupa todo el ancho del contenedor */
   box-sizing: border-box;
   margin: 0 auto;
 }
-
 </style>

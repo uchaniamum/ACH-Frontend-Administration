@@ -44,6 +44,17 @@ class SeriesService {
     );
   }
 
+  async getSerieEvolutivaCountByCode(
+    code: string
+  ): Promise<SeriesEvolutivaResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    return this.request<SeriesEvolutivaResponse>(
+      `analytics/dashboard/series/count/period/${code}`
+    );
+  }
+
   async getSerieUsabilityByChannelByCode(
     code: string
   ): Promise<SerieUsabilityChannelResponse> {
@@ -83,6 +94,19 @@ class SeriesService {
     return response;
   }
 
+  async getSerieTotalTransactionsCountByCode(
+    code: string
+  ): Promise<SerieTotalTransactionsResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    const response = await this.request<SerieTotalTransactionsResponse>(
+      `analytics/dashboard/transfers/external-participant-totals/count/period/${code}` // cxambiar ruta
+    );
+    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
+    return response;
+  }
+
   async getSerieTotalTransactionsRegionByCode(
     code: string
   ): Promise<SerieTotalTransactionsRegionResponse> {
@@ -91,6 +115,19 @@ class SeriesService {
     }
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
       `analytics/dashboard/regions/amount/period/${code}` // cxambiar ruta
+    );
+    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
+    return response;
+  }
+
+  async getSerieTotalTransactionsRegionCountByCode(
+    code: string
+  ): Promise<SerieTotalTransactionsRegionResponse> {
+    if (!code) {
+      throw new Error("User code is required");
+    }
+    const response = await this.request<SerieTotalTransactionsRegionResponse>(
+      `analytics/dashboard/regions/count/period/${code}` // cxambiar ruta
     );
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;

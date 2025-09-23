@@ -19,11 +19,7 @@
       />
     </div>
   </div>
-
-  <!-- Componente PieUsabilidadCanal con el parámetro periodo -->
-  <UsabilityByChannelChart :periodo="selectedPeriod" />
-
-  <!-- Contenedor inferior pegado -->
+   <!-- Contenedor inferior pegado -->
   <div class="w-full p-6 border border-gray-200 rounded-b-lg mt-0 mb-12 bg-white">
     <p class="text-gray-600">
       {{ sumaryData?.panelDescription || 'No hay descripción disponible' }}
@@ -188,14 +184,14 @@ const sumaryData = ref<SumaryResponses | null>(null)
 const error = ref<string | null>(null);
 const toast = useToast();
 const selectedPeriod = ref<string | null>(null)
-
+const periodo = useState<string | null>('periodo', () => null)
 // Watcher para detectar cambios en el periodo seleccionado
 watch(selectedPeriod, (newVal) => {
+  periodo.value = newVal
   if (newVal) {
     loadSumaryData()
   }
 })
-
 const mapTransactionLabel = (code: string): string => {
   const map: Record<string, string> = {
     QR: "QR",
@@ -242,6 +238,7 @@ const loadSumaryData = async () => {
 // Cargar opciones al montar el componente
 onMounted(async () => {
   await loadperiodsOptions()
+  
   // Manejo de errores
   if (optionsError.value) {
     console.warn('No se pudieron cargar las opciones de periodos:', optionsError.value)

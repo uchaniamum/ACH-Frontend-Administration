@@ -19,12 +19,12 @@
 
       <!-- Botones Enviados / Recibidos -->
       <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF]">
-        <button @click="accion1"
+        <button @click="Enviados"
           class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
           <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
           Enviados
         </button>
-        <button @click="accion2"
+        <button @click="Recibidos"
           class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
           <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
           Recibidos
@@ -106,7 +106,7 @@ interface ChartData {
 
 export default defineComponent({
   name: "UsabilityByChannelChart",
-  
+
   components: { PieChart: Pie, XCheckBox },
   setup() {
     const { copiarGrafico, copiado } = useChartUtilitarios();
@@ -114,13 +114,14 @@ export default defineComponent({
     const grafico: Ref<any> = ref(null);
     const mostrarValoresPie: Ref<boolean> = ref(false);
     const seleccionado: Ref<string | null> = ref(null);
+    const handleCopiar = (): void => { if (graficoContenido.value) copiarGrafico(graficoContenido.value); };
+    const total = computed(() => chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
 
-    const handleCopiar = (): void => {
-      if (graficoContenido.value) copiarGrafico(graficoContenido.value);
-    };
-
-  
-
+    const usabilityData = ref<SerieUsabilityChannelResponse | null>(null);
+    const loading = ref(false);
+    const error = ref<string | null>(null);
+    const toast = useToast();
+    const periodo = useState<string | null>('periodo')
     const chartData: Ref<ChartData> = ref({
       labels: [],
       datasets: [
@@ -148,22 +149,19 @@ export default defineComponent({
       }
     };
 
-    const total = computed(() => chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
 
-    const usabilityData = ref<SerieUsabilityChannelResponse | null>(null);
-    const loading = ref(false);
-    const error = ref<string | null>(null);
-    const toast = useToast();
+    watch(periodo, (newVal) => {
+      if (newVal) {
+        loadUsabilityChannelData(newVal)
+      }
+    })
 
-    const loadUsabilityChannelData = async () => {
+    const loadUsabilityChannelData = async (periodo: string) => {
       try {
         loading.value = true;
         error.value = null;
-        const response = await seriesService.getSerieUsabilityByChannelByCode("1M");
-        console.log("mis usabilidad es", response);
+        const response = await seriesService.getSerieUsabilityByChannelByCode(periodo);
         if (response) usabilityData.value = response;
-
-        // Inicializa gráfico con "Enviados"
         actualizarChart('sent');
       } catch (err: any) {
         console.error('Error loading channel data:', err);
@@ -176,9 +174,7 @@ export default defineComponent({
 
     const actualizarChart = (tipo: 'sent' | 'received') => {
       if (!usabilityData.value) return; // asegura que hay datos
-
       const items = tipo === 'sent' ? usabilityData.value.sent.items : usabilityData.value.received.items;
-
       // Actualizamos reactivo
       chartData.value = {
         labels: items.map(item => item.paymentChannelCode),
@@ -194,19 +190,17 @@ export default defineComponent({
       };
     };
 
-    const accion1 = (): void => {
+    const Enviados = (): void => {
       if (!usabilityData.value) return;
       actualizarChart('sent');
     };
-    const accion2 = (): void => {
+    const Recibidos = (): void => {
       if (!usabilityData.value) return;
       actualizarChart('received');
     };
 
-    onMounted(() => { 
+    onMounted(() => {
       loadUsabilityChannelData();
-
-  
     });
 
     return {
@@ -217,8 +211,8 @@ export default defineComponent({
       chartData,
       chartOptions,
       toggleValores,
-      accion1,
-      accion2,
+      Enviados,
+      Recibidos,
       total,
       mostrarValoresPie,
       seleccionado,

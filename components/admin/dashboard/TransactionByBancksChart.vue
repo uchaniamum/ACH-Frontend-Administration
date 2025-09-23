@@ -23,7 +23,7 @@
         <h3
           class="text-black font-bold text-[20px] m-0 flex items-center gap-2"
         >
-        {{ totalTransactionsData?.panel || 'No hay descripción disponible' }}
+          {{ totalTransactionsData?.panel || "No hay descripción disponible" }}
           <Icon
             name="x:paste-clipboard"
             @click="handleCopiar"
@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, type Ref } from "vue";
+import { defineComponent, onMounted, ref, watch, type Ref } from "vue";
 import {
   Chart as ChartJS,
   Title,
@@ -146,7 +146,6 @@ ChartJS.register(mostrarValoresPluginHorizontal);
 export default defineComponent({
   name: "BarHorizontal",
   components: { BarChart: Bar },
-
   setup() {
     const chartRef = ref<InstanceType<typeof Bar> | null>(null);
     const seleccionado = ref<string | null>(null);
@@ -155,6 +154,18 @@ export default defineComponent({
       labels: [],
       datasets: [],
     });
+    const { copiado, copiarGrafico, ordenarBarras } = useChartUtilitarios();
+    const totalTransactionsData = ref<SerieTotalTransactionsResponse | null>(
+      null
+    );
+    const loading = ref(false);
+    const error = ref<string | null>(null);
+    const toast = useToast();
+
+    const handleCopiar = (): void => copiarGrafico(chartRef.value?.$el);
+    const handleOrdenar = (): void =>
+      ordenarBarras(chartRef.value, chartData.value, ordenAscendente);
+    const periodo = useState<string | null>("periodo");
 
     // Opciones del gráfico
     const chartOptions = ref({
@@ -184,12 +195,9 @@ export default defineComponent({
             font: { size: 10, family: "Work Sans", weight: "400" },
             color: "#5F6A7B",
           },
-          
         },
       },
     });
-
-    const { copiado, copiarGrafico, ordenarBarras } = useChartUtilitarios();
 
     const toggleValores = (): void => {
       if (seleccionado.value === "seleccionarDatos") {
@@ -207,29 +215,21 @@ export default defineComponent({
       }
     };
 
-    const handleCopiar = (): void => copiarGrafico(chartRef.value?.$el);
-    const handleOrdenar = (): void =>
-      ordenarBarras(chartRef.value, chartData.value, ordenAscendente);
-
-    // Botones de acción
-
     const accionFiltro1 = (): void => alert("Filtro por Monto");
     const accionFiltro2 = (): void => alert("Filtro por Cantidad");
 
-    const totalTransactionsData = ref<SerieTotalTransactionsResponse | null>(
-      null
-    );
-    const loading = ref(false);
-    const error = ref<string | null>(null);
-    const toast = useToast();
+    watch(periodo, (newVal) => {
+      if (newVal) {
+        loadTotalTransactionsBanckData(newVal);
+      }
+    });
 
-    const loadTotalTransactionsBanckData = async () => {
+    const loadTotalTransactionsBanckData = async (periodo: string) => {
       try {
         loading.value = true;
         error.value = null;
-
         const response = await seriesService.getSerieTotalTransactionsByCode(
-          "1M"
+          periodo
         );
         if (response) {
           totalTransactionsData.value = response;
@@ -320,7 +320,7 @@ export default defineComponent({
       accionFiltro1,
       accionFiltro2,
       loadTotalTransactionsBanckData,
-      totalTransactionsData
+      totalTransactionsData,
     };
   },
 });
