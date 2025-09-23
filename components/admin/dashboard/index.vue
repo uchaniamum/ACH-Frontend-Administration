@@ -19,7 +19,7 @@
     <div class="flex flex-wrap gap-4 w-full justify-center">
       <!-- Primer PieChart -->
       <div class="flex-1 flex flex-col items-center chart-wrapper">
-        <PieChartUsabilidadCanal />
+        <UsabilityByChannelChart />
       </div>
 
       <!-- Segundo PieChart -->
@@ -38,17 +38,17 @@
 
 
 <script>
-import BarChartVertical from './TotalTransactionsByBancksChart.vue'   // tu gráfico vertical
-import BarChartHorizontal from './TransactionByRegionChart.vue' // tu gráfico horizontal
+import BarChartVertical from './TotalTransactionsRegionChart.vue'   // tu gráfico vertical
+import BarChartHorizontal from './TransactionByBancksChart.vue' // tu gráfico horizontal
 import LineChart from './EvolutionsOfMovementsChart.vue'
 
-import PieChartUsabilidadCanal from './UsabilityByChannelChart.vue'
+import UsabilityByChannelChart from './UsabilityByChannelChart.vue'
 import PieChartUsabilidadTransferencia from './UsabilityByTransferChart.vue'
 import PanelEjecutivo from './panelEjecutivo/ExecutivePanel.vue'
 
 export default {
   name: 'Index',
-  components: { BarChartVertical, BarChartHorizontal, LineChart, PieChartUsabilidadCanal, PieChartUsabilidadTransferencia, PanelEjecutivo }
+  components: { BarChartVertical, BarChartHorizontal, LineChart, UsabilityByChannelChart, PieChartUsabilidadTransferencia, PanelEjecutivo }
 }
 </script>
 <style scoped>

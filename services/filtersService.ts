@@ -1,6 +1,7 @@
 import { API_CONFIG } from "~/config/api";
 import type {
   Currencies,
+  ExternalParticipantAcronyms,
   FiltersRespuesta,
   Periods,
 } from "~/features/dashboard/options.types";
@@ -82,6 +83,33 @@ class FiltersService {
         // label: this.formatCodeToLabel(status.code),
         label: period.displayName,
         value: this.formatCodeToLabel(period.code),
+      }));
+  }
+
+  async getFilterBanck(): Promise<ExternalParticipantAcronyms[]> {
+    try {
+      const response = await this.getOptions();
+      console.log("mis peridos son", response);
+      if (response.Filters?.externalParticipantAcronyms) {
+        return response.Filters.externalParticipantAcronyms.filter(
+          (externalParticipantAcronyms) => externalParticipantAcronyms.isActive
+        );
+      }
+      return [];
+    } catch (error) {
+      console.error("Error getting user periods:", error);
+      return [];
+    }
+  }
+
+  mapBancksOptions(externalParticipantAcronyms: Periods[]) {
+    console.log("mis datos de peridos son", externalParticipantAcronyms);
+    return externalParticipantAcronyms
+      .sort((a, b) => a.order - b.order)
+      .map((bancks) => ({
+        // label: this.formatCodeToLabel(status.code),
+        label: bancks.displayName,
+        value: this.formatCodeToLabel(bancks.code),
       }));
   }
 }

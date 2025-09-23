@@ -17,7 +17,8 @@
       <div class="flex items-center justify-between w-full mb-6">
         <h3 class="text-black font-bold text-[18px] lg:text-[20px] m-0 flex flex-col gap-1">
           <div class="flex items-center justify-between w-full mb-8">
-            <span>Evolucion de Movimientos (Expresado en Dólares)</span>
+            <span>{{ evolutionsMovementsData?.panel || 'No hay descripción disponible' }}
+            </span>
             <Icon name="x:paste-clipboard"
               class="text-[#0A44C6] w-8 h-8 lg:w-10 lg:h-10 cursor-pointer hover:text-[#0C55F8]"
               @click="handleCopiar" />
@@ -27,12 +28,12 @@
           </div>
         </h3>
         <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
-          <button @click="accion1"
+          <button @click="Enviados"
             class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
             <Icon name="x:arrow-tr-circle" class="text-[#5F6A7B] w-7 h-7" />
             Enviados
           </button>
-          <button @click="accion2"
+          <button @click="Recibidos"
             class="px-3 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
             <Icon name="x:arrow-br-circle" class="text-[#5F6A7B] w-7 h-7" />
             Recibidos
@@ -51,12 +52,12 @@
       <div class="flex items-center gap-1">
         <span class="w-7 h-7 rounded-full inline-block" :style="{ backgroundColor: '#6F8CCE' }"></span>
         <span class="text-[10px] font-normal" :style="{ color: '#5F6A7B', fontFamily: 'Work Sans' }">Express</span>
-        <XRadioButton v-model="seleccionado" value="Express" />
+        <XRadioButton v-model="seleccionado" value="EXPRESS" />
       </div>
       <div class="flex items-center gap-1">
         <span class="w-7 h-7 rounded-full inline-block" :style="{ backgroundColor: '#A6C4F6' }"></span>
         <span class="text-[10px] font-normal" :style="{ color: '#5F6A7B', fontFamily: 'Work Sans' }">Asincrono</span>
-        <XRadioButton v-model="seleccionado" value="Asincrono" />
+        <XRadioButton v-model="seleccionado" value="ASYNC" />
       </div>
     </div>
 
@@ -86,8 +87,6 @@ import { XRadioButton } from "#components";
 import { seriesService } from '~/services/dashboard/seriesService';
 import type { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
 import { useToast } from '#imports';
-// import { seriesService } from '~/services/dashboard/seriesService';
-// import { SeriesEvolutivaResponse } from '~/features/dashboard/serieEvolutiva.types';
 
 // Interfaces para tipar el gráfico
 interface ChartDataSet {
@@ -113,9 +112,13 @@ ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScal
 
 // Composable
 const { copiado, copiarGrafico } = useChartUtilitarios();
-
+const chartData: Ref<ChartData> = ref({
+  labels: [],
+  datasets: [],
+});
 // Refs
 const chartRef: Ref<any> = ref(null);
+
 const seleccionado = ref(''); // por defecto no mostrar valores
 
 // Plugin personalizado
@@ -174,47 +177,6 @@ const puntosColorYDatos = {
   }
 };
 
-// Chart data
-const chartData: Ref<ChartData> = ref({
-  labels: Array.from({ length: 30 }, (_, i) => (i + 1).toString().padStart(2, '0')),
-  datasets: [
-    {
-      label: 'QR',
-      data: [200, 190, 170, 160, 140, 120, 110, 95, 90, 0, 120, 100, 140, 160, 180, 200, 205, 230, 240, 200, 190, 170, 150, 140, 120, 90, 98, 200, 205, 220],
-      borderColor: '#0C55F8',
-      backgroundColor: '#0C55F8',
-      tension: 0.8,
-      fill: true,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 8
-    },
-    {
-      label: 'Express',
-      data: [500, 450, 300, 380, 380, 360, 450, 480, 400, 300, 350, 450, 600, 540, 330, 220, 450, 320, 450, 320, 150, 200, 250, 300, 350, 400, 450, 500, 550],
-      borderColor: '#6F8CCE',
-      backgroundColor: '#6F8CCE',
-      tension: 0.5,
-      fill: true,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 8
-    },
-    {
-      label: 'Asincrono',
-      data: [150, 100, 60, 180, 160, 120, 150, 60, 80, 150, 180, 200, 250, 60, 80, 140, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800],
-      borderColor: '#A6C4F6',
-      backgroundColor: '#A6C4F6',
-      tension: 0.9,
-      fill: true,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 8
-    }
-  ]
-});
-
-// Chart options
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -243,14 +205,30 @@ const handleCopiar = () => {
   }
 };
 
-const accion1 = () => alert('Botón Enviados presionado');
-const accion2 = () => alert('Botón Recibidos presionado');
+
 const accionFiltro1 = () => alert('Filtro por Monto');
 const accionFiltro2 = () => alert('Filtro por Cantidad');
 const evolutionsMovementsData = ref<SeriesEvolutivaResponse | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const toast = useToast();
+const currentMode = ref<"sent" | "received">("sent");
+
+// Reemplaza los métodos vacíos
+const Enviados = () => {
+  if (evolutionsMovementsData.value) {
+    currentMode.value = "sent";
+    chartData.value = buildChartData(evolutionsMovementsData.value.sent.series);
+  }
+};
+
+const Recibidos = () => {
+  if (evolutionsMovementsData.value) {
+    currentMode.value = "received";
+    chartData.value = buildChartData(evolutionsMovementsData.value.received.series);
+  }
+};
+
 
 const loadEvolutionsMovementsData = async () => {
   try {
@@ -259,8 +237,8 @@ const loadEvolutionsMovementsData = async () => {
     const response = await seriesService.getSerieEvolutivaByCode("1M");
     console.log("mis usabilidad es", response);
     if (response) evolutionsMovementsData.value = response;
-
-    // Inicializa gráfico con "Enviados"
+    chartData.value = buildChartData(response.sent.series, response.granularity // 'day', 'month' o 'year'
+    );    // Inicializa gráfico con "Enviados"
     //actualizarChart('sent');
   } catch (err: any) {
     console.error('Error loading channel data:', err);
@@ -269,6 +247,43 @@ const loadEvolutionsMovementsData = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+
+const buildChartData = (series: any[], granularity: string) => {
+  // Función para obtener label según la granularidad
+  const getLabel = (p: any) => {
+    if (granularity === 'day') return p.date.slice(8, 10);  //DD  
+    if (granularity === 'month') return p.date.slice(0, 7); // YYYY-MM
+    if (granularity === 'year') return p.date.slice(0, 4);  // YYYY
+    return p.date; // fallback
+  };
+
+  // Tomamos labels del primer dataset
+  const labels = series[0]?.points.map((p: any) => getLabel(p)) || [];
+
+  // Construimos datasets
+  const datasets = series.map((s: any) => ({
+    label: s.transactionCode,
+    data: s.points.map((p: any) => p.value / 1000000), // ajusta según necesites
+    borderColor:
+      s.transactionCode === 'QR'
+        ? '#0C55F8'
+        : s.transactionCode === 'EXPRESS'
+          ? '#6F8CCE'
+          : '#A6C4F6',
+    backgroundColor:
+      s.transactionCode === 'QR'
+        ? '#0C55F8'
+        : s.transactionCode === 'EXPRESS'
+          ? '#6F8CCE'
+          : '#A6C4F6',
+    fill: false,
+    tension: 0.2,
+    pointRadius: 4
+  }));
+
+  return { labels, datasets };
 };
 
 onMounted(async () => {
@@ -280,16 +295,16 @@ onMounted(async () => {
 });
 
 
-
-// Watcher para mostrar solo el dataset seleccionado en el gráfico
 watch(seleccionado, (nuevoValor) => {
   chartData.value.datasets.forEach(ds => {
-    ds.hidden = ds.label !== nuevoValor && nuevoValor !== '';
+    // Mostrar solo el dataset seleccionado, ocultar los demás
+    ds.hidden = nuevoValor !== '' ? ds.label !== nuevoValor : false;
   });
 
-  // Actualizar gráfico para mostrar valores del plugin
+  // Actualiza el gráfico
   chartRef.value?.chart?.update();
 });
+
 
 // Component name (opcional pero útil para debugging)
 defineOptions({

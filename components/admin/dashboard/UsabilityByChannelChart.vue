@@ -84,6 +84,7 @@ import { XCheckBox } from "#components";
 import { seriesService } from '~/services/dashboard/seriesService';
 import type { SerieUsabilityChannelResponse } from "~/features/dashboard/serieUsabilityChannel.types";
 import { useToast } from 'primevue/usetoast';
+import { watch } from 'vue';
 
 ChartJS.register(
   Title,
@@ -104,7 +105,8 @@ interface ChartData {
 }
 
 export default defineComponent({
-  name: "PieUsabilidadCanal",
+  name: "UsabilityByChannelChart",
+  
   components: { PieChart: Pie, XCheckBox },
   setup() {
     const { copiarGrafico, copiado } = useChartUtilitarios();
@@ -116,6 +118,8 @@ export default defineComponent({
     const handleCopiar = (): void => {
       if (graficoContenido.value) copiarGrafico(graficoContenido.value);
     };
+
+  
 
     const chartData: Ref<ChartData> = ref({
       labels: [],
@@ -199,7 +203,11 @@ export default defineComponent({
       actualizarChart('received');
     };
 
-    onMounted(() => { loadUsabilityChannelData(); });
+    onMounted(() => { 
+      loadUsabilityChannelData();
+
+  
+    });
 
     return {
       graficoContenido,
@@ -215,7 +223,8 @@ export default defineComponent({
       mostrarValoresPie,
       seleccionado,
       usabilityData,
-      loadUsabilityChannelData
+      loadUsabilityChannelData,
+
     };
   },
 });

@@ -21,7 +21,7 @@
   </div>
 
   <!-- Componente PieUsabilidadCanal con el parámetro periodo -->
-  <PieUsabilidadCanal :periodo="selectedPeriod" />
+  <UsabilityByChannelChart :periodo="selectedPeriod" />
 
   <!-- Contenedor inferior pegado -->
   <div class="w-full p-6 border border-gray-200 rounded-b-lg mt-0 mb-12 bg-white">

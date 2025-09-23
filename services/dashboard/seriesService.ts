@@ -64,37 +64,36 @@ class SeriesService {
       throw new Error("User code is required");
     }
     const response = await this.request<SerieUsabilityTransferResponse>(
-      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta 
+      `analytics/dashboard/transfers/usability/transfer/period/${code}` // cxambiar ruta
     );
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
-    async getSerieTotalTransactionsByCode(
+  async getSerieTotalTransactionsByCode(
     code: string
   ): Promise<SerieTotalTransactionsResponse> {
     if (!code) {
       throw new Error("User code is required");
     }
     const response = await this.request<SerieTotalTransactionsResponse>(
-      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta
+      `analytics/dashboard/transfers/external-participant-totals/period/${code}` // cxambiar ruta
     );
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
-     async getSerieTotalTransactionsRegionByCode(
+  async getSerieTotalTransactionsRegionByCode(
     code: string
   ): Promise<SerieTotalTransactionsRegionResponse> {
     if (!code) {
       throw new Error("User code is required");
     }
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
-      `analytics/dashboard/transfers/usability/payment-channel/period/${code}`  // cxambiar ruta
+      `analytics/dashboard/regions/amount/period/${code}` // cxambiar ruta
     );
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
-
 }
 export const seriesService = new SeriesService();
