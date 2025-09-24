@@ -6,6 +6,7 @@ export function useOptions() {
     // State
     const roleOptions = ref<{ label: string; value: string }[]>([])
     const roleFilterOptions = ref<{ label: string; value: string }[]>([])
+    const roleAccessOptions = ref<{ label: string; value: string }[]>([])
 
     const statusOptions = ref<{ label: string; value: string }[]>([])
     const statusFilterOptions = ref<{ label: string; value: string }[]>([])
@@ -100,7 +101,8 @@ export function useOptions() {
                     console.log('tive: ', activeRoles);
                     roleOptions.value = optionsService.mapRolesToSelectOptions(activeRoles)
                     roleFilterOptions.value = optionsService.mapRolesToFilterOptions(activeRoles)
-                    console.log('hola: ', roleFilterOptions);
+                    roleAccessOptions.value = optionsService.mapRolesAccessOptions(activeRoles)
+                    console.log('hola: ', roleAccessOptions);
                 }
 
                 if (UserStatuses) {
@@ -133,6 +135,7 @@ export function useOptions() {
         roleOptions.value = []
         statusOptions.value = []
         roleFilterOptions.value = []
+        roleAccessOptions.value = []
         statusFilterOptions.value = []
         paymentGatewayOptions.value = []
         paymentGatewayFilterOptions.value = []
@@ -144,6 +147,7 @@ export function useOptions() {
         roleOptions: readonly(roleOptions),
         statusOptions: readonly(statusOptions),
         roleFilterOptions: readonly(roleFilterOptions),
+        roleAccessOptions: readonly(roleAccessOptions),
         statusFilterOptions: readonly(statusFilterOptions),
         paymentGatewayOptions: readonly(paymentGatewayOptions),
         paymentGatewayFilterOptions: readonly(paymentGatewayFilterOptions),

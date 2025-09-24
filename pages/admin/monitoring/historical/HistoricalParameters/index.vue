@@ -1,18 +1,18 @@
 <template>
     <div>
         <div class="flex flex-col gap-20">
-        <XHeader title="Bitácora - Parámetros" :breadcrumb-items="itemsBreadHistoricalParameter" :show-breadcrumb="true">
-            <template #description>
-                <p>Texto descriptivo de la sección .</p>
-            </template>
-        </XHeader>
-        <div class="flex flex-col gap-12">
-            <HistoryModule
-                :config="parameterConfig"
-                search-placeholder="Buscar"
-            />
+            <XHeader title="Bitácora - Parámetros" :breadcrumb-items="itemsBreadHistoricalParameter" :show-breadcrumb="true">
+                <template #description>
+                    <p>Texto descriptivo de la sección .</p>
+                </template>
+            </XHeader>
+            <div class="flex flex-col gap-12">
+                <HistoryModule
+                    :config="parameterConfig"
+                    search-placeholder="Buscar"
+                />
+            </div>
         </div>
-    </div>
     </div>
 </template>
 

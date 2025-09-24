@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { PaymentGatewayBackUpdateResponse, Processes, ProcessesListResponse } from "~/features/processes/type";
+import type { PaymentGatewayBackUpdateResponse, Processes, ProcessesListResponse, ProcessHistoryListItem } from "~/features/processes/type";
 
 
 class ProccessService {
@@ -34,11 +34,16 @@ class ProccessService {
         return this.request<ProcessesListResponse>(endpoint);
     }
 
-    async updateProcess( dataBackground: Processes, paymentGatewayBackgroundCode: string | undefined): Promise<PaymentGatewayBackUpdateResponse> {
+    async updateProcess(dataBackground: Processes, paymentGatewayBackgroundCode: string | undefined): Promise<PaymentGatewayBackUpdateResponse> {
         return this.request<PaymentGatewayBackUpdateResponse>(`payment-gateways/${paymentGatewayBackgroundCode}/background`, {
             method: 'PATCH',
             body: JSON.stringify(dataBackground)
         });
+    }
+
+    async getHistoryProcess(): Promise<ProcessHistoryListItem> {
+        const endpoint = 'payment-gateways/background/historical';
+        return this.request<ProcessHistoryListItem>(endpoint);
     }
 }
 

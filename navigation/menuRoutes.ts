@@ -74,7 +74,6 @@ const menuConfigACH: MenuBarAdminConfig = {
                             key: 'historicalParameters',
                             label: 'Parámetros',
                             to: '/admin/monitoring/historical/HistoricalParameters',
-                            // pages\admin\monitoring\historical\HistoricalParameters\index.vue
                         },
                         {
                             key: 'historicalSchedules',
@@ -85,6 +84,11 @@ const menuConfigACH: MenuBarAdminConfig = {
                             key: 'historicalUsers',
                             label: 'Usuarios',
                             to: '/admin/monitoring/historical/HistoricalUser'
+                        },
+                        {
+                            key: 'historicalProcess',
+                            label: 'Procesos',
+                            to: '/admin/monitoring/historical/HistoricalProcess'
                         }
 
                     ]

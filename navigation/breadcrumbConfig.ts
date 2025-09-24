@@ -71,33 +71,39 @@ export const breadcrumbConfig = {
         historyContingency:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitacora Contingencia' }
+                { label: 'Bitacora de Contingencia' }
             ] 
         },
         //HistoryUser
         historyUser:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitácora - Usuarios' }
+                { label: 'Bitácora de Usuarios' }
             ] 
         },
         //HistoryParameter
         historyParameter:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitácora - Parámetros' }
+                { label: 'Bitácora de Parámetros' }
             ] 
         },
         historyChannels:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitácora - Administrador canales' }
+                { label: 'Bitácora de Administrador canales' }
             ] 
         },
         historySchedule:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Bitácora - Horarios de atención' }
+                { label: 'Bitácora de Horarios' }
+            ] 
+        },
+        historyProcess:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Procesos' }
             ] 
         },
     }

@@ -31,4 +31,5 @@ export type ModulesMenu =
     | 'historyParameter'
     | 'historyChannels'
     | 'historySchedule'
+    | 'historyProcess'
     ;
