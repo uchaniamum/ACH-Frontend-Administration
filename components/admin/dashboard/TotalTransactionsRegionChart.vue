@@ -6,13 +6,13 @@
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
         <button
-          @click="accionFiltro1"
+          @click="Monto"
           class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
         >
           Monto
         </button>
         <button
-          @click="accionFiltro2"
+          @click="Cantidad"
           class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
         >
           Cantidad
@@ -61,13 +61,8 @@
     >
       <!-- Botón Ver todas las cifras -->
       <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10">
-        <XCheckBox
-          v-model="seleccionado"
-          name="mostrarValoresHorizontal"
-          value="seleccionarDatos"
-          @click="toggleValores"
-          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }"
-        />
+        <XCheckBox v-model="seleccionado" name="mostrarValoresBarra" value="seleccionarDatos"
+          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" @click="toggleManual" />
         <span class="font-normal text-[12px] ml-2">Ver todas las cifras</span>
       </div>
 
@@ -115,37 +110,47 @@ const mostrarValoresPlugin = {
   id: "mostrarValoresPlugin",
   afterDatasetsDraw(chart: any) {
     if (!chart.$mostrarValores) return;
+
     const ctx = chart.ctx;
-    const lastDatasetIndex = chart.data.datasets.length - 1;
-    chart.data.labels.forEach((_: any, i: number) => {
-      let sum = 0;
-      chart.data.datasets.forEach((dataset: any, idx: number) => {
-        const meta = chart.getDatasetMeta(idx);
-        const bar = meta.data[i];
-        const value = dataset.data[i];
-        sum += value;
-        const color = ["Asincrono", "Express"].includes(dataset.label)
-          ? "#FFFFFF"
-          : "#2A303A";
+
+    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+      const meta = chart.getDatasetMeta(datasetIndex);
+
+      meta.data.forEach((bar: any, index: number) => {
+        const value = dataset.data[index];
+        if (value === 0) return; // ignorar ceros
+
         const fontSize = Math.max(10, chart.height * 0.025);
         ctx.save();
-        ctx.fillStyle = color;
+        ctx.fillStyle = ["Asincrono", "Express"].includes(dataset.label)
+          ? "#FFFFFF"
+          : "#2A303A";
         ctx.font = `${fontSize}px Work Sans`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(value + "M", bar.x, (bar.y + bar.base) / 2);
+
+        // ⚡ Ajuste: poner el valor en la mitad de la barra
+        ctx.fillText(formatNumber(value), bar.x, bar.y - bar.height / 2);
         ctx.restore();
+      });
+    });
+
+    // Suma total arriba de la barra superior
+    const lastDatasetIndex = chart.data.datasets.length - 1;
+    chart.data.labels.forEach((_: any, i: number) => {
+      let sum = 0;
+      chart.data.datasets.forEach((dataset: any) => {
+        sum += dataset.data[i];
       });
 
       const topBar = chart.getDatasetMeta(lastDatasetIndex).data[i];
       const sumFontSize = Math.max(10, chart.height * 0.03);
-
       ctx.save();
       ctx.fillStyle = "#373F4A";
       ctx.font = `${sumFontSize}px Work Sans`;
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
-      ctx.fillText(sum + "M", topBar.x, topBar.y - 4);
+      ctx.fillText(sum, topBar.x, topBar.y - 4); // justo arriba
       ctx.restore();
     });
   },
@@ -161,7 +166,24 @@ ChartJS.register(
   LinearScale,
   mostrarValoresPlugin
 );
+// Función para formatear números
+function formatNumber(value: number): string {
+  const suffixes = ["", "K", "M", "B", "T"];
+  let newValue = value;
+  let suffixIndex = 0;
 
+  while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
+    newValue /= 1000;
+    suffixIndex++;
+  }
+
+  const formatted = newValue.toLocaleString("es-BO", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+
+  return formatted + suffixes[suffixIndex];
+}
 const { copiarGrafico, copiado } = useChartUtilitarios();
 const grafico: Ref<any> = ref(null);
 const mostrarValores = ref(false);
@@ -177,6 +199,7 @@ const error = ref<string | null>(null);
 const toast = useToast();
 const periodo = useState<string | null>('periodo')
 const currentMode = ref<"sent" | "received">("sent");
+const filtroActivo = ref<'amount' | 'count'>('amount');
 
 
 const chartOptions = ref({
@@ -188,10 +211,25 @@ const chartOptions = ref({
       stacked: true,
       beginAtZero: true,
       suggestedMax: 1000,
-      ticks: { stepSize: 100, callback: (v: any) => v + "M" },
+      ticks: {
+              callback: (value: any) => formatNumber(Number(value)),
+              font: {
+                size: 11,
+                family: "Work Sans",
+              },
+            },
     },
   },
   plugins: {
+        tooltip: {
+            callbacks: {
+              label: function (context: any) {
+                const label = context.dataset.label || '';
+                const value = formatNumber(context.raw);
+                return `${label}: ${value}`;
+              }
+            }
+          },
     legend: {
       position: "top" as const,
       align: "end" as const,
@@ -227,13 +265,7 @@ const chartOptions = ref({
         },
       },
     },
-    tooltip: {
-      callbacks: {
-        label: (context: any) => {
-          return `${context.dataset.label}: ${context.raw}M`;
-        },
-      },
-    },
+  
   },
 });
 
@@ -243,17 +275,30 @@ const handleCopiar = () => {
   }
 };
 
-const toggleValores = () => {
-  mostrarValores.value = !mostrarValores.value;
-  if (grafico.value?.chart) {
-    grafico.value.chart.$mostrarValores = mostrarValores.value;
-    grafico.value.chart.update();
-  }
-};
 
-// Placeholder de acciones (evita errores en runtime)
-const accionFiltro1 = () => console.log("accionFiltro1");
-const accionFiltro2 = () => console.log("accionFiltro2");
+   const toggleManual = () => {
+      console.log('Toggle manual - estado actual:', mostrarValores.value);
+      mostrarValores.value = !mostrarValores.value;
+      seleccionado.value = mostrarValores.value ? "seleccionarDatos" : null;
+    };
+
+
+        watch(mostrarValores, (newVal) => {
+      const chartInstance = grafico.value?.chart;
+      if (chartInstance) {
+        console.log('Watchers: mostrarValoresHorizontal cambió a:', newVal);
+
+        // Actualizar directamente la configuración del plugin
+        if (chartInstance.config.options.plugins) {
+          chartInstance.config.options.plugins.mostrarValoresPlugin = {
+            enabled: newVal
+          };
+        }
+
+        // Forzar actualización completa
+        chartInstance.update('active');
+      }
+    });
 
 watch(periodo, (newVal) => {
   if (newVal) {
@@ -262,11 +307,31 @@ watch(periodo, (newVal) => {
 })
 
 
-const loadTotalTransactionsRegionData = async (periodo:string) => {
+const Monto = (): void => {
+      console.log('Filtro por Monto seleccionado');
+      filtroActivo.value = 'amount';
+      if (periodo.value) {
+        loadTotalTransactionsRegionData(periodo.value, 'amount');
+      }
+    };
+
+    const Cantidad = (): void => {
+      console.log('Filtro por Cantidad seleccionado');
+      filtroActivo.value = 'count';
+
+      // Recargar datos con el nuevo filtro
+      if (periodo.value) {
+        loadTotalTransactionsRegionData(periodo.value, 'count');
+      }
+    };
+
+
+  const loadTotalTransactionsRegionData = async (periodo: string, tipo: 'amount' | 'count' = filtroActivo.value) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await seriesService.getSerieTotalTransactionsRegionByCode(periodo);
+    const response = await seriesService.getSerieTotalTransactionsRegionByCode(periodo,tipo);
+    console.log("mis datos son ", response,tipo  );
     if (response) {
       totalTransactionsRegionData.value = response;
       // 👇 inicializamos con "sent" (Enviados)
@@ -290,17 +355,17 @@ const buildChartData = (participants: any[]) => {
 
   const qr = participants.map((p: any) => {
     const item = p.items.find((i: any) => i.transactionCode === "QR");
-    return item ? item.value / 1000000 : 0; // 👉 lo divido a "millones"
+    return item ? item.value : 0; // 👉 lo divido a "millones"
   });
 
   const express = participants.map((p: any) => {
     const item = p.items.find((i: any) => i.transactionCode === "EXPRESS");
-    return item ? item.value / 1000000 : 0;
+    return item ? item.value : 0;
   });
 
   const asincrono = participants.map((p: any) => {
     const item = p.items.find((i: any) => i.transactionCode === "ASYNC");
-    return item ? item.value / 1000000 : 0;
+    return item ? item.value : 0;
   });
 
   return {
@@ -329,6 +394,7 @@ const Recibidos = () => {
     );
   }
 };
+
 
 
 onMounted(async () => {

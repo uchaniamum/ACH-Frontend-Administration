@@ -82,39 +82,28 @@ class SeriesService {
   }
 
   async getSerieTotalTransactionsByCode(
-    code: string
+    code: string,
+    tipo: "mount" | "count" = "mount" // por defecto "mount"
   ): Promise<SerieTotalTransactionsResponse> {
     if (!code) {
       throw new Error("User code is required");
     }
+    // Aquí usamos "tipo" en la ruta
     const response = await this.request<SerieTotalTransactionsResponse>(
-      `analytics/dashboard/transfers/external-participant-totals/period/${code}` // cxambiar ruta
+      `analytics/dashboard/transfers/external-participant-totals/${tipo}/period/${code}`
     );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
-    return response;
-  }
-
-  async getSerieTotalTransactionsCountByCode(
-    code: string
-  ): Promise<SerieTotalTransactionsResponse> {
-    if (!code) {
-      throw new Error("User code is required");
-    }
-    const response = await this.request<SerieTotalTransactionsResponse>(
-      `analytics/dashboard/transfers/external-participant-totals/count/period/${code}` // cxambiar ruta
-    );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
   async getSerieTotalTransactionsRegionByCode(
-    code: string
+    code: string,
+    tipo: "mount" | "count" = "mount" // por defecto "mount"
   ): Promise<SerieTotalTransactionsRegionResponse> {
     if (!code) {
       throw new Error("User code is required");
     }
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
-      `analytics/dashboard/regions/amount/period/${code}` // cxambiar ruta
+      `analytics/dashboard/regions/${tipo}/period/${code}` // cxambiar ruta
     );
     console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;

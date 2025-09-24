@@ -34,7 +34,10 @@
     <!-- Botón Ver todas las cifras -->
     <div class="flex items-center gap-2 mb-2">
       <div ref="verCifras" class="flex items-center cursor-pointer transition-all">
-        <XCheckBox v-model="seleccionado" name="mostrarValoresPie" value="seleccionarDatos" @click="toggleValores"
+        <XCheckBox 
+        v-model="seleccionado"
+         name="mostrarValoresPie"
+          value="seleccionarDatos" @click="toggleValores"
           :class="{
             'border-[#0C55F8]': seleccionado === 'seleccionarDatos',
           }" />
