@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import AdminDashboardIndex from '~/components/admin/dashboard/index.vue'
+import { useRouter, onMounted } from '#imports'  
+
+const router = useRouter()
+
+onMounted(() => {
+  router.replace('admin/dashboard')  // redirige automáticamente
+})
 </script>
 
 <template>
-  <AdminDashboardIndex />
-</template>s
+  <!-- vacío, redirección automática -->
+</template>

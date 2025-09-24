@@ -1,7 +1,7 @@
 <template>
-  <div
-    class="flex flex-col relative w-full border-2 border-gray-300 rounded-xl shadow-md p-2 box-border"
-  >
+ <div
+    class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-2 box-border"
+    style="box-shadow:-4px 0 6px -1px rgba(0, 0, 0, 0.1),4px 0 6px -1px rgba(0, 0, 0, 0.1),0 -4px 6px -1px rgba(0, 0, 0, 0.1),0 4px 6px -1px rgba(0, 0, 0, 0.1);">
     <!-- Botones Monto / Cantidad + Título y botones Enviados/Recibidos -->
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
@@ -332,7 +332,9 @@ const Recibidos = () => {
 
 
 onMounted(async () => {
-  await loadTotalTransactionsRegionData();
+   if (periodo.value) {
+    loadTotalTransactionsRegionData(periodo.value);
+  }
   // Manejo de errores
   if (error.value) {
     console.warn(

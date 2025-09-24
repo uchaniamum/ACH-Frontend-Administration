@@ -1,5 +1,6 @@
 <template>
-  <div class="flex flex-col relative w-full border-2 border-gray-300 rounded-xl shadow-md p-4 box-border">
+  <div class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-4 box-border"
+    style="box-shadow:-4px 0 6px -1px rgba(0, 0, 0, 0.1),4px 0 6px -1px rgba(0, 0, 0, 0.1),0 -4px 6px -1px rgba(0, 0, 0, 0.1),0 4px 6px -1px rgba(0, 0, 0, 0.1);">
     <!-- Encabezado con título y botones -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mb-4 titulo-botones gap-2">
       <h3 class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2 relative">
@@ -197,7 +198,9 @@ const actualizarChart = (tipo: 'sent' | 'received') => {
 };
 
 onMounted(async () => {
-  await loadUsabilityTransferData();
+  if (periodo.value) {
+    loadUsabilityTransferData(periodo.value);
+  }
   // Manejo de errores
   if (error.value) {
     console.warn('No se pudieron cargar los datos de usabilidad de transferencia:', error.value)

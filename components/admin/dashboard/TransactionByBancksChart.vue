@@ -1,54 +1,38 @@
 <template>
-  <div
-    class="flex flex-col relative w-full border-2 border-gray-300 rounded-xl shadow-md p-2 box-border"
-  >
+  <div class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-2 box-border"
+    style="box-shadow:-4px 0 6px -1px rgba(0, 0, 0, 0.1),4px 0 6px -1px rgba(0, 0, 0, 0.1),0 -4px 6px -1px rgba(0, 0, 0, 0.1),0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+
     <!-- Botones Monto / Cantidad + Título y botones Enviados/Recibidos -->
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
-        <button
-          @click="accionFiltro1"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
-        >
+        <button @click="accionFiltro1"
+          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
           Monto
         </button>
-        <button
-          @click="accionFiltro2"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
-        >
+        <button @click="accionFiltro2"
+          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
           Cantidad
         </button>
       </div>
 
       <div class="flex items-center justify-between w-full mb-2">
-        <h3
-          class="text-black font-bold text-[20px] m-0 flex items-center gap-2"
-        >
+        <h3 class="text-black font-bold text-[20px] m-0 flex items-center gap-2">
           {{ totalTransactionsData?.panel || "No hay descripción disponible" }}
-          <Icon
-            name="x:paste-clipboard"
-            @click="handleCopiar"
-            class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]"
-          />
-          <span
-            v-if="copiado"
-            class="mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20"
-          >
+          <Icon name="x:paste-clipboard" @click="handleCopiar"
+            class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]" />
+          <span v-if="copiado" class="mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20">
             Copiado
           </span>
         </h3>
 
         <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
-          <button
-            @click="Enviados"
-            class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white"
-          >
+          <button @click="Enviados"
+            class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
             <Icon name="x:arrow-tr-circle" class="text-[#5F6A7B] w-7 h-7" />
             Enviados
           </button>
-          <button
-            @click="Recibidos"
-            class="px-3 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white"
-          >
+          <button @click="Recibidos"
+            class="px-3 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
             <Icon name="x:arrow-br-circle" class="text-[#5F6A7B] w-7 h-7" />
             Recibidos
           </button>
@@ -57,25 +41,13 @@
     </div>
 
     <!-- Contenedor del gráfico con scroll vertical -->
-    <div
-      class="relative w-full border-gray-200 rounded-lg p-2"
-      style="height: 500px; overflow-y: auto"
-    >
+    <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto">
       <!-- Botón Ver todas las cifras -->
       <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10">
-        <XCheckBox
-          v-model="seleccionado"
-          name="mostrarValoresHorizontal"
-          value="seleccionarDatos"
-          @click="toggleValores"
-          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }"
-        />
+        <XCheckBox v-model="seleccionado" name="mostrarValoresHorizontal" value="seleccionarDatos"
+          @click="toggleValores" :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" />
         <span class="font-normal text-[12px] ml-2">Ver todas las cifras</span>
-        <Icon
-          name="x:sort"
-          class="text-[#0C55F8] w-7 h-7 ml-2 cursor-pointer"
-          @click="handleOrdenar"
-        />
+        <Icon name="x:sort" class="text-[#0C55F8] w-7 h-7 ml-2 cursor-pointer" @click="handleOrdenar" />
       </div>
 
       <!-- Gráfico -->
@@ -297,7 +269,9 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      await loadTotalTransactionsBanckData();
+      if (periodo.value) {
+        loadTotalTransactionsBanckData(periodo.value);
+      }
       // Manejo de errores
       if (error.value) {
         console.warn(
