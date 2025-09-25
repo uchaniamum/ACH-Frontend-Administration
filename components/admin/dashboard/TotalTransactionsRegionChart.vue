@@ -1,68 +1,57 @@
 <template>
- <div
-    class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-2 box-border"
+  <div class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-2 box-border"
     style="box-shadow:-4px 0 6px -1px rgba(0, 0, 0, 0.1),4px 0 6px -1px rgba(0, 0, 0, 0.1),0 -4px 6px -1px rgba(0, 0, 0, 0.1),0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+
     <!-- Botones Monto / Cantidad + Título y botones Enviados/Recibidos -->
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
-        <button
-          @click="Monto"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
-        >
+        <button @click="filtroActivo = 'amount'"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'amount'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Monto
         </button>
-        <button
-          @click="Cantidad"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]"
-        >
+
+        <button @click="filtroActivo = 'count'"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'count'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Cantidad
         </button>
       </div>
+
+
       <div class="flex items-center justify-between w-full mb-2">
-        <h3
-          class="text-black font-bold text-[20px] m-0 flex items-center gap-2"
-        >
-        {{ totalTransactionsRegionData?.panel || 'No hay descripción disponible' }}
-          <Icon
-            name="x:paste-clipboard"
-            @click="handleCopiar"
-            class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]"
-          />
-          <span
-            v-if="copiado"
-            class="mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20"
-          >
+        <h3 class="text-black font-bold text-[20px] m-0 flex items-center gap-2">
+          {{ totalTransactionsRegionData?.panel || 'No hay descripción disponible' }}
+          <Icon name="x:paste-clipboard" @click="handleCopiar"
+            class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]" />
+          <span v-if="copiado" class="mt-1 bg-blue-500 text-white text-sm px-2 py-1 rounded z-20">
             Copiado
           </span>
         </h3>
-        <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
-          <button
-            @click="Enviados"
-            class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white"
-          >
-            <Icon name="x:arrow-tr-circle" class="text-[#5F6A7B] w-7 h-7" />
+
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+          <button @click="Enviados"
+            class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+            <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
             Enviados
           </button>
-          <button
-            @click="Recibidos"
-            class="px-3 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white"
-          >
-            <Icon name="x:arrow-br-circle" class="text-[#5F6A7B] w-7 h-7" />
+          <button @click="Recibidos"
+            class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+            <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
             Recibidos
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Contenedor del gráfico con scroll vertical -->
-    <div
-      class="relative w-full border-gray-200 rounded-lg p-2"
-      style="height: 500px; overflow-y: auto"
-    >
+    <!-- Contenedor del gráfico -->
+    <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto">
       <!-- Botón Ver todas las cifras -->
       <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10">
-        <XCheckBox v-model="seleccionado" name="mostrarValoresBarra" value="seleccionarDatos"
-          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" @click="toggleManual" />
+        <XCheckBox v-model="seleccionado" name="mostrarValores" value="seleccionarDatos"
+          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" @change="toggleManual" />
         <span class="font-normal text-[12px] ml-2">Ver todas las cifras</span>
       </div>
 
@@ -93,7 +82,7 @@ import { useToast } from "#imports";
 import { useAnalyticsOptions } from "~/componsables/useAnalyticsOptions";
 import type { SerieTotalTransactionsRegionResponse } from "~/features/dashboard/serieTotalTransaccionsRegion.types";
 
-// Interfaces para tipar el gráfico
+// Interfaces
 interface ChartDataSet {
   label: string;
   data: number[];
@@ -105,67 +94,21 @@ interface ChartData {
   datasets: ChartDataSet[];
 }
 
-// Plugin para mostrar valores
-const mostrarValoresPlugin = {
-  id: "mostrarValoresPlugin",
-  afterDatasetsDraw(chart: any) {
-    if (!chart.$mostrarValores) return;
+// Variables reactivas
+const { copiarGrafico, copiado } = useChartUtilitarios();
+const { mostrarValoresPluginSumatoria } = useChartUtilitarios();
+const grafico: Ref<any> = ref(null);
+const mostrarValores = ref(false);
+const seleccionado = ref<string | null>(null);
+const chartData: Ref<ChartData> = ref({ labels: [], datasets: [] });
+const totalTransactionsRegionData = ref<SerieTotalTransactionsRegionResponse | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const toast = useToast();
+const periodo = useState<string | null>('periodo');
+const currentMode = ref<"sent" | "received">("sent");
+const filtroActivo = ref<'amount' | 'count'>('amount');
 
-    const ctx = chart.ctx;
-
-    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
-      const meta = chart.getDatasetMeta(datasetIndex);
-
-      meta.data.forEach((bar: any, index: number) => {
-        const value = dataset.data[index];
-        if (value === 0) return; // ignorar ceros
-
-        const fontSize = Math.max(10, chart.height * 0.025);
-        ctx.save();
-        ctx.fillStyle = ["Asincrono", "Express"].includes(dataset.label)
-          ? "#FFFFFF"
-          : "#2A303A";
-        ctx.font = `${fontSize}px Work Sans`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        // ⚡ Ajuste: poner el valor en la mitad de la barra
-        ctx.fillText(formatNumber(value), bar.x, bar.y - bar.height / 2);
-        ctx.restore();
-      });
-    });
-
-    // Suma total arriba de la barra superior
-    const lastDatasetIndex = chart.data.datasets.length - 1;
-    chart.data.labels.forEach((_: any, i: number) => {
-      let sum = 0;
-      chart.data.datasets.forEach((dataset: any) => {
-        sum += dataset.data[i];
-      });
-
-      const topBar = chart.getDatasetMeta(lastDatasetIndex).data[i];
-      const sumFontSize = Math.max(10, chart.height * 0.03);
-      ctx.save();
-      ctx.fillStyle = "#373F4A";
-      ctx.font = `${sumFontSize}px Work Sans`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      ctx.fillText(sum, topBar.x, topBar.y - 4); // justo arriba
-      ctx.restore();
-    });
-  },
-};
-
-// Registrar Chart.js y plugins
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  mostrarValoresPlugin
-);
 // Función para formatear números
 function formatNumber(value: number): string {
   const suffixes = ["", "K", "M", "B", "T"];
@@ -184,24 +127,23 @@ function formatNumber(value: number): string {
 
   return formatted + suffixes[suffixIndex];
 }
-const { copiarGrafico, copiado } = useChartUtilitarios();
-const grafico: Ref<any> = ref(null);
-const mostrarValores = ref(false);
-const seleccionado = ref<string | null>(null);
-const chartData: Ref<ChartData> = ref({
-  labels: [],
-  datasets: [],
-});
-const totalTransactionsRegionData =
-  ref<SerieTotalTransactionsRegionResponse | null>(null);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const toast = useToast();
-const periodo = useState<string | null>('periodo')
-const currentMode = ref<"sent" | "received">("sent");
-const filtroActivo = ref<'amount' | 'count'>('amount');
+
+// Plugin corregido para mostrar valores
 
 
+
+// Registrar Chart.js y plugin
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  mostrarValoresPluginSumatoria
+);
+
+// Opciones del gráfico
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
@@ -210,26 +152,24 @@ const chartOptions = ref({
     y: {
       stacked: true,
       beginAtZero: true,
-      suggestedMax: 1000,
       ticks: {
-              callback: (value: any) => formatNumber(Number(value)),
-              font: {
-                size: 11,
-                family: "Work Sans",
-              },
-            },
+        callback: (value: any) => formatNumber(Number(value)),
+        font: { size: 11, family: "Work Sans" },
+      },
     },
   },
   plugins: {
-        tooltip: {
-            callbacks: {
-              label: function (context: any) {
-                const label = context.dataset.label || '';
-                const value = formatNumber(context.raw);
-                return `${label}: ${value}`;
-              }
-            }
-          },
+    mostrarValoresPluginSumatoria: { enabled: mostrarValores.value },
+
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const label = context.dataset.label || '';
+          const value = formatNumber(context.raw);
+          return `${label}: ${value}`;
+        }
+      }
+    },
     legend: {
       position: "top" as const,
       align: "end" as const,
@@ -242,8 +182,6 @@ const chartOptions = ref({
         padding: 15,
         font: { size: 10, family: "Work Sans", weight: "400" },
         color: "#5F6A7B",
-        borderColor: "transparent", // 🔹 esto elimina el borde
-
         generateLabels: (chart: any) => {
           const order = ["QR", "Express", "Asincrono"];
           return order
@@ -251,90 +189,59 @@ const chartOptions = ref({
               const datasetIndex = chart.data.datasets.findIndex(
                 (d: any) => d.label === label
               );
-              if (datasetIndex === -1) return null; // Ignorar si no existe
+              if (datasetIndex === -1) return null;
               const dataset = chart.data.datasets[datasetIndex];
               return {
                 text: dataset.label,
                 fillStyle: dataset.backgroundColor,
                 hidden: !chart.isDatasetVisible(datasetIndex),
                 datasetIndex,
-                strokeStyle: "transparent", // sin borde
+                strokeStyle: "transparent",
               };
             })
-            .filter((x: any) => x !== null); // eliminar los nulos
+            .filter((x: any) => x !== null);
         },
       },
     },
-  
   },
 });
 
+// Funciones
 const handleCopiar = () => {
   if (grafico.value?.$el) {
     copiarGrafico(grafico.value.$el);
   }
 };
 
-
-   const toggleManual = () => {
-      console.log('Toggle manual - estado actual:', mostrarValores.value);
-      mostrarValores.value = !mostrarValores.value;
-      seleccionado.value = mostrarValores.value ? "seleccionarDatos" : null;
-    };
-
-
-        watch(mostrarValores, (newVal) => {
-      const chartInstance = grafico.value?.chart;
-      if (chartInstance) {
-        console.log('Watchers: mostrarValoresHorizontal cambió a:', newVal);
-
-        // Actualizar directamente la configuración del plugin
-        if (chartInstance.config.options.plugins) {
-          chartInstance.config.options.plugins.mostrarValoresPlugin = {
-            enabled: newVal
-          };
-        }
-
-        // Forzar actualización completa
-        chartInstance.update('active');
-      }
-    });
-
-watch(periodo, (newVal) => {
-  if (newVal) {
-    loadTotalTransactionsRegionData(newVal)
-  }
-})
-
+const toggleManual = () => {
+  console.log('Toggle manual - estado actual:', mostrarValores.value);
+  mostrarValores.value = !mostrarValores.value;
+  seleccionado.value = mostrarValores.value ? "seleccionarDatos" : null;
+  console.log('Toggle manual - nuevo estado:', mostrarValores.value);
+};
 
 const Monto = (): void => {
-      console.log('Filtro por Monto seleccionado');
-      filtroActivo.value = 'amount';
-      if (periodo.value) {
-        loadTotalTransactionsRegionData(periodo.value, 'amount');
-      }
-    };
+  filtroActivo.value = 'amount';
+  if (periodo.value) {
+    loadTotalTransactionsRegionData(periodo.value, 'amount');
+  }
+};
 
-    const Cantidad = (): void => {
-      console.log('Filtro por Cantidad seleccionado');
-      filtroActivo.value = 'count';
+const Cantidad = (): void => {
+  filtroActivo.value = 'count';
+  if (periodo.value) {
+    loadTotalTransactionsRegionData(periodo.value, 'count');
+  }
+};
 
-      // Recargar datos con el nuevo filtro
-      if (periodo.value) {
-        loadTotalTransactionsRegionData(periodo.value, 'count');
-      }
-    };
-
-
-  const loadTotalTransactionsRegionData = async (periodo: string, tipo: 'amount' | 'count' = filtroActivo.value) => {
+const loadTotalTransactionsRegionData = async (periodo: string, tipo: 'amount' | 'count' = filtroActivo.value) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await seriesService.getSerieTotalTransactionsRegionByCode(periodo,tipo);
-    console.log("mis datos son ", response,tipo  );
+    const response = await seriesService.getSerieTotalTransactionsRegionByCode(periodo, tipo);
+
     if (response) {
       totalTransactionsRegionData.value = response;
-      // 👇 inicializamos con "sent" (Enviados)
       chartData.value = buildChartData(response.sent.regions);
     }
   } catch (err: any) {
@@ -350,12 +257,13 @@ const Monto = (): void => {
     loading.value = false;
   }
 };
+
 const buildChartData = (participants: any[]) => {
   const labels = participants.map((p: any) => p.code);
 
   const qr = participants.map((p: any) => {
     const item = p.items.find((i: any) => i.transactionCode === "QR");
-    return item ? item.value : 0; // 👉 lo divido a "millones"
+    return item ? item.value : 0;
   });
 
   const express = participants.map((p: any) => {
@@ -373,7 +281,7 @@ const buildChartData = (participants: any[]) => {
     datasets: [
       { label: "Asincrono", data: asincrono, backgroundColor: "#A6C4F6" },
       { label: "Express", data: express, backgroundColor: "#6F8CCE" },
-      { label: "QR", data: qr, backgroundColor: "#0C55F8" }, 
+      { label: "QR", data: qr, backgroundColor: "#0C55F8" },
     ],
   };
 };
@@ -381,36 +289,49 @@ const buildChartData = (participants: any[]) => {
 const Enviados = () => {
   if (totalTransactionsRegionData.value) {
     currentMode.value = "sent";
-    chartData.value = buildChartData(
-      totalTransactionsRegionData.value.sent.regions
-    );
+    chartData.value = buildChartData(totalTransactionsRegionData.value.sent.regions);
   }
 };
+
 const Recibidos = () => {
   if (totalTransactionsRegionData.value) {
     currentMode.value = "received";
-    chartData.value = buildChartData(
-      totalTransactionsRegionData.value.received.regions
-    );
+    chartData.value = buildChartData(totalTransactionsRegionData.value.received.regions);
   }
 };
 
+// Watchers
+watch(mostrarValores, (newVal) => {
+  console.log('mostrarValores cambió a:', newVal);
+  const chartInstance = grafico.value?.chart;
+  if (chartInstance) {
+    // Configurar el plugin en las opciones del gráfico
+    if (!chartInstance.options.plugins) {
+      chartInstance.options.plugins = {};
+    }
+    if (!chartInstance.options.plugins.mostrarValoresPluginSumatoria) {
+      chartInstance.options.plugins.mostrarValoresPluginSumatoria = {};
+    }
+    chartInstance.options.plugins.mostrarValoresPluginSumatoria.enabled = newVal;
 
-
-onMounted(async () => {
-   if (periodo.value) {
-    loadTotalTransactionsRegionData(periodo.value);
-  }
-  // Manejo de errores
-  if (error.value) {
-    console.warn(
-      "No se pudieron cargar los datos de transacciones totales:",
-      error.value
-    );
+    // Forzar actualización
+    chartInstance.update('none');
   }
 });
 
-// Component name (opcional pero útil para debugging)
+watch(periodo, (newVal) => {
+  if (newVal) {
+    loadTotalTransactionsRegionData(newVal);
+  }
+});
+
+// Mounted
+onMounted(async () => {
+  if (periodo.value) {
+    loadTotalTransactionsRegionData(periodo.value);
+  }
+});
+
 defineOptions({
   name: "BarVertical",
 });

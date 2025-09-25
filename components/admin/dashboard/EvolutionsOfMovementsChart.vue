@@ -1,14 +1,21 @@
 <template>
-  <div class="flex flex-col relative w-full border-2 border-gray-300 rounded-xl shadow-md p-2 box-border">
+  <div class="flex flex-col relative w-full border-0 border-gray-300 rounded-xl shadow-md p-2 box-border"
+    style="box-shadow:-4px 0 6px -1px rgba(0, 0, 0, 0.1),4px 0 6px -1px rgba(0, 0, 0, 0.1),0 -4px 6px -1px rgba(0, 0, 0, 0.1),0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+
     <!-- Botones Monto / Cantidad -->
     <div class="flex flex-col items-start gap-1.5">
       <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
-        <button @click="Monto"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
+        <button @click="filtroActivo = 'amount'"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'amount'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Monto
         </button>
-        <button @click="Cantidad"
-          class="px-4 py-2 min-w-[100px] rounded-md text-[#5F6A7B] text-base cursor-pointer bg-transparent transition-all hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]">
+
+        <button @click="filtroActivo = 'count'"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'count'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Cantidad
         </button>
       </div>
@@ -27,18 +34,18 @@
             </span>
           </div>
         </h3>
-        <div class="flex gap-3 p-3 rounded-lg bg-[#F0F5FF]">
-          <button @click="Enviados"
-            class="px-2 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-            <Icon name="x:arrow-tr-circle" class="text-[#5F6A7B] w-7 h-7" />
-            Enviados
-          </button>
-          <button @click="Recibidos"
-            class="px-3 py-2 min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-            <Icon name="x:arrow-br-circle" class="text-[#5F6A7B] w-7 h-7" />
-            Recibidos
-          </button>
-        </div>
+         <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+        <button @click="Enviados"
+          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+          <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+          Enviados
+        </button>
+        <button @click="Recibidos"
+          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+          <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+          Recibidos
+        </button>
+      </div>
       </div>
     </div>
 
@@ -62,7 +69,7 @@
     </div>
 
     <!-- Contenedor del gráfico -->
-    <div class="relative w-full flex justify-center items-start min-h-[300px]">
+    <div class="relative w-full flex justify-center items-start min-h-[400px] lg:min-h-[500px]">
       <LineChart ref="chartRef" :data="chartData" :options="chartOptions" :plugins="[puntosColorYDatos]" />
     </div>
   </div>
@@ -117,7 +124,7 @@ const chartData: Ref<ChartData> = ref({
   datasets: [],
 });
 // Refs
-const chartRef: Ref<any> = ref(null);  
+const chartRef: Ref<any> = ref(null);
 const seleccionado = ref(''); // por defecto no mostrar valores
 const accionFiltro1 = () => alert('Filtro por Monto');
 const accionFiltro2 = () => alert('Filtro por Cantidad');
@@ -127,13 +134,33 @@ const error = ref<string | null>(null);
 const toast = useToast();
 const currentMode = ref<"sent" | "received">("sent");
 const periodo = useState<string | null>('periodo')
+const filtroActivo = ref<'amount' | 'count'>('amount');
 
 
+// Función para formatear números
+function formatNumber(value: number): string {
+  const suffixes = ["", "K", "M", "B", "T"];
+  let newValue = value;
+  let suffixIndex = 0;
+
+  while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
+    newValue /= 1000;
+    suffixIndex++;
+  }
+
+  const formatted = newValue.toLocaleString("es-BO", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+
+  return formatted + suffixes[suffixIndex];
+}
 // Plugin personalizado
 const puntosColorYDatos = {
   id: 'puntosColorYDatos',
   afterDatasetsDraw(chart: any) {
     const { ctx } = chart;
+
     chart.data.datasets.forEach((dataset: any) => {
       const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
       if (!meta) return;
@@ -146,44 +173,56 @@ const puntosColorYDatos = {
         ctx.fillStyle = 'white';
         ctx.fill();
         ctx.lineWidth = 2;
-        ctx.strokeStyle = dataset.borderColor;
+        ctx.strokeStyle = dataset.borderColor || '#000';
         ctx.stroke();
         ctx.restore();
 
-        // Dibujar tooltip solo si hay selección
+        // Solo mostrar tooltip si está seleccionado
         if (!seleccionado.value || dataset.label !== seleccionado.value) return;
 
-        const value = dataset.data[index] + 'M';
-        ctx.save();
-        ctx.translate(point.x, point.y - 25); // desplazado un poco más arriba
-        ctx.rotate(-Math.PI / 3); // ROTADO AL OTRO LADO
+        const value = dataset.data[index];
+        const texto = formatNumber(value);
 
-        const padding = 6;
-        const textWidth = ctx.measureText(value).width;
-        const width = textWidth + padding * 2;
+        ctx.save();
+        ctx.translate(point.x, point.y - 25); // un poco arriba
+        ctx.rotate(-Math.PI / 3); // rotación si quieres
+
+        const paddingX = 8;
+        const paddingY = 4;
+        const textWidth = ctx.measureText(texto).width;
+        const width = textWidth + paddingX * 2;
         const height = 18;
 
-        // Burbuja curvada
+        // Ajustar la burbuja
         ctx.beginPath();
-        ctx.moveTo(-width / 2 + 5, -height / 2);
-        ctx.bezierCurveTo(-width / 2, -height / 2, -width / 2, height / 2, -width / 2 + 5, height / 2);
-        ctx.lineTo(width / 2 - 5, height / 2);
-        ctx.bezierCurveTo(width / 2, height / 2, width / 2, -height / 2, width / 2 - 5, -height / 2);
+        const radius = 6; // esquinas redondeadas
+        ctx.moveTo(-width / 2 + radius, -height / 2);
+        ctx.lineTo(width / 2 - radius, -height / 2);
+        ctx.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
+        ctx.lineTo(width / 2, height / 2 - radius);
+        ctx.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
+        ctx.lineTo(-width / 2 + radius, height / 2);
+        ctx.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - radius);
+        ctx.lineTo(-width / 2, -height / 2 + radius);
+        ctx.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + radius, -height / 2);
         ctx.closePath();
+
         ctx.fillStyle = '#6F8CCE';
         ctx.fill();
 
-        // Texto
+        // Texto centrado
         ctx.fillStyle = 'white';
         ctx.font = '10px Work Sans';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(value, 0, 0);
+        ctx.fillText(texto, 0, 0);
+
         ctx.restore();
       });
     });
   }
 };
+
 
 const chartOptions = ref({
   responsive: true,
@@ -195,13 +234,21 @@ const chartOptions = ref({
       beginAtZero: true,
       suggestedMax: 1000,
       ticks: {
-        stepSize: 100,
-        precision: 0,
-        callback: (value: any) => value + 'M'
-      }
+        callback: (value: any) => formatNumber(Number(value)),
+        font: { size: 11, family: "Work Sans" },
+      },
     }
   },
   plugins: {
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const label = context.dataset.label || '';
+          const value = formatNumber(context.raw);
+          return `${label}: ${value}`;
+        }
+      }
+    },
     legend: { display: false }
   }
 });
@@ -217,14 +264,14 @@ const handleCopiar = () => {
 const Enviados = () => {
   if (evolutionsMovementsData.value) {
     currentMode.value = "sent";
-    chartData.value = buildChartData(evolutionsMovementsData.value.sent.series,evolutionsMovementsData.value.granularity);
+    chartData.value = buildChartData(evolutionsMovementsData.value.sent.series, evolutionsMovementsData.value.granularity);
   }
 };
 
 const Recibidos = () => {
   if (evolutionsMovementsData.value) {
     currentMode.value = "received";
-    chartData.value = buildChartData(evolutionsMovementsData.value.received.series,evolutionsMovementsData.value.granularity);
+    chartData.value = buildChartData(evolutionsMovementsData.value.received.series, evolutionsMovementsData.value.granularity);
   }
 };
 
@@ -234,15 +281,29 @@ watch(periodo, (newVal) => {
   }
 })
 
-const loadEvolutionsMovementsData = async (periodo:string) => {
+const Monto = (): void => {
+  filtroActivo.value = 'amount';
+  if (periodo.value) {
+    loadEvolutionsMovementsData(periodo.value, 'amount');
+  }
+};
+
+const Cantidad = (): void => {
+  filtroActivo.value = 'count';
+  if (periodo.value) {
+    loadEvolutionsMovementsData(periodo.value, 'count');
+  }
+};
+
+const loadEvolutionsMovementsData = async (periodo: string, tipo: 'amount' | 'count' = filtroActivo.value) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await seriesService.getSerieEvolutivaByCode(periodo);
+    const response = await seriesService.getSerieEvolutivaByCode(periodo, tipo);
     console.log("mis usabilidad es", response);
-    if (response) evolutionsMovementsData.value = response;
-    chartData.value = buildChartData(response.sent.series, response.granularity // 'day', 'month' o 'year'
-    );    // Inicializa gráfico con "Enviados"
+    if (response)
+      evolutionsMovementsData.value = response;
+    chartData.value = buildChartData(response.sent.series, response.granularity);    // Inicializa gráfico con "Enviados"
     //actualizarChart('sent');
   } catch (err: any) {
     console.error('Error loading channel data:', err);
@@ -252,6 +313,7 @@ const loadEvolutionsMovementsData = async (periodo:string) => {
     loading.value = false;
   }
 };
+
 
 
 const buildChartData = (series: any[], granularity: string) => {
@@ -264,18 +326,18 @@ const buildChartData = (series: any[], granularity: string) => {
   };
   const labels = series[0]?.points.map((p: any) => getLabel(p)) || [];
   const datasets = series.map((s: any) => ({
-    label: s.transactionCode,
-    data: s.points.map((p: any) => p.value / 1000000), 
+    label: s.transactionCode.toUpperCase(), // fuerza todo a mayúscula
+    data: s.points.map((p: any) => p.value),
     borderColor:
-      s.transactionCode === 'QR'
+      s.transactionCode.toUpperCase() === 'QR'
         ? '#0C55F8'
-        : s.transactionCode === 'EXPRESS'
+        : s.transactionCode.toUpperCase() === 'EXPRESS'
           ? '#6F8CCE'
           : '#A6C4F6',
     backgroundColor:
-      s.transactionCode === 'QR'
+      s.transactionCode.toUpperCase() === 'QR'
         ? '#0C55F8'
-        : s.transactionCode === 'EXPRESS'
+        : s.transactionCode.toUpperCase() === 'EXPRESS'
           ? '#6F8CCE'
           : '#A6C4F6',
     fill: false,
@@ -286,17 +348,13 @@ const buildChartData = (series: any[], granularity: string) => {
   return { labels, datasets };
 };
 watch(seleccionado, (nuevoValor) => {
+  const valueUpper = nuevoValor.toUpperCase(); // <-- normalizamos
   chartData.value.datasets.forEach(ds => {
-    ds.hidden = nuevoValor !== '' ? ds.label !== nuevoValor : false;
+    ds.hidden = valueUpper !== '' ? ds.label !== valueUpper : false;
   });
   chartRef.value?.chart?.update();
 });
 
-
-const loadChartData = async (p: string) => {
-  console.log("Cargando datos con periodo:", p)
-  // tu lógica fetch aquí...
-}
 
 
 onMounted(async () => {
@@ -306,7 +364,5 @@ onMounted(async () => {
   }
 });
 
-defineOptions({
-  name: "LineExample"
-});
+
 </script>

@@ -1,4 +1,8 @@
 <template>
+  <!-- Texto INICIO arriba -->
+<p class="text-[#0C55F8] font-normal text-lg mb-2 px-3 sm:px-6">
+  Inicio
+</p>
   <!-- Contenedor superior con degradado -->
   <div class="w-full p-3 sm:p-6 rounded-t-lg border border-gray-200 mb-0"
     style="background: linear-gradient(to left, #E7EEFE, #9EBBFC) top no-repeat, white;">
@@ -21,9 +25,10 @@
 
   <!-- Contenedor flexible con altura unificada -->
   <div class="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 justify-center items-stretch">
-    <!-- Bloque 1 -->
+    <!-- Bloque 1: Total Movimientos de Transacciones -->
     <div class="flex flex-col flex-1 lg:flex-[2] min-w-0 rounded-3xl overflow-hidden"
-      style="box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), 4px 0 6px -1px rgba(0, 0, 0, 0.1), 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+      style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
+      
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#6D99FB] rounded-t-3xl mb-4">
         <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
           Total Movimientos de Transacciones
@@ -43,18 +48,20 @@
             {{ sumaryData?.amount.received.total || 'No hay descripción disponible' }}
           </div>
 
-          <div
-            class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex-1 min-h-[180px] sm:h-52 flex flex-col justify-between overflow-auto">
-            <div v-for="(item, index) in sumaryData?.amount.received.items" :key="index"
-              class="flex justify-between items-center py-1 gap-2">
-              <span class="text-[#0C55F8] text-sm sm:text-base flex-shrink-0 min-w-0">
-                {{ mapTransactionLabel(item.transactionCode) }}
-              </span>
-              <span class="text-[#0C55F8] text-sm sm:text-base font-medium text-right">
-                $us.{{ item.value.toLocaleString('es-BO') }}
-              </span>
-            </div>
-          </div>
+      <div
+  class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex flex-col justify-start overflow-auto"
+>
+  <div v-for="(item, index) in sumaryData?.amount.received.items" :key="index"
+    class="flex justify-between items-center py-1 gap-2">
+    <span class="text-[#0C55F8] text-sm sm:text-base flex-shrink-0 min-w-0">
+      {{ mapTransactionLabel(item.transactionCode) }}
+    </span>
+    <span class="text-[#0C55F8] text-sm sm:text-base font-medium text-right">
+      $us.{{ item.value.toLocaleString('es-BO') }}
+    </span>
+  </div>
+</div>
+
         </div>
 
         <!-- Enviados -->
@@ -69,8 +76,9 @@
             {{ sumaryData?.amount.sent.total || 'No hay descripción disponible' }}
           </div>
 
-          <div
-            class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex-1 min-h-[180px] sm:h-52 flex flex-col justify-between overflow-auto">
+            <div
+  class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex flex-col justify-start overflow-auto"
+>
             <div v-for="(item, index) in sumaryData?.amount.sent.items" :key="index"
               class="flex justify-between items-center py-1 gap-2">
               <span class="text-[#0C55F8] text-sm sm:text-base flex-shrink-0 min-w-0">
@@ -85,10 +93,10 @@
       </div>
     </div>
 
-    <!-- Bloque 2 -->
+    <!-- Bloque 2: Total Cantidad de Transacciones -->
     <div class="flex flex-col flex-1 lg:flex-[2] min-w-0 rounded-3xl overflow-hidden"
-      style="box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), 4px 0 6px -1px rgba(0, 0, 0, 0.1), 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-
+      style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
+      
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#92ACE5] rounded-t-3xl mb-4">
         <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
           Total Cantidad de Transacciones
@@ -108,8 +116,9 @@
             {{ sumaryData?.count.received.total || 'No hay descripción disponible' }}
           </div>
 
-          <div
-            class="p-3 sm:p-4 bg-white border border-[#92ACE5] rounded-3xl flex-1 min-h-[180px] sm:h-52 flex flex-col justify-between overflow-auto">
+           <div
+  class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex flex-col justify-start overflow-auto"
+>
             <div v-for="(item, index) in sumaryData?.count.received.items" :key="index"
               class="flex justify-between items-center py-1 gap-2">
               <span class="text-[#0C55F8] text-sm sm:text-base flex-shrink-0 min-w-0">
@@ -133,9 +142,9 @@
             class="px-4 sm:px-8 py-4 sm:py-6 bg-[#92ACE5] text-white rounded-2xl font-bold text-center text-base sm:text-lg mb-6 sm:mb-8 break-words">
             {{ sumaryData?.count.sent.total || 'No hay descripción disponible' }}
           </div>
-
-          <div
-            class="p-3 sm:p-4 bg-white border border-[#92ACE5] rounded-3xl flex-1 min-h-[180px] sm:h-52 flex flex-col justify-between overflow-auto">
+     <div
+  class="p-3 sm:p-4 bg-white border border-[#6D99FB] rounded-3xl flex flex-col justify-start overflow-auto"
+>
             <div v-for="(item, index) in sumaryData?.count.sent.items" :key="index"
               class="flex justify-between items-center py-1 gap-2">
               <span class="text-[#0C55F8] text-sm sm:text-base flex-shrink-0 min-w-0">
@@ -150,9 +159,9 @@
       </div>
     </div>
 
-    <!-- Bloque 3 -->
+    <!-- Bloque 3: Eficiencia -->
     <div class="flex flex-col flex-1 min-w-0 max-w-full lg:max-w-xs rounded-3xl overflow-hidden"
-      style="box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), 4px 0 6px -1px rgba(0, 0, 0, 0.1), 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+      style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
 
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#052263] rounded-t-3xl mb-4">
         <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
@@ -191,6 +200,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'

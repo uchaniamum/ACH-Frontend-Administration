@@ -69,7 +69,13 @@ export function useChartUtilitarios() {
     chartRef.chart.update();
   };
   //mostrar tooltip burbuja chart pie
-  // ~/composables/useChartUtilitarios.js
+  const labelMap = {
+  ASYNC: "ASINCRONO",
+  EXPRESS: "EXPRESS",
+  QR: "QR",
+  // agrega todos los que necesites
+};
+
   const mostrarTooltipBurbujaPlugin = {
     id: "mostrarTooltipBurbujaPlugin",
     afterDatasetsDraw(chart) {
@@ -83,8 +89,8 @@ export function useChartUtilitarios() {
 
       meta.data.forEach((sector, i) => {
         const value = dataset.data[i];
-        const label = chart.data.labels[i];
-
+        const rawLabel = chart.data.labels[i];
+        const label = labelMap[rawLabel] || rawLabel; // si no está en el map, usamos el label original
         const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
         const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
 
@@ -137,8 +143,229 @@ export function useChartUtilitarios() {
     },
   };
 
+
+
+//Función utilitaria para formatear números
+function formatNumber(value: number): string {
+  const suffixes = ["", "K", "M", "B", "T"];
+  let newValue = value;
+  let suffixIndex = 0;
+
+  while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
+    newValue /= 1000;
+    suffixIndex++;
+  }
+  const formatted = newValue.toLocaleString("es-BO", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+  return formatted + suffixes[suffixIndex];
+}
+
+// Plugin: Mostrar valores internos + sumatoria total de la pila x o y 
+const mostrarValoresPluginSumatoria: Plugin = {
+  id: "mostrarValoresPluginSumatoria",
+  afterDatasetsDraw(chart: any) {
+    const pluginEnabled = chart.config.options.plugins?.mostrarValoresPluginSumatoria?.enabled;
+    if (!pluginEnabled) return;
+
+    const ctx = chart.ctx;
+    const indexAxis = chart.config.options.indexAxis || "x"; // 'x' = vertical, 'y' = horizontal
+    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+      const meta = chart.getDatasetMeta(datasetIndex);
+      if (meta.hidden) return;
+
+      meta.data.forEach((bar: any, index: number) => {
+        const value = dataset.data[index];
+        if (value <= 0) return;
+
+        const color = ["QR", "Express"].includes(dataset.label)
+          ? "#FFFFFF"
+          : "#2A303A";
+
+        const fontSize = Math.max(11, chart.height * 0.025);
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = `${fontSize}px Work Sans`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        let x: number, y: number;
+
+        if (indexAxis === "y") {
+          // Barras horizontales
+          x = (bar.base + bar.x) / 2;
+          y = bar.y;
+        } else {
+          // Barras verticales
+          x = bar.x;
+          y = (bar.base + bar.y) / 2;
+        }
+
+        ctx.fillText(formatNumber(value), x, y);
+        ctx.restore();
+      });
+    });
+
+    //  Mostrar sumatoria total por cada pila
+    chart.data.labels.forEach((_: any, index: number) => {
+      let total = 0;
+      let barRef: any = null;
+
+      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+        const value = dataset.data[index] || 0;
+        total += value;
+
+        const bar = meta.data[index];
+        if (bar) barRef = bar; // última barra visible
+      });
+
+      if (total > 0 && barRef) {
+        const fontSize = Math.max(12, chart.height * 0.03);
+
+        ctx.save();
+        ctx.fillStyle = "#000000";
+        ctx.font = `${fontSize}px Work Sans`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+
+        if (indexAxis === "y") {
+          // Totales para barras horizontales → al final
+          ctx.fillText(formatNumber(total), barRef.x + 25, barRef.y);
+        } else {
+          // Totales para barras verticales → encima
+          ctx.fillText(formatNumber(total), barRef.x, barRef.y - 10);
+        }
+
+        ctx.restore();
+      }
+    });
+  },
+};
+// Plugin: Mostrar valores internos sin sumatoria  de la pila x o y 
+const mostrarValoresPlugin: Plugin = {
+  id: "mostrarValoresPlugin",
+  afterDatasetsDraw(chart: any) {
+    const pluginEnabled = chart.config.options.plugins?.mostrarValoresPlugin?.enabled;
+    if (!pluginEnabled) return;
+
+    const ctx = chart.ctx;
+    const indexAxis = chart.config.options.indexAxis || "x"; // 'x' = vertical (default), 'y' = horizontal
+
+    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+      const meta = chart.getDatasetMeta(datasetIndex);
+      if (meta.hidden) return;
+
+      meta.data.forEach((bar: any, index: number) => {
+        const value = dataset.data[index];
+        if (value <= 0) return;
+
+        const color = ["QR", "Express"].includes(dataset.label)
+          ? "#FFFFFF"
+          : "#2A303A";
+
+        const fontSize = Math.max(11, chart.height * 0.025);
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = `${fontSize}px Work Sans`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        let x: number, y: number;
+
+        if (indexAxis === "y") {
+          // Barras horizontales
+          x = (bar.base + bar.x) / 2;
+          y = bar.y;
+        } else {
+          // Barras verticales (default)
+          x = bar.x;
+          y = (bar.base + bar.y) / 2;
+        }
+
+        ctx.fillText(formatNumber(value), x, y);
+        ctx.restore();
+      });
+    });
+  },
+};
+//plugin Mostrar toltips de charts lineal 
+const puntosColorYDatos = {
+  id: 'puntosColorYDatos',
+  afterDatasetsDraw(chart: any) {
+    const { ctx } = chart;
+
+    chart.data.datasets.forEach((dataset: any) => {
+      const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
+      if (!meta) return;
+
+      meta.data.forEach((point: any, index: number) => {
+        // Dibujar círculo
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = dataset.borderColor || '#000';
+        ctx.stroke();
+        ctx.restore();
+
+        // Solo mostrar tooltip si está seleccionado
+        if (!seleccionado.value || dataset.label !== seleccionado.value) return;
+
+        const value = dataset.data[index];
+        const texto = formatNumber(value);
+
+        ctx.save();
+        ctx.translate(point.x, point.y - 25); // un poco arriba
+        ctx.rotate(-Math.PI / 3); // rotación si quieres
+
+        const paddingX = 8;
+        const paddingY = 4;
+        const textWidth = ctx.measureText(texto).width;
+        const width = textWidth + paddingX * 2;
+        const height = 18;
+
+        // Ajustar la burbuja
+        ctx.beginPath();
+        const radius = 6; // esquinas redondeadas
+        ctx.moveTo(-width / 2 + radius, -height / 2);
+        ctx.lineTo(width / 2 - radius, -height / 2);
+        ctx.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
+        ctx.lineTo(width / 2, height / 2 - radius);
+        ctx.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
+        ctx.lineTo(-width / 2 + radius, height / 2);
+        ctx.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - radius);
+        ctx.lineTo(-width / 2, -height / 2 + radius);
+        ctx.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + radius, -height / 2);
+        ctx.closePath();
+
+        ctx.fillStyle = '#6F8CCE';
+        ctx.fill();
+
+        // Texto centrado
+        ctx.fillStyle = 'white';
+        ctx.font = '10px Work Sans';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(texto, 0, 0);
+
+        ctx.restore();
+      });
+    });
+  }
+};
+
+
+
+  
   // Función para formatear números
-  function formatNumber(value: number): string {
+/*  function formatNumber(value: number): string {
     const suffixes = ["", "K", "M", "B", "T"];
     let newValue = value;
     let suffixIndex = 0;
@@ -154,7 +381,7 @@ export function useChartUtilitarios() {
     });
 
     return formatted + suffixes[suffixIndex];
-  }
+  }*/
 
   return {
     copiado,
@@ -162,5 +389,8 @@ export function useChartUtilitarios() {
     ordenarBarras,
     mostrarTooltipBurbujaPlugin,
     formatNumber,
+    mostrarValoresPluginSumatoria,
+    mostrarValoresPlugin,
+    
   };
 }

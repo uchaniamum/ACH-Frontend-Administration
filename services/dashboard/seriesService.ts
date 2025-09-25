@@ -34,15 +34,19 @@ class SeriesService {
   }
 
   async getSerieEvolutivaByCode(
-    code: string
-  ): Promise<SeriesEvolutivaResponse> {
+    code: string,
+    tipo: "mount" | "count" = "mount" // por defecto "mount"
+  ): Promise<SerieTotalTransactionsRegionResponse> {
     if (!code) {
       throw new Error("User code is required");
     }
-    return this.request<SeriesEvolutivaResponse>(
-      `analytics/dashboard/series/amount/period/${code}`
+    const response = await this.request<SerieTotalTransactionsRegionResponse>(
+      `analytics/dashboard/series/${tipo}/period/${code}`
     );
+    console.log("DEBUG - respuesta del servidor:", response); 
+    return response;
   }
+
 
   async getSerieEvolutivaCountByCode(
     code: string
