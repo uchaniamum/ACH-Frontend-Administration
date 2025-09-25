@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col relative w-full border border-gray-300 rounded-2xl p-5 m-1 box-border min-h-[400px] sm:h-auto"
+  <div
+    class="flex flex-col relative w-full border border-gray-300 rounded-2xl p-5 m-1 box-border min-h-[400px] sm:h-auto"
     style="box-shadow:-4px 0 6px -1px rgba(0,0,0,0.1),4px 0 6px -1px rgba(0,0,0,0.1),0 -4px 6px -1px rgba(0,0,0,0.1),0 4px 6px -1px rgba(0,0,0,0.1);">
-    <!-- Encabezado con título y botones -->  
+    <!-- Encabezado con título y botones -->
     <div
-
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full mb-4 gap-3 flex-wrap titulo-botones">
       <h3 class="text-black font-bold text-lg sm:text-[20px] flex items-center gap-2 relative">
         {{ usabilityData?.panel || 'No hay descripción disponible' }}
@@ -20,13 +20,24 @@
 
       <!-- Botones Enviados / Recibidos -->
       <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
-        <button @click="Enviados"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+        <!-- Botón Enviados -->
+        <button @click="Enviados" :class="[
+          'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+          selected === 'enviados'
+            ? 'bg-[#6F8CCE] text-white'
+            : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+        ]">
           <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
           Enviados
         </button>
-        <button @click="Recibidos"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
+
+        <!-- Botón Recibidos -->
+        <button @click="Recibidos" :class="[
+          'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+          selected === 'recibidos'
+            ? 'bg-[#6F8CCE] text-white'
+            : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+        ]">
           <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
           Recibidos
         </button>
@@ -127,6 +138,8 @@ const seleccionado: Ref<string | null> = ref(null);
 const usabilityData = ref<SerieUsabilityChannelResponse | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const selected = ref<'enviados' | 'recibidos'>('enviados');
+
 
 // Datos del gráfico con datos iniciales para testing
 const chartData: Ref<ChartData> = ref({
@@ -200,11 +213,13 @@ const actualizarChart = (tipo: 'sent' | 'received') => {
 };
 
 const Enviados = (): void => {
+  selected.value = 'enviados';
   if (!usabilityData.value) return;
   actualizarChart('sent');
 };
 
 const Recibidos = (): void => {
+  selected.value = 'recibidos';
   if (!usabilityData.value) return;
   actualizarChart('received');
 };

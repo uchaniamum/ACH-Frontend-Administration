@@ -20,18 +20,29 @@
 </div>
 
       <!-- Botones Enviados / Recibidos -->
-        <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
-        <button @click="Enviados"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-          <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
-          Enviados
-        </button>
-        <button @click="Recibidos"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-          <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
-          Recibidos
-        </button>
-      </div>
+       <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+          <!-- Botón Enviados -->
+          <button @click="Enviados" :class="[
+            'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+            selected === 'enviados'
+              ? 'bg-[#6F8CCE] text-white'
+              : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+          ]">
+            <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+            Enviados
+          </button>
+
+          <!-- Botón Recibidos -->
+          <button @click="Recibidos" :class="[
+            'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+            selected === 'recibidos'
+              ? 'bg-[#6F8CCE] text-white'
+              : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+          ]">
+            <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+            Recibidos
+          </button>
+        </div>
     </div>
 
     <!-- Botón Ver todas las cifras -->
@@ -127,6 +138,8 @@ const chartData: Ref<ChartData> = ref({
 });
 const total = computed(() => chartData.value.datasets[0].data.reduce((sum, val) => sum + val, 0));
 const periodo = useState<string | null>('periodo')
+const selected =  ref<'enviados' | 'recibidos'>('enviados');
+
 
 
 // Chart options
@@ -160,10 +173,12 @@ const toggleValores = () => {
 
 
 const Enviados = (): void => {
+  selected.value = 'enviados';
   if (!usabilityTransferData.value) return;
   actualizarChart('sent');
 };
 const Recibidos = (): void => {
+  selected.value = 'recibidos';
   if (!usabilityTransferData.value) return;
   actualizarChart('received');
 };

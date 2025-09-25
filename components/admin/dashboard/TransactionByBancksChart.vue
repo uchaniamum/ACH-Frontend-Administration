@@ -4,25 +4,21 @@
      
     <!-- Botones Monto / Cantidad + Título y botones Enviados/Recibidos -->
     <div class="flex flex-col items-start gap-1.5">
-      <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
-        <button @click="Monto" :class="[
-          'px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer bg-transparent transition-all',
-          filtroActivo === 'amount'
-            ? 'text-[#0C55F8] bg-[#d1e4f0] border-b-2 border-[#0C55F8]'
-            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]'
-        ]">
+            <div class="flex gap-3 border-b-2 border-[#c2c0c0] mb-2.5">
+        <button @click="Monto"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'amount'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Monto
         </button>
-        <button @click="Cantidad" :class="[
-          'px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer bg-transparent transition-all',
-          filtroActivo === 'count'
-            ? 'text-[#0C55F8] bg-[#d1e4f0] border-b-2 border-[#0C55F8]'
-            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:bg-[#d1e4f0] hover:border-b-2 hover:border-[#0C55F8]'
-        ]">
+
+        <button @click="Cantidad"
+          class="px-4 py-2 min-w-[100px] rounded-md text-base cursor-pointer transition-all" :class="filtroActivo === 'count'
+            ? 'text-[#0C55F8] border-b-2 border-[#0C55F8] bg-[#d1e4f0]'
+            : 'text-[#5F6A7B] hover:text-[#0C55F8] hover:border-b-2 hover:border-[#0C55F8] hover:bg-[#d1e4f0]'">
           Cantidad
         </button>
       </div>
-
       <div class="flex items-center justify-between w-full mb-2">
         <h3 class="text-black font-bold text-[20px] m-0 flex items-center gap-2">
           {{ totalTransactionsData?.panel || "No hay descripción disponible" }}
@@ -33,18 +29,29 @@
           </span>
         </h3>
 
-         <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
-        <button @click="Enviados"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-          <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
-          Enviados
-        </button>
-        <button @click="Recibidos"
-          class="flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md bg-[#F0F5FF] text-[#5F6A7B] text-sm cursor-pointer transition-colors hover:bg-[#6F8CCE] hover:text-white">
-          <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
-          Recibidos
-        </button>
-      </div>
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+          <!-- Botón Enviados -->
+          <button @click="Enviados" :class="[
+            'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+            currentMode === 'enviados'
+              ? 'bg-[#6F8CCE] text-white'
+              : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+          ]">
+            <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+            Enviados
+          </button>
+
+          <!-- Botón Recibidos -->
+          <button @click="Recibidos" :class="[
+            'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
+            currentMode === 'recibidos'
+              ? 'bg-[#6F8CCE] text-white'
+              : 'bg-[#F0F5FF] text-[#5F6A7B] hover:bg-[#6F8CCE] hover:text-white'
+          ]">
+            <Icon name="x:arrow-br-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
+            Recibidos
+          </button>
+        </div>
       </div>
     </div>
 
@@ -142,6 +149,7 @@ const error = ref<string | null>(null);
 const filtroActivo = ref<'amount' | 'count'>('amount');
 const currentMode = ref<"sent" | "received">("sent");
 const periodo = useState<string | null>("periodo");
+
 
 // Opciones del gráfico
 const chartOptions = computed((): ChartOptions<'bar'> => {
