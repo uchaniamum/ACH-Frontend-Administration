@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-col gap-20">
-            <XHeader title="Bitácora de procesos" :breadcrumb-items="itemsBreadHistoricalProcesos" :show-breadcrumb="true">
+            <XHeader title="Bitácora de procesos" :breadcrumb-items="itemsBreadHistoricalProcesos" :show-breadcrumb="true" :show-back="true">
                 <template #description>
                     <p>Texto descriptivo de la sección .</p>
                 </template>

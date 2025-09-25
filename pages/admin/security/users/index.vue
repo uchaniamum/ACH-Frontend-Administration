@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-16">
-        <XHeader title="Gestión de usuarios" :breadcrumb-items="itemsBreadUsers" :show-breadcrumb="true">
+        <XHeader title="Gestión de usuarios" :breadcrumb-items="itemsBreadUsers" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p class="text-gray-800">Crea usuarios y asigna los roles correspondientes, procura garantizar que cada usuario cuente con los permisos adecuados para sus funciones.</p>
             </template>
@@ -59,7 +59,7 @@
                             </span> 
                         </template>
 
-                        <Column field="codigo" header="Código" sortable class="min-w-[158px] text-left" :showFilterMenu="false">
+                        <Column field="codigo" header="Código de usuario" class=" text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.code }}
                             </template>
@@ -77,7 +77,7 @@
                             </template> -->
                         </Column>
                     
-                        <Column field="fullname" header="Nombre" sortable class="min-w-[280px] text-left" :showFilterMenu="false">
+                        <Column field="fullname" header="Nombre" sortable class=" text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.fullname }}
                             </template>
@@ -95,7 +95,7 @@
                             </template> -->
                         </Column>
                     
-                        <Column field="email" header="Correo Electrónico" sortable class="min-w-[225px] text-left" :showFilterMenu="false">
+                        <Column field="email" header="Correo Electrónico" sortable class="text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 {{ data.email }}
                             </template>
@@ -113,7 +113,7 @@
                             </template> -->
                         </Column>
                     
-                        <Column field="roleDescription" header="Rol" sortable class="min-w-[158px]" :showFilterMenu="false">
+                        <Column field="roleDescription" header="Rol" sortable :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.roleDescription" 
@@ -135,7 +135,7 @@
                             </template> -->
                         </Column>
                     
-                        <Column field="statusDescription" header="Estado" sortable class="min-w-[158px] text-left" :showFilterMenu="false">
+                        <Column field="statusDescription" header="Estado" sortable class="text-left" :showFilterMenu="false">
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 

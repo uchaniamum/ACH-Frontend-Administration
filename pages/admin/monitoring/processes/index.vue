@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Procesos " :breadcrumb-items="itemsBreadProcesses" :show-breadcrumb="true">
+        <XHeader title="Procesos " :breadcrumb-items="itemsBreadProcesses" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p>Identifica y aborda los procesos que no fueron atendidos.</p>
             </template>

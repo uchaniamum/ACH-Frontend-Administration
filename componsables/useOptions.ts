@@ -8,6 +8,9 @@ export function useOptions() {
     const roleFilterOptions = ref<{ label: string; value: string }[]>([])
     const roleAccessOptions = ref<{ label: string; value: string }[]>([])
 
+    const roleUserFeatures = ref<{ label: string; value: string }[]>([])
+    const roleUserFeaturesCategories = ref<{ label: string; value: string }[]>([])
+
     const statusOptions = ref<{ label: string; value: string }[]>([])
     const statusFilterOptions = ref<{ label: string; value: string }[]>([])
 
@@ -94,7 +97,7 @@ export function useOptions() {
             const response = await optionsService.getOptions()
 
             if (response.users) {
-                const { userRoles, UserStatuses } = response.users
+                const { userRoles, UserStatuses, userFeatures, userFeatureCategories} = response.users
 
                 if (userRoles) {
                     const activeRoles = userRoles.filter((role: UserRoleOp) => role.isActive)
@@ -102,13 +105,22 @@ export function useOptions() {
                     roleOptions.value = optionsService.mapRolesToSelectOptions(activeRoles)
                     roleFilterOptions.value = optionsService.mapRolesToFilterOptions(activeRoles)
                     roleAccessOptions.value = optionsService.mapRolesAccessOptions(activeRoles)
-                    console.log('hola: ', roleAccessOptions);
                 }
 
                 if (UserStatuses) {
                     const activeStatuses = UserStatuses.filter((status: UserStatusOp) => status.isActive)
                     statusOptions.value = optionsService.mapStatusesToSelectOptions(activeStatuses)
                     statusFilterOptions.value = optionsService.mapStatusesToFilterOptions(activeStatuses)
+                }
+
+                if(userFeatures){
+                    const activeFeatures = userFeatures.filter((status: UserStatusOp) => status.isActive)
+                    roleUserFeatures.value = optionsService.mapRolesAccessOptions(activeFeatures)
+                }
+
+                if(userFeatureCategories){
+                    const activeFeaturesCategories = userFeatureCategories.filter((status: UserStatusOp) => status.isActive)
+                    roleUserFeaturesCategories.value = optionsService.mapRolesAccessOptions(activeFeaturesCategories)
                 }
             }
 
@@ -136,6 +148,10 @@ export function useOptions() {
         statusOptions.value = []
         roleFilterOptions.value = []
         roleAccessOptions.value = []
+
+        roleUserFeatures.value = []
+        roleUserFeaturesCategories.value = []
+
         statusFilterOptions.value = []
         paymentGatewayOptions.value = []
         paymentGatewayFilterOptions.value = []
@@ -148,6 +164,8 @@ export function useOptions() {
         statusOptions: readonly(statusOptions),
         roleFilterOptions: readonly(roleFilterOptions),
         roleAccessOptions: readonly(roleAccessOptions),
+        roleUserFeatures: readonly(roleUserFeatures),
+        roleUserFeaturesCategories: readonly(roleUserFeaturesCategories),
         statusFilterOptions: readonly(statusFilterOptions),
         paymentGatewayOptions: readonly(paymentGatewayOptions),
         paymentGatewayFilterOptions: readonly(paymentGatewayFilterOptions),

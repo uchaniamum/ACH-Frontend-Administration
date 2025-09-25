@@ -1,7 +1,7 @@
 <template>
     <div>
       <div v-if="channelData" class="flex flex-col gap-8">
-        <XHeader :title="`Editar canal - ${channelData.name}`" :breadcrumb-items="itemsBreadChannelsEdit" :show-breadcrumb="true" @back-click="goBack"/>
+        <XHeader :title="`Editar canal - ${channelData.name}`" :breadcrumb-items="itemsBreadChannelsEdit" :show-breadcrumb="true" @back-click="goBack" :show-back="true"/>
         <span class="text-normal font-normal">Registra el certificado del canal y/o modifica el centro de procesamiento.</span>
     
         <div class="pt-12 flex flex-col gap-20">
@@ -118,6 +118,7 @@ import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertifica
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { useChannelService } from '~/componsables/channels/useChannels';
+import { useSmartBackNavigation } from '~/navigation/backNavigation';
 //Composable
 const { channelData, loading, error, loadChannelsDetails, updateChannel } = useChannelService();
 
@@ -217,10 +218,12 @@ const openConfirmEditModal = () => {
     }
 }
 
-// NAVEGACIÓN
-const goBack = () => {
-    router.back();
-};
+// // NAVEGACIÓN
+// const goBack = () => {
+//     router.back();
+// };
+
+const { goBack } = useSmartBackNavigation()
 
 const handleConfirmChange = async () => {
   if (!channelData.value || !selectedRouteData.value) return

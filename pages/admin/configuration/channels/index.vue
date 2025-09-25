@@ -1,6 +1,6 @@
 <template>
     <div>
-        <XHeader title="Administración de canales" :breadcrumb-items="itemsBreadChannels" :show-breadcrumb="true">
+        <XHeader title="Administración de canales" :breadcrumb-items="itemsBreadChannels" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p>Gestiona los canales modificando el centro de procesamiento, las rutas asociadas, los certificados correspondientes y realiza un seguimiento a través del historial de cambios.</p>
             </template>
@@ -34,7 +34,7 @@
                     </span> 
                 </template>
 
-                <Column field="code" header="Codigo" :showFilterMenu="false" class="min-w-[143px]">
+                <Column field="code" header="Codigo" :showFilterMenu="false" class="column-code">
                     <template #body="{ data }">
                         {{ data.code }}
                     </template>
@@ -51,7 +51,7 @@
                         </IconField>
                     </template> -->
                 </Column>
-                <Column field="name" header="Nombre" :showFilterMenu="false" class="min-w-[328px]">
+                <Column field="name" header="Nombre" :showFilterMenu="false" class="column-name">
                     <template #body="{ data }">
                         {{ data.name }}
                     </template>
@@ -69,7 +69,7 @@
                         />
                     </template> -->
                 </Column>
-                <Column field="acronym" header="Sigla" :showFilterMenu="false" class="w-[145px]">
+                <Column field="acronym" header="Sigla" :showFilterMenu="false" class="column-acronym">
                     <template #body="{ data }">
                         {{ data.acronym }}
                     </template>
@@ -87,7 +87,7 @@
                         />
                     </template> -->
                 </Column>
-                <Column field="aliases" header="Alias CPD" :showFilterMenu="false" style="width:145px">
+                <Column field="aliases" header="Alias CPD" :showFilterMenu="false" class="column-aliases">
                     <template #body="{ data }">
                         <div v-for="(route, index) in data.routes" :key="index">
                             {{ route.alias }}
@@ -107,7 +107,7 @@
                         />
                     </template> -->
                 </Column>
-                <Column field="updatedAt" header="Última modificación" :showFilterMenu="false" class="!min-w-[189px]">
+                <Column field="updatedAt" header="Última modificación" :showFilterMenu="false" class="column-actions">
                     <template #body="{ data }">
                         {{ formatDate(data.updatedAt) }}
                     </template>
@@ -206,3 +206,57 @@ watch(() => filters.value.aliases.value, (newVal) => {
     console.log('Filtro de alias aplicado:', newVal);
 });
 </script>
+
+<style scoped>
+.p-datatable-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+/* Clases para asignar en tu template */
+.column-code {
+    width: 143px !important;
+    min-width: 143px !important;
+    max-width: 143px !important;
+}
+
+.column-name {
+    width: 328px !important;
+    min-width: 328px !important;
+    max-width: 328px !important;
+}
+
+.column-acronym {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+}
+
+.column-aliases {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+}
+
+.column-date {
+    width: 189px !important;
+    min-width: 189px !important;
+    max-width: 189px !important;
+}
+
+.column-actions {
+    width: 122px !important;
+    min-width: 122px !important;
+    max-width: 122px !important;
+    text-align: center !important;
+}
+
+/* Estilos base para todas las celdas */
+.p-datatable-thead > tr > th,
+.p-datatable-tbody > tr > td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    vertical-align: middle !important;
+}
+</style>

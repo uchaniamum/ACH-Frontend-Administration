@@ -113,6 +113,21 @@ class OptionsService {
         }
     }
 
+    async getUserFeatures(): Promise<UserStatusOp[]> {
+        try {
+            const response = await this.getOptions()
+
+            if (response.users?.userFeatures) {
+                return response.users.userFeatures.filter(status => status.isActive)
+            }
+
+            return []
+        } catch (error) {
+            console.error('Error getting user statuses:', error)
+            return []
+        }
+    }
+
     async getPaymentGateways(): Promise<PaymentGatewayOp[]> {
         try {
             const response = await this.getOptions()
@@ -155,15 +170,6 @@ class OptionsService {
             }))
     }
 
-    mapRolesAccessOptions(roles: UserRoleOp[]) {
-        return roles
-            .sort((a, b) => a.order - b.order)
-            .map(role => ({
-                label: role.displayName,
-                value: role.code,
-            }))
-    }
-
     mapStatusesToFilterOptions(statuses: UserStatusOp[]) {
         return statuses
             .sort((a, b) => a.order - b.order)
@@ -171,6 +177,15 @@ class OptionsService {
                 // label: this.formatCodeToLabel(status.code),
                 label: status.displayName,
                 value: status.displayName,
+            }))
+    }
+    
+    mapRolesAccessOptions(roles: UserRoleOp[]) {
+        return roles
+            .sort((a, b) => a.order - b.order)
+            .map(role => ({
+                label: role.displayName,
+                value: role.code,
             }))
     }
 

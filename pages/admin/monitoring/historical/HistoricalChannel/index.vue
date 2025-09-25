@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-col gap-20">
-            <XHeader title="Bitácora - Administrador canales" :breadcrumb-items="itemsBreadHistoricalChannels" :show-breadcrumb="true">
+            <XHeader title="Bitácora - Administrador canales" :breadcrumb-items="itemsBreadHistoricalChannels" :show-breadcrumb="true" :show-back="true">
                 <template #description>
                     <p>Texto descriptivo de la sección .</p>
                 </template>
@@ -74,13 +74,13 @@ const channlsCertificateHistory = ref<PaymentGatewayCertificatesHistoryItem[]>([
 
 const channelsConfig: HistoryConfig<any> = {
     columns: [
-        { field: 'paymentGatewayCode', header: 'Código', style: 'min-width: 90px;', class: 'text-left'},
-        { field: 'description', header: 'Canales ', style: 'min-width: 320px;', class: 'text-left'},
-        { field: 'paymentGatewayAcronym', header: 'Sigla', style: 'min-width: 130px;', class: 'text-left' },
-        { field: 'alias', header: 'Alias CPD', style: 'min-width: 130px;', class: 'text-left'},
-        { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 130px;', class: 'text-left'},
-        { field: 'changeNumber', header: 'Nro. de Cambio', style: 'min-width: 75px;', class: 'text-left'},
-        { field: 'updatedAt', header: 'Últ. fecha de modif.', style: 'min-width: 164px;', class: 'text-left',
+        { field: 'paymentGatewayCode', header: 'Código',class: 'text-left'},
+        { field: 'description', header: 'Canales ', class: 'text-left'},
+        { field: 'paymentGatewayAcronym', header: 'Sigla', class: 'text-left' },
+        { field: 'alias', header: 'Alias CPD',  class: 'text-left'},
+        { field: 'updatedByUser', header: 'Usuario',  class: 'text-left'},
+        { field: 'changeNumber', header: 'Nro. de Cambio',  class: 'text-left'},
+        { field: 'updatedAt', header: 'Últ. fecha de modif.',  class: 'text-left',
             formatter: (value: string) =>  formatDateTimeDirect(value),
             searchFormatter: (value: string) => formatDateTimeDirect(value),
 
@@ -112,28 +112,28 @@ const channelsConfig: HistoryConfig<any> = {
 
 const channelsCertificateConfig: HistoryConfig<any> = {
     columns: [
-        { field: 'paymentGatewayCode', header: 'Canal ', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'acronym', header: 'Identificador', style: 'min-width: 110px;', class: 'text-left' },
-        { field: 'serialNumber', header: 'Nro. serie', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'validFrom', header: 'Val. desde', style: 'min-width: 100px;', class: 'text-left',
+        { field: 'paymentGatewayCode', header: 'Canal ',  class: 'text-left'},
+        { field: 'acronym', header: 'Identificador', class: 'text-left' },
+        { field: 'serialNumber', header: 'Nro. serie',  class: 'text-left'},
+        { field: 'validFrom', header: 'Val. desde',  class: 'text-left',
             formatter: (value: string) =>  formatDate(value),
             searchFormatter: (value: string) => formatDate(value),
         },
-        { field: 'validTo', header: 'Val. hasta', style: 'min-width: 100px;', class: 'text-left',
+        { field: 'validTo', header: 'Val. hasta', class: 'text-left',
             formatter: (value: string) =>  formatDate(value),
             searchFormatter: (value: string) => formatDate(value),
         },
-        { field: 'hasPrivateKey', header: 'Tipo certificado', style: 'min-width: 80px;', class: 'text-left',
+        { field: 'hasPrivateKey', header: 'Tipo certificado', class: 'text-left',
             formatter: (value: boolean) => getTypeCertificateText(value),
             searchFormatter: (value: boolean) => getTypeCertificateText(value),
         },
-        { field: 'isActive', header: 'En uso', style: 'min-width: 75px;', class: 'text-left',
+        { field: 'isActive', header: 'En uso', class: 'text-left',
             formatter: (value: boolean) => getStatusCertificateText(value),
             searchFormatter: (value: boolean) => getStatusCertificateText(value),
         },
-        { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'changeNumber', header: 'Nro. de Cambio', style: 'min-width: 75px;', class: 'text-left'},
-        { field: 'updatedAt', header: 'Últ. fecha de modif.', style: 'min-width: 90px;', class: 'text-left',
+        { field: 'updatedByUser', header: 'Usuario', class: 'text-left'},
+        { field: 'changeNumber', header: 'Nro. de Cambio',  class: 'text-left'},
+        { field: 'updatedAt', header: 'Últ. fecha de modif.', class: 'text-left',
             formatter: (value: string) =>  formatDateTimeDirect(value),
             searchFormatter: (value: string) => formatDateTimeDirect(value),
         },

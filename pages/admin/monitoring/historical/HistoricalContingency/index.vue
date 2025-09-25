@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Bitácora - Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true">
+        <XHeader title="Bitácora - Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadHistoricalContingency" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p>Texto descriptivo de la sección .</p>
             </template>

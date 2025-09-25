@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Bitácora - Horarios de atención" :breadcrumb-items="itemsBreadHistoricalShedule" :show-breadcrumb="true">
+        <XHeader title="Bitácora - Horarios de atención" :breadcrumb-items="itemsBreadHistoricalShedule" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p>Texto descriptivo de la sección .</p>
             </template>
@@ -71,7 +71,7 @@ const loading = ref(false);
 
 const scheduleRegularConfig : HistoryConfig<any> = {
     columns: [
-        { field: 'paymentGatewayAcronym', header: 'Canal', style: 'min-width: 100px;', class: 'text-left'},
+        { field: 'paymentGatewayAcronym', header: 'Canal', class: 'text-left'},
         { field: 'paymentGatewayName', header: 'Transacción', style: 'min-width: 130px;', class: 'text-left',
             iconConfig: {
                 conditionalIcon: {
@@ -83,20 +83,20 @@ const scheduleRegularConfig : HistoryConfig<any> = {
                 },
             }
         },
-        { field: 'paymentGatewayCode', header: 'Día', style: 'min-width: 150px;', class: 'text-left',
+        { field: 'paymentGatewayCode', header: 'Día', style: 'min-width: 160px;', class: 'text-left',
             formatter: (value: string, rowData: SheduleRegularHistoryItem) => formatScheduleWeek(value, rowData),
             searchFormatter: (value: string, rowData: SheduleRegularHistoryItem) => formatScheduleWeek(value, rowData),
         },
-        { field: 'startTime', header: 'Hora inicio', style: 'min-width: 100px;', class: 'text-left',
+        { field: 'startTime', header: 'Hora inicio', class: 'text-left',
             formatter: (value: string ) =>  formatTime(value),
         },
-        { field: 'endTime', header: 'Hora fin', style: 'min-width: 100px;', class: 'text-left', 
+        { field: 'endTime', header: 'Hora fin', class: 'text-left', 
             formatter: (value: string ) =>  formatTime(value),
         },
         { field: 'description', header: 'Detalle', style: 'min-width: 200px;', class: 'text-left'},
-        { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 80px;', class: 'text-left' },
-        { field: 'lastChangeNumber', header: 'Nro. de Cambio', style: 'min-width: 75px;', class: 'text-left'},
-        { field: 'updatedAt', header: 'Última fecha de modificación', style: 'min-width: 90px;', class: 'text-left',
+        { field: 'updatedByUser', header: 'Usuario', class: 'text-left' },
+        { field: 'lastChangeNumber', header: 'Nro. de Cambio', class: 'text-left'},
+        { field: 'updatedAt', header: 'Últ. fecha de modif.', class: 'text-left',
             formatter: (value: string) =>  formatDateTimeDirect(value),
             searchFormatter: (value: string) => formatDateTimeDirect(value),
         },
@@ -133,16 +133,16 @@ const scheduleExceptionConfig : HistoryConfig<any> = {
             formatter: (value: string ) =>  formatDate(value),
             searchFormatter: (value: string) => formatDate(value),
         },
-        { field: 'startTime', header: 'Hora inicio', style: 'min-width: 100px;', class: 'text-left', 
+        { field: 'startTime', header: 'Hora inicio', class: 'text-left', 
             formatter: (value: string ) =>  formatTime(value),
         },
-        { field: 'endTime', header: 'Hora fin', style: 'min-width: 100px;', class: 'text-left', 
+        { field: 'endTime', header: 'Hora fin', class: 'text-left', 
             formatter: (value: string ) =>  formatTime(value),
         },
         { field: 'description', header: 'Justificación', style: 'min-width: 220px;', class: 'text-left'},
-        { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 80px;', class: 'text-left' },
-        { field: 'changeNumber', header: 'Nro. de Cambio', style: 'min-width: 75px;', class: 'text-left'},
-        { field: 'updatedAt', header: 'Última fecha de modificación', style: 'min-width: 90px;', class: 'text-left',
+        { field: 'updatedByUser', header: 'Usuario', class: 'text-left' },
+        { field: 'changeNumber', header: 'Nro. de Cambio', class: 'text-left'},
+        { field: 'updatedAt', header: 'Últ. fecha de modif.',  class: 'text-left',
             formatter: (value: string) =>  formatDateTimeDirect(value),
             searchFormatter: (value: string) => formatDateTimeDirect(value),
         },

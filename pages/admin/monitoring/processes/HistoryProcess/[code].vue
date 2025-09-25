@@ -1,66 +1,11 @@
 <template>
     <div class="flex flex-col gap-20">
         <div class="flex flex-col gap-8">
-            <XHeader title="Historial de procesos" :breadcrumb-items="itemsBreadProcesses" :show-breadcrumb="true" @back-click="goBack"/>
+            <XHeader title="Historial de procesos" :breadcrumb-items="itemsBreadProcesses" :show-breadcrumb="true" :show-back="true" @back-click="goBack"/>
             <span class="text-normal font-normal">Texto descriptivo del flujo.</span>
         </div>
 
         <div class="flex flex-col gap-12 pb-40">
-            <!-- <div class="flex justify-between gap-4">
-                <div class="self-center">
-                    <XIconField>
-                        <XInputText name="searchProcessesHistory" placeholder="Buscar" v-model="searchTermProcessesHistory"/>
-                        <XInputIcon icon="search"/>
-                    </XIconField>
-                </div>
-            </div> -->
-
-            <!-- <DataTable
-                :value="filteredProccessHistory"
-                :loading="loading"
-            >
-                <Column field="paymentGateway" header="Canal" style="min-width: 104px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.channel }}
-                    </template>
-                </Column>
-                <Column field="processes" header="Proceso"  style="min-width: 130px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.process }}
-                    </template>
-                </Column>
-                <Column field="description" header="Descripción"  style="min-width: 242px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.description }}
-                    </template>
-                </Column>
-                <Column field="lastExecution" header="Última ejecución"  style="min-width: 160px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.lastExecution }}
-                    </template>
-                </Column>
-                <Column field="nextExecution" header="Próxima ejecución" style="min-width: 160px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.nextExecution }}
-                    </template>
-                </Column>
-                <Column field="status" header="Estado"  style="min-width: 145px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.executionStatus ? 'Ejecutado' : 'No ejecutado' }}
-                    </template>
-                </Column>
-                <Column field="users" header="Usuario"  style="min-width: 114px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.lastExecution }}
-                    </template>
-                </Column>
-                <Column field="lastDate" header="Última fecha de modificación" style="min-width: 164px;" class="text-left">
-                    <template #body="{ data }">
-                        {{ data.nextExecution }}
-                    </template>
-                </Column>
-            </DataTable> -->
-        
             <HistoryModule
                 :config="processesConfig"
                 search-placeholder="Buscar"

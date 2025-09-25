@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Parámetros" :breadcrumb-items="itemsBreadParameters" :show-breadcrumb="true">
+        <XHeader title="Parámetros" :breadcrumb-items="itemsBreadParameters" :show-breadcrumb="true" :show-back="true">
             <template #description>
-                <p class="text-gray-800">Consulta r todos los parámetros configurados en el sistema y realizar las modificaciones necesarias. Además te presenta el historial de cambios para asegurar un control adecuado.</p>
+                <p class="text-gray-800">Verifica todos los parámetros configurados en el sistema y realiza las modificaciones necesarias. Asegúrate de tener un control adecuado.</p>
             </template>
         </XHeader>
 
@@ -56,37 +56,37 @@
                                 </span> 
                             </template>
 
-                            <Column field="systemAcronym" header="Canal" sortable style="min-width: 100px;" class="text-left">
+                            <Column field="systemAcronym" header="Canal" style="min-width: 100px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.systemAcronym }}
                                 </template>
                             </Column>
 
-                            <Column field="code" header="Código" sortable headerStyle="width: 100px;" bodyStyle="width: 100px;" class="text-left">
+                            <Column field="code" header="Código" headerStyle="width: 100px;" bodyStyle="width: 100px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.code }}
                                 </template>
                             </Column>
                         
-                            <Column field="value" header="Valor" sortable style="min-width: 160px;" class="text-left">
+                            <Column field="value" header="Valor" style="min-width: 160px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.value }}
                                 </template>
                             </Column>
 
-                            <Column field="dataType" header="Tipo de Dato" sortable style="min-width: 100px;" class="text-left">
+                            <Column field="dataType" header="Tipo de Dato" style="min-width: 100px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.dataType }}
                                 </template>
                             </Column> 
 
-                            <Column field="description" header="Descripción" sortable class="min-w-[275px] text-left" >
+                            <Column field="description" header="Descripción" class="min-w-[275px] text-left" >
                                 <template #body="{ data }">
                                     {{ data.description }}
                                 </template>
                             </Column>
 
-                            <Column header="Acciones" class="min-w-[210px] text-left">
+                            <Column header="Acción" class="min-w-[210px] text-left">
                                 <template #body="{ data }">
                                     <div class="flex gap-4">
                                         <XButton 
@@ -96,10 +96,10 @@
                                             v-tooltip="{ value: 'Editar parámetro', hideDelay: 300 }"
                                             @click="openEditModal(data)"
                                         />
-                                        <XButton 
+                                        <!-- <XButton 
                                             label="Ver historial"
                                             @click="openHistoModal(data)"
-                                        />
+                                        /> -->
                                     </div>
                                 </template>
                             </Column>
@@ -198,19 +198,19 @@ const openEditModal = (parameterData: ParameterListItem) => {
     }
 }
 
-const openHistoModal = (parameterData: ParameterListItem) => {
+// const openHistoModal = (parameterData: ParameterListItem) => {
     
-    modalStateHistoParameter.value = {
-        modalParameterHistorial: true,
-        parameterHistoData: {
-            code: parameterData.code || '',
-            value: parameterData.value,
-            description: parameterData.description, 
-            dataType: parameterData.dataType,     
-            systemAcronym: parameterData.systemAcronym
-        }
-    }
-}
+//     modalStateHistoParameter.value = {
+//         modalParameterHistorial: true,
+//         parameterHistoData: {
+//             code: parameterData.code || '',
+//             value: parameterData.value,
+//             description: parameterData.description, 
+//             dataType: parameterData.dataType,     
+//             systemAcronym: parameterData.systemAcronym
+//         }
+//     }
+// }
 
 const handleParameterSaved = (): void => {
     loadParameters()

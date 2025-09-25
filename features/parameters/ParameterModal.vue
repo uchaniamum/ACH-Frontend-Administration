@@ -16,8 +16,8 @@
             </template>
             <template #content>
                 <div class="flex flex-col">
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span>{{ props.parameterData?.dataType }}</div>
-                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span>{{ props.parameterData?.description }}</div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Tipo de dato:</span><span class="text-gray-700">{{ props.parameterData?.dataType }}</span></div>
+                    <div class="flex gap-4"><span class="font-semibold text-gray-700">Descripción:</span><span class="text-gray-700">{{ props.parameterData?.description }}</span></div>
                 </div>
             </template>
         </XCard>
@@ -37,7 +37,7 @@
                 <div class="flex justify-end gap-4">
                     <XButton 
                         label="Cancelar" 
-                        variant="outlined" 
+                        variant="text" 
                         class="!w-[130px]" 
                         @click="handleCancel" 
                         :disabled="loading"

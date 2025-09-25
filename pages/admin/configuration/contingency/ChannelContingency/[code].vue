@@ -6,6 +6,7 @@
                 @back-click="goBack"
                 :breadcrumb-items="itemsBreadContingencyEdit" 
                 :show-breadcrumb="true"
+                :show-back="true"
             />
             <span class="text-normal font-normal">
                 {{ pageDescription }}

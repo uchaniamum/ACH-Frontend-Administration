@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Gestión de horarios" :breadcrumb-items="itemsBreadSchedules" :show-breadcrumb="true">
+        <XHeader title="Gestión de horarios" :breadcrumb-items="itemsBreadSchedules" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <span>Gestiona horarios regulares y extraordinarios, asegúrate de configurarlos adecuadamente para garantizar la correcta continuidad operativa.</span>
             </template>
@@ -79,13 +79,13 @@
                             <span class="flex justify-center">Cargando datos de horarios. Por favor espere.</span> 
                         </template>
 
-                        <Column field="acronym" header="Canal" sortable style="min-width: 125px;" class="text-left">
+                        <Column field="acronym" header="Canal" sortable  class="text-left">
                             <template #body="{ data }">
                                 {{ data.acronym }}
                             </template> 
                         </Column>
 
-                        <Column field="isInbound" header="Transacción" sortable style="min-width: 135px;"  class="text-left">
+                        <Column field="isInbound" header="Transacción" sortable  class="text-left">
                             <template #body="{ data }">
                                 <span v-if="data.isInbound" class="flex gap-6">
                                     <Icon name="x:arrow-tr" class="text-sky-500 text-[12px] font-bold"/>
@@ -98,31 +98,31 @@
                             </template>
                         </Column>
                     
-                        <Column field="scheduleWeek" header="Día" style="min-width: 180px;" class="text-left">
+                        <Column field="scheduleWeek" header="Día" style="min-width: 160px;" class="text-left">
                             <template #body="{ data }">
                                 {{ formatScheduleWeek(data.scheduleWeek) }}
                             </template>
                         </Column>
 
-                        <Column field="startTime" header="Hora Inicio" sortable style="min-width: 120px;" class="text-left">
+                        <Column field="startTime" header="Hora Inicio" sortable class="text-left">
                             <template #body="{ data }">
                                 {{ data.startTime }}
                             </template>
                         </Column> 
 
-                        <Column field="endTime" header="Hora Fin" sortable style="min-width: 120px;" class="text-left">
+                        <Column field="endTime" header="Hora Fin" sortable class="text-left">
                             <template #body="{ data }">
                                 {{ data.endTime }}
                             </template>
                         </Column>
 
-                        <Column field="transactionCodeDescription" header="Detalle" sortable style="min-width: 200px;" class="text-left">
+                        <Column field="transactionCodeDescription" header="Detalle" sortable style="min-width: 190px;" class="text-left">
                             <template #body="{ data }">
                                 {{ data.transactionCodeDescription }}
                             </template>
                         </Column>
 
-                        <Column field="exceptionCounter" header="Horario extraordinario" sortable  style="min-width: 160px;" class="text-left">
+                        <Column field="exceptionCounter" header="Horario extraordinario" sortable  style="min-width: 157px;" class="text-left">
                             <template #body="{ data }">
                                 <span v-if="data.exceptionCounter > 0" class="flex gap-6">
                                     <XTag severity="magenta" :value="`(${data.exceptionCounter}) Programado`" />
@@ -133,7 +133,7 @@
                             </template>
                         </Column>
 
-                        <Column header="Acciones" style="min-width: 133px;" class="text-left">
+                        <Column header="Acciones" class="text-left">
                             <template #body="{ data }">
                                 <div class="flex justify-end gap-4">
                                     <XButton v-if="data.exceptionCounter > 0"
@@ -541,3 +541,4 @@ onMounted(async () => {
 })
 
 </script>
+

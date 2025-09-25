@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-col gap-20">
-            <XHeader title="Bitácora - Parámetros" :breadcrumb-items="itemsBreadHistoricalParameter" :show-breadcrumb="true">
+            <XHeader title="Bitácora - Parámetros" :breadcrumb-items="itemsBreadHistoricalParameter" :show-breadcrumb="true" :show-back="true">
                 <template #description>
                     <p>Texto descriptivo de la sección .</p>
                 </template>
@@ -35,14 +35,14 @@ const { formatDateTimeDirect } = useDates();
 
 const parameterConfig: HistoryConfig<any> = {
     columns: [
-        { field: 'paymentGatewayAcronym', header: 'Canal', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'paymentGatewayParameterCode', header: 'Código', style: 'min-width: 160px;', class: 'text-left'},
-        { field: 'value', header: 'Valor', style: 'min-width: 160px;', class: 'text-left' },
-        { field: 'dataType', header: 'Tipo de Dato', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'description', header: 'Descripción', style: 'min-width: 240px;', class: 'text-left'},
-        { field: 'updatedByUser', header: 'Usuario', style: 'min-width: 100px;', class: 'text-left'},
-        { field: 'changeNumber', header: 'Nro. de Cambio', style: 'min-width: 75PX;', class: 'text-left'},
-        { field: 'updatedAt', header: 'Últ. fecha de modif.', style: 'min-width: 90px;', class: 'text-left',
+        { field: 'paymentGatewayAcronym', header: 'Canal', class: 'text-left'},
+        { field: 'paymentGatewayParameterCode', header: 'Código', class: 'text-left'},
+        { field: 'value', header: 'Valor',  class: 'text-left' },
+        { field: 'dataType', header: 'Tipo de Dato',  class: 'text-left'},
+        { field: 'description', header: 'Descripción',  class: 'text-left'},
+        { field: 'updatedByUser', header: 'Usuario',  class: 'text-left'},
+        { field: 'changeNumber', header: 'Nro. de Cambio', class: 'text-left'},
+        { field: 'updatedAt', header: 'Últ. fecha de modif.',  class: 'text-left',
             formatter: (value: string) =>  formatDateTimeDirect(value),
             searchFormatter: (value: string) => formatDateTimeDirect(value),
 

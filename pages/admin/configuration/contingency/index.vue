@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
     <div class="flex flex-col gap-16">
         <XHeader title="Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadContingency" :show-breadcrumb="true">
             <template #description>
@@ -91,7 +91,7 @@
                             dataKey="participantCode"
                             @page="onPageChange"
                         >
-                            <Column :showFilterMenu="false" class="min-w-[75px] items-start" >
+                            <Column :showFilterMenu="false" class="items-start" >
                                 <template #header>
                                     <XCheckBox 
                                         :modelValue="isAllSelected"
@@ -109,7 +109,7 @@
                                 </template>
                             </Column>
                         
-                            <Column field="participantName" header="Entidad bancaria" sortable :showFilterMenu="false" class="min-w-[209px]" >
+                            <Column field="participantName" header="Entidad bancaria" sortable :showFilterMenu="false">
                                 <template #body="{ data }">
                                     {{ data.participantName }}
                                 </template>
@@ -127,7 +127,7 @@
                                 </template>
                             </Column>
 
-                            <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="min-w-[209px] text-left">
+                            <Column field="transaccPaymentGateway" header="Envío de Transferencias Interbancarias Regular" :showFilterMenu="false" class="text-left">
                                 <template #body="{ data }">
                                     <div class="flex flex-col gap-4">
                                         <div class="flex items-center gap-4">
@@ -157,7 +157,7 @@
                                 </template>
                             </Column>
                         
-                            <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="min-w-[209px] text-left">
+                            <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="text-left">
                                 <template #body="{ data }">
                                     <div class="flex flex-col gap-4">
                                         <div class="flex items-center gap-4">
@@ -188,7 +188,7 @@
                                 </template>
                             </Column>
                         
-                            <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="min-w-[209px] text-left">
+                            <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="text-left">
                                 <template #body="{ data }">
                                     <div class="flex flex-col gap-3">
                             <div class="flex items-center gap-3">
@@ -219,7 +219,7 @@
                                 </template>
                             </Column>
                         
-                            <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="min-w-[209px] text-left">
+                            <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="text-left">
                                 <template #body="{ data }">
                                     <div class="flex flex-col gap-3">
                             <div class="flex items-center gap-3">
@@ -879,11 +879,11 @@ onMounted(() => {
     loadChannels();
 });
 
-</script> -->
+</script>
 
-<template>
+<!-- <template>
     <div class="flex flex-col gap-16">
-        <XHeader title="Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadContingency" :show-breadcrumb="true">
+        <XHeader title="Enrutamiento y operabilidad" :breadcrumb-items="itemsBreadContingency" :show-breadcrumb="true" :show-back="true">
             <template #description>
                 <p>Gestiona el enrutamiento de los canales para garantizar la continuidad operativa y defina contingencias específicas por cada canal o participante.</p>
             </template>
@@ -928,7 +928,6 @@ onMounted(() => {
             </XTabs>
         </div>
 
-        <!-- Toast movido aquí para que prevalezca -->
         <Toast position="top-right">
             <template #message="{ message }">
                 <Icon 
@@ -950,4 +949,4 @@ import ParticipantsTab from '~/components/contingency/ParticipantsTab.vue';
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 
 const itemsBreadContingency = getBreadcrumbItems('contingency', 'list');
-</script>
+</script> -->

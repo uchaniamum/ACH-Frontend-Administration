@@ -1,4 +1,3 @@
-import { filter } from "@primevue/core";
 import { API_CONFIG } from "~/config/api";
 import type { RoleFeaturesResponse } from "~/features/roles/type";
 
