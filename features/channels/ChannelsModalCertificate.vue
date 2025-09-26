@@ -16,7 +16,7 @@
         <XFileUpload
           ref="fileupload"
           name="certificateFiles"
-          accept=".txt"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
           @select="onFileSelect"
           :showUploadButton="false"
           :showCancelButton="false"

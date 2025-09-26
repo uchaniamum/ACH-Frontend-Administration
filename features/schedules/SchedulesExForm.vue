@@ -23,7 +23,6 @@
                         v-model="formDataSchedules.scheduleEffectiveDate"
                         label="Fecha"
                         name="datepicker"
-                        placeholder="Selecciona la fecha"
                         :rules="[(v: any) => !!v || 'El campo es requerido']"
                         showButtonBar
                         label-required
@@ -31,13 +30,11 @@
                         fluid 
                         iconDisplay="input"
                         icon="calendar-1"
-                        dateFormat="dd/mm/yy"
                     />
 
                     <XDatePicker
                         v-model="formDataSchedules.startTime"
                         label="Hora de inicio"
-                        placeholder="Selecciona la hora"
                         label-required
                         name="startTime"
                         showIcon
@@ -49,7 +46,6 @@
                     <XDatePicker
                         v-model="formDataSchedules.endTime"
                         label="Hora de fin"
-                        placeholder="Selecciona la hora"
                         label-required
                         name="endTime"
                         showIcon
@@ -59,7 +55,7 @@
                     />
                 </div>
                 
-                <!--<span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
+                <span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
             
                 <XFileUpload
                     ref="fileupload"
@@ -77,7 +73,7 @@
                             <span class="text-normal font-normal">Arrastra y suelta archivos aquí para subirlos.</span>
                         </div>
                     </template> 
-                
+                  
                     <template #content="{ files, removeFileCallback }">
                         <div class="p-fileupload-file-list">
                             <div 
@@ -118,17 +114,9 @@
                             </div>
                         </div>
                     </template>
-                </XFileUpload> -->
+                </XFileUpload>
 
-                <div class="flex flex-col gap-16 col-span-2">
-                    <XTextarea
-                        id="textarea"
-                        v-model="formDataSchedules.changeReason"
-                        name="textarea"
-                        label="Justificación"
-                        label-required
-                        placeholder="Escribe una justificación"
-                    />
+                <div class="flex flex-col gap-4 col-span-2">
                     <XDivider />
                     <div class="flex justify-end gap-4">
                         <XButton 
@@ -143,7 +131,6 @@
                             class="!w-[130px]" 
                             type="submit"
                             :loading="loading"
-                            :disabled="!hasFormSheduleChanged || !isFormValidSchedule"
                         />
                     </div>
                 </div>
@@ -176,7 +163,7 @@ const emit = defineEmits<{
     cancel: []
 }>()
 
-const originalFormDataSchedules = ref({
+const formDataSchedules = ref<any>({
     code: '', 
     acronym: '',
     transactionCodeDescription: '',
@@ -187,32 +174,6 @@ const originalFormDataSchedules = ref({
     base64JustificationFile: '',
 });
 
-const formDataSchedules = ref({ ...originalFormDataSchedules.value })
-
-const hasFormSheduleChanged = computed(() =>{
-    if(!props.isEdit) return true
-
-    return(
-        formDataSchedules.value.code !== originalFormDataSchedules.value.code &&
-        formDataSchedules.value.acronym !== originalFormDataSchedules.value.acronym &&
-        formDataSchedules.value.transactionCodeDescription !== originalFormDataSchedules.value.transactionCodeDescription &&
-        formDataSchedules.value.scheduleEffectiveDate !== originalFormDataSchedules.value.scheduleEffectiveDate &&
-        formDataSchedules.value.startTime !== originalFormDataSchedules.value.startTime &&
-        formDataSchedules.value.endTime !== originalFormDataSchedules.value.endTime &&
-        formDataSchedules.value.changeReason !== originalFormDataSchedules.value.changeReason
-    )
-})
-
-const isFormValidSchedule = computed(() => {
-    return(formDataSchedules.value.code.trim() !== '' &&
-            formDataSchedules.value.acronym.trim() !== '' &&
-            formDataSchedules.value.transactionCodeDescription.trim() !== '' &&
-            formDataSchedules.value.scheduleEffectiveDate.trim() !== '' &&
-            formDataSchedules.value.startTime.trim() !== '' &&
-            formDataSchedules.value.endTime.trim() !== '' &&
-            formDataSchedules.value.changeReason.trim() !== ''
-    )
-})
 
 const onSubmit = async () => {
     try {
@@ -229,6 +190,8 @@ const onSubmit = async () => {
                         : formDataSchedules.value.endTime,
                     base64JustificationFile: fileUpload.fileBase64.value
                 };
+
+        
         // Emitir el evento submit
         emit('submit', submitData)
         
@@ -238,48 +201,19 @@ const onSubmit = async () => {
     }
 }
 
-// watch(() => props.scheduleData, (newData) => {
-//     if (newData) {
-//         formDataSchedules.value = {
-//             ...formDataSchedules.value,
-//             ...newData
-//         }
-//     }
-// }, { immediate: true, deep: true }) 
-
 watch(() => props.scheduleData, (newData) => {
-    if (newData && Object.keys(newData).length > 0) {
-        const newFormData = {
-            code: newData.code || '',
-            acronym: newData.acronym || '',
-            transactionCodeDescription: newData.transactionCodeDescription || '',
-            scheduleEffectiveDate: newData.scheduleEffectiveDate || '',
-            startTime: newData.startTime || '',
-            endTime: newData.endTime || '',
-            changeReason: newData.changeReason || '',
-            base64JustificationFile: newData.base64JustificationFile || '',
-        }
+    if (newData) {
+        console.log('Datos recibidos en formulario (watch profundo):', newData);
+        console.log('Código recibido:', newData.code);
         
-        formDataSchedules.value = { ...newFormData }
+        formDataSchedules.value = {
+            ...formDataSchedules.value,
+            ...newData
+        }
 
-        if (props.isEdit) {
-            originalFormDataSchedules.value = { ...newFormData }
-        }
-    } else {
-        // Datos por defecto
-        const defaultData = {
-            code: '', 
-            acronym: '',
-            transactionCodeDescription: '',
-            scheduleEffectiveDate: '',
-            startTime: '',
-            endTime: '',
-            changeReason: '',
-            base64JustificationFile: '',
-        }
-        
-        formDataSchedules.value = { ...defaultData }
-        originalFormDataSchedules.value = { ...defaultData }
+        console.log('Datos después de merge:', formDataSchedules.value);
+        console.log('Código después de merge:', formDataSchedules.value.code);
     }
-}, { immediate: true, deep: true })
+}, { immediate: true, deep: true }) 
+
 </script>

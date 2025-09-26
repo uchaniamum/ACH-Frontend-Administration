@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 
   nitro: {
     routeRules: {
+      // Usa un prefix específico para tu API
       '/my-api/**': {
         proxy: 'http://10.240.208.143/interbank-core-cortex-api/api/**',
         cors: true,
@@ -40,7 +41,16 @@ export default defineNuxtConfig({
   
   runtimeConfig: {
     public: {
-      apiBase: '/my-api'
+      apiBase: '/my-api' // ← Cambia a un prefix único
     }
+  },
+  modules: [
+    '@primevue/nuxt-module', // módulo PrimeVue para Nuxt 3
+  ],
+  primevue: {
+    theme: 'saga-blue', // tema oficial de PrimeVue 4.x
+    ripple: true,
+    inputStyle: 'outlined'
   }
+
 })
