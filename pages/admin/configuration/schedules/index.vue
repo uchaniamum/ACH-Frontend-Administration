@@ -609,21 +609,13 @@ watch(flatSchedules, (newVal) => {
                             <span class="flex justify-center">Cargando datos de horarios. Por favor espere.</span> 
                         </template>
 
-<<<<<<< HEAD
-                        <Column field="acronym" header="Canal" sortable style="min-width: 125px;">
-=======
                         <Column field="acronym" header="Canal" sortable  class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.acronym }}
                             </template> 
                         </Column>
 
-<<<<<<< HEAD
-                        <Column field="isInbound" header="Transacción" sortable style="min-width: 135px;">
-=======
                         <Column field="isInbound" header="Transacción" sortable  class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <span v-if="data.isInbound" class="flex gap-6">
                                     <Icon name="x:arrow-tr" class="text-sky-500 text-[12px] font-bold"/>
@@ -636,51 +628,31 @@ watch(flatSchedules, (newVal) => {
                             </template>
                         </Column>
                     
-<<<<<<< HEAD
-                        <Column field="scheduleWeek" header="Día" style="min-width: 180px;">
-=======
                         <Column field="scheduleWeek" header="Día" style="min-width: 160px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ formatScheduleWeek(data.scheduleWeek) }}
                             </template>
                         </Column>
 
-<<<<<<< HEAD
-                        <Column field="startTime" header="Hora Inicio" sortable style="min-width: 120px;">
-=======
                         <Column field="startTime" header="Hora Inicio" sortable class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.startTime }}
                             </template>
                         </Column> 
 
-<<<<<<< HEAD
-                        <Column field="endTime" header="Hora Fin" sortable style="min-width: 120px;">
-=======
                         <Column field="endTime" header="Hora Fin" sortable class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.endTime }}
                             </template>
                         </Column>
 
-<<<<<<< HEAD
-                        <Column field="transactionCodeDescription" header="Detalle" sortable style="min-width: 200px;">
-=======
                         <Column field="transactionCodeDescription" header="Detalle" sortable style="min-width: 190px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.transactionCodeDescription }}
                             </template>
                         </Column>
 
-<<<<<<< HEAD
-                        <Column field="exceptionCounter" header="Horario extraordinario" sortable  style="min-width: 160px;">
-=======
                         <Column field="exceptionCounter" header="Horario extraordinario" sortable  style="min-width: 157px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <span v-if="data.exceptionCounter > 0" class="flex gap-6">
                                     <XTag severity="magenta" :value="`(${data.exceptionCounter}) Programado`" />
@@ -691,11 +663,7 @@ watch(flatSchedules, (newVal) => {
                             </template>
                         </Column>
 
-<<<<<<< HEAD
-                        <Column header="Acciones" style="min-width: 133px;">
-=======
                         <Column header="Acciones" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <div class="flex justify-end gap-4">
                                     <XButton v-if="data.exceptionCounter > 0"
@@ -1097,24 +1065,5 @@ onMounted(async () => {
     await loadSchedule()
 })
 
-<<<<<<< HEAD
-// Watchers para debugging
-watch(selectedChannel, (newValue) => {
-    console.log('Canal seleccionado changed to:', newValue);
-    // Reset pagination when filter changes
-    paginationSchedulesFirst.value = 0;
-})
-
-watch(filteredSchedule, (newVal) => {
-    console.log('Filtered schedules count:', newVal.length);
-    console.log('Current selected channel:', selectedChannel.value);
-})
-
-watch(flatSchedules, (newVal) => {
-    console.log('Flat schedules updated, count:', newVal.length);
-})
-</script>
-=======
 </script>
 
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058

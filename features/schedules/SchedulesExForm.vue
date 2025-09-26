@@ -55,7 +55,7 @@
                     />
                 </div>
                 
-                <!--<span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
+                <span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
             
                 <XFileUpload
                     ref="fileupload"

@@ -45,26 +45,9 @@
                                         <span class="h-4 w-4 p-[2.67px] rounded-full bg-green-500 ring-2 ring-white"></span>
                                     </span>
                                 </span>
-<<<<<<< HEAD
-                                <span class="text-sm">{{ data.envioRegular.mainGateway }}</span>
-                            </div>
-                            <div v-if="data.envioRegular.contingencyEnabled" class="text-xs text-gray-500 ml-8">
-                                Canal extraordinario: {{ data.envioRegular.secondaryGateway }}
-                            </div>
-                        </div>
-                    </template>
-                </Column>
-
-                <!-- Envío de Transferencias QR -->
-                <Column field="qrPaymentGateway"  header="Envío de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
-                    <template #body="{ data }">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-2">
-=======
                                 <span class="text-gray-700">Operativo </span>
                             </div> 
                             <div class="flex items-center gap-4">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <span class="relative inline-flex">
                                     <span class="relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-500 bg-white shadow-[0.667px_0.667px_2.667px_0_#F1594E]">
                                         <span class="h-4 w-4 rounded-full bg-red-500 ring-2 ring-white"></span>
@@ -74,27 +57,6 @@
                             </div> 
                         </div>
 
-<<<<<<< HEAD
-                <!-- Recepción Transferencia Interbancaria Regular -->
-                <Column  field="retransacPaymentGateway" header="Recepción Transferencia Interbancaria Regular" :showFilterMenu="false" class="min-w-[209px]">
-                    <template #body="{ data }">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-2">
-                                <span class="relative inline-flex">
-                                    <span :class="[
-                                        'relative inline-flex h-6 w-6 items-center justify-center rounded-full border bg-white',
-                                        data.recepcionRegular.contingencyEnabled 
-                                            ? 'border-red-500 shadow-[0.667px_0.667px_2.667px_0_#F1594E]' 
-                                            : 'border-green-500 shadow-[0.667px_0.667px_2.667px_0_#9CDB7D]'
-                                    ]">
-                                        <span :class="[
-                                            'h-4 w-4 rounded-full ring-1 ring-white',
-                                            data.recepcionRegular.contingencyEnabled ? 'bg-red-500' : 'bg-green-500'
-                                        ]"></span>
-                                    </span>
-                                </span>
-                                <span class="text-sm">{{ data.recepcionRegular.mainGateway }}</span>
-=======
                         <div class="flex flex-row justify-between">
                             <div class="self-center">
                                 <XIconField>
@@ -105,7 +67,6 @@
                                     />
                                     <XInputIcon icon="search" @click="handleSearch" />
                                 </XIconField>
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             </div>
                             <div class="self-center flex gap-8">
                                 <XButton 
@@ -124,13 +85,6 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
-                <!-- Recepción de Transferencias QR -->
-                <Column field="reqrPaymentGateway" header="Recepción de Transferencias QR" :showFilterMenu="false" class="min-w-[209px]">
-                    <template #body="{ data }">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-2">
-=======
                         <DataTable 
                             :value="paginatedContingency" 
                             :loading="loading"
@@ -238,7 +192,6 @@
                                 <template #body="{ data }">
                                     <div class="flex flex-col gap-3">
                             <div class="flex items-center gap-3">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <span class="relative inline-flex">
                                     <span :class="getStatusClasses(data.envioRegular.statusType).containerClass">
                                         <span :class="getStatusClasses(data.envioRegular.statusType).dotClass"></span>
@@ -312,19 +265,6 @@
                                 </template>
                             </Paginator>
                         </div>
-<<<<<<< HEAD
-                    </template>
-                </Column>
-            </DataTable>
-
-            <Paginator 
-                v-if="filteredContingency.length > 0"
-                v-model:first="paginationContingencyFirst"
-                v-model:rows="paginationContingencyRows"
-                :totalRecords="filteredContingency.length"
-                :rowsPerPageOptions="[2, 10, 25, 50, 100]"
-            />
-=======
                         </div>
                         
                     </XTabPanel>
@@ -388,7 +328,6 @@
                     </XTabPanel>
                 </XTabPanels>
             </XTabs>
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
         </div>
         <ConfirmDialogWrapper
             v-model="confirmDialogChange.visible"
@@ -423,16 +362,12 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-import type { ContingencyTableRow, PaymentGatewayBankList } from '~/features/contingency/type';
-=======
 import type { DataTablePageEvent } from 'primevue';
 import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import ChannelContingencyModal from '~/features/contingency/ChannelContingencyModal.vue';
 import type { ContingencyTableRow, EnhancedTransactionStatus, Participant, PaymentGateway, Transaction } from '~/features/contingency/type';
 import type { ServiceError } from '~/features/users/types';
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 import { contingencyService } from '~/services/contingencySevice';
 
 ///PARA CONTINGENCIA DE PARTICIPANTES

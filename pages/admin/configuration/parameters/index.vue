@@ -56,61 +56,37 @@
                                 </span> 
                             </template>
 
-<<<<<<< HEAD
-                            <Column field="systemAcronym" header="Canal" sortable style="min-width: 100px;">
-=======
                             <Column field="systemAcronym" header="Canal" style="min-width: 100px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.systemAcronym }}
                                 </template>
                             </Column>
 
-<<<<<<< HEAD
-                            <Column field="code" header="Código" sortable headerStyle="width: 100px;" bodyStyle="width: 100px;">
-=======
                             <Column field="code" header="Código" headerStyle="width: 100px;" bodyStyle="width: 100px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.code }}
                                 </template>
                             </Column>
                         
-<<<<<<< HEAD
-                            <Column field="value" header="Valor" sortable style="min-width: 160px;">
-=======
                             <Column field="value" header="Valor" style="min-width: 160px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.value }}
                                 </template>
                             </Column>
 
-<<<<<<< HEAD
-                            <Column field="dataType" header="Tipo de Dato" sortable style="min-width: 100px;">
-=======
                             <Column field="dataType" header="Tipo de Dato" style="min-width: 100px;" class="text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.dataType }}
                                 </template>
                             </Column> 
 
-<<<<<<< HEAD
-                            <Column field="description" header="Descripción" sortable class="min-w-[275px]">
-=======
                             <Column field="description" header="Descripción" class="min-w-[275px] text-left" >
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.description }}
                                 </template>
                             </Column>
 
-<<<<<<< HEAD
-                            <Column header="Acciones" class="min-w-[210px]">
-=======
                             <Column header="Acción" class="min-w-[210px] text-left">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     <div class="flex gap-4">
                                         <XButton 
@@ -168,14 +144,9 @@ import { useParameterService } from '~/componsables/parameters/useParameters';
 import ParameterHistorialModal from '~/features/parameters/ParameterHistorialModal.vue';
 import ParameterModal from '~/features/parameters/ParameterModal.vue';
 import type { ParameterListItem, ParameterModalData } from '~/features/parameters/types';
-<<<<<<< HEAD
-import type { ServiceError } from '~/features/users/types';
-import { parametersService } from '~/services/parametersService';
-=======
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { useParameterFilters } from '~/componsables/parameters/useParameterFilters';
 import { usePagination } from '~/componsables/usePagination';
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
 // Composables
 const { parameters, loading, loadParameters, showToast} = useParameterService()
@@ -184,21 +155,7 @@ const { searchTermParameter, selectedChannel, filteredParameters } = useParamete
 const { firstPagination, rowsPagination, paginatedItems, totalRecords, onPage, resetPagination } = usePagination(filteredParameters);
 
 // State
-<<<<<<< HEAD
-const parameters = ref<ParameterListItem[]>([]);
-const loading = ref(false);
-const searchTermParameter = ref('')
-const first = ref(0)
-const rows = ref(10)
-
-const itemsBreadParameters = ref([
-    { label: 'Inicio'},
-    { label: 'Configuracion'},
-    { label: 'Parámetros'}
-])
-=======
 const itemsBreadParameters = getBreadcrumbItems('parameters', 'list');
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
 const channelOptions = computed(() => {
     return [

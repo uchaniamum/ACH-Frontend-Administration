@@ -1,10 +1,6 @@
 <template>
     <div class="flex flex-col gap-16">
-<<<<<<< HEAD
-        <XHeader title="Gestión de usuarios">
-=======
         <XHeader title="Gestión de usuarios" :breadcrumb-items="itemsBreadUsers" :show-breadcrumb="true" :show-back="true">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
             <template #description>
                 <p class="text-gray-800">Crea usuarios y asigna los roles correspondientes, procura garantizar que cada usuario cuente con los permisos adecuados para sus funciones.</p>
             </template>
@@ -63,11 +59,7 @@
                             </span> 
                         </template>
 
-<<<<<<< HEAD
-                        <Column field="codigo" header="Código" sortable class="w-[158px]" :showFilterMenu="false">
-=======
                         <Column field="codigo" header="Código de usuario" class=" text-left" :showFilterMenu="false">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.code }}
                             </template>
@@ -85,11 +77,7 @@
                             </template> -->
                         </Column>
                     
-<<<<<<< HEAD
-                        <Column field="fullname" header="Nombre" sortable class="w-[280px]" :showFilterMenu="false">
-=======
                         <Column field="fullname" header="Nombre" sortable class=" text-left" :showFilterMenu="false">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.fullname }}
                             </template>
@@ -107,11 +95,7 @@
                             </template> -->
                         </Column>
                     
-<<<<<<< HEAD
-                        <Column field="email" header="Correo Electrónico" sortable class="w-[225px]" :showFilterMenu="false">
-=======
                         <Column field="email" header="Correo Electrónico" sortable class="text-left" :showFilterMenu="false">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.email }}
                             </template>
@@ -129,11 +113,7 @@
                             </template> -->
                         </Column>
                     
-<<<<<<< HEAD
-                        <Column field="roleDescription" header="Rol" sortable class="w-[158px]" :showFilterMenu="false">
-=======
                         <Column field="roleDescription" header="Rol" sortable :showFilterMenu="false">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.roleDescription" 
@@ -155,11 +135,7 @@
                             </template> -->
                         </Column>
                     
-<<<<<<< HEAD
-                        <Column field="statusDescription" header="Estado" sortable class="w-[158px]" :showFilterMenu="false">
-=======
                         <Column field="statusDescription" header="Estado" sortable class="text-left" :showFilterMenu="false">
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
@@ -199,17 +175,6 @@
                             </template>
                         </Column>
                     </DataTable>
-<<<<<<< HEAD
-
-                    <Paginator 
-                        v-if="hasUsers"
-                        :rows="rows"
-                        :totalRecords="users.length"
-                        :first="first"
-                        :rowsPerPageOptions="[10, 25, 50, 100]"
-                        @page="onPage"
-                    />
-=======
                     <div class="flex justify-center">
                         <Paginator 
                             v-if="hasUsers"
@@ -226,7 +191,6 @@
                         </Paginator>
                     </div>
                     
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                 </div>
             </div>
         </div>
@@ -258,14 +222,9 @@ import { useOptions } from '~/componsables/useOptions';
 import { useUserService } from '~/componsables/user/useUsers';
 import type { ModalMode, UserModalData } from '~/features/users/types';
 import UserModal from '~/features/users/UserModal.vue';
-<<<<<<< HEAD
-import UserModalReset from '~/features/users/UserModalReset.vue';
-import { userService } from '~/services/userService';
-=======
 import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { useUserFilters } from '../../../../componsables/user/useUserFilters';
 import { usePagination } from '~/componsables/usePagination';
->>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
 // Composables 
 const { users, loading, loadUsers, showToast } = useUserService()
