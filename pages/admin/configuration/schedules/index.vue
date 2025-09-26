@@ -9,7 +9,7 @@
             <div class="flex justify-end gap-8">
                 <span class="text-gray-700">Definiciones:</span>  
                 <div class="flex items-center gap-4">
-                    <Icon name="x:arrow-bl " class="text-orange-500 text-[12px] font-semibold"/>
+                    <Icon name="x:arrow-bl" class="text-orange-500 text-[12px] font-semibold"/>
                     <span class="text-gray-700">Recibidas</span>
                 </div> 
 
@@ -222,18 +222,8 @@ import { scheduleService } from '~/services/scheduleService';
 // Composables 
 const toast = useToast()
 
-
-const itemsBreadSchedules = getBreadcrumbItems('schedule', 'list');
-
 const itemsBreadSchedules = getBreadcrumbItems('schedule', 'list');
 const { paymentGatewayFilterOptions, loadAllOptions } = useOptions()
-
-const itemsBreadSchedules = ref([
-    { label: 'Inicio', to: '/' },
-    { label: 'Configuracion', to: '/admin/configuration' },
-    { label: 'Horarios' }
-])
-
 
 // State - Cambio importante: ahora es Schedule[] directamente
 const schedules = ref<ScheduleResponseList[]>([])
