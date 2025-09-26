@@ -54,17 +54,8 @@
                         icon="clock"
                     />
                 </div>
-
-                <XTextarea
-                    id="textarea"
-                    v-model="formDataSchedules.changeReason"
-                    name="textarea"
-                    label="Justificación"
-                    label-required
-                    placeholder="Escribe una justificación"
-                />
-
-                <span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
+                
+                <!--<span >En caso de ser necesario adjunta el/los archivos que respalden tu justificación.</span>
             
                 <XFileUpload
                     ref="fileupload"

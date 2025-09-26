@@ -2,7 +2,6 @@
     <XDialog 
         v-model:visible="modalScheduleDetail" 
         modal
-        :closable="true"
         header="Ver horario(s) extraordinario(s)"
         :style="{ width: '720px !important' }" 
     > 

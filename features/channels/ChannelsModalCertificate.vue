@@ -558,8 +558,8 @@ const registerCertificate = async () => {
         close()
         toast.add({ 
           severity: 'success', 
-          summary: 'Éxito',
-          detail: 'Certificado público registrado correctamente', 
+          summary: 'Certificado público registrado',
+          //detail: 'Certificado público registrado', 
           life: 5000 
         })
       }, 1000)

@@ -1,5 +1,5 @@
 import { API_CONFIG } from "~/config/api";
-import type { CertificateVerificationRequest, CertificateVerificationResponse, ChannelsListItemResponse, ChannelsResponse, ChannelsSaveResponse } from "~/features/channels/type";
+import type { CertificateVerificationRequest, CertificateVerificationResponse, ChannelsListItemResponse, ChannelsResponse, ChannelsSaveResponse, PaymentGatewayCertificatesHistoryListItem, PaymentGatewayRoutesHistoryListItem } from "~/features/channels/type";
 import type { UserSaveResponse } from "~/features/users/types";
 
 class ChannelsService {
@@ -47,7 +47,6 @@ class ChannelsService {
     }
 
     async updateChannels(channelsData: { code: string }): Promise<ChannelsSaveResponse> {
-        console.log('Updating parameter with data:', channelsData);
         return this.request<ChannelsSaveResponse>('payment-gateways', {
             method: 'PUT',
             body: JSON.stringify(channelsData)
@@ -66,6 +65,16 @@ class ChannelsService {
             method: 'POST',
             body: JSON.stringify(data)
         });
+    }
+
+    async getHistoryPaymentGateway(): Promise<PaymentGatewayRoutesHistoryListItem> {
+        const endpoint = 'payment-gateways/historical-routes';
+        return this.request<PaymentGatewayRoutesHistoryListItem>(endpoint)
+    }
+
+    async getHistoryPaymentGatewayCertificates(): Promise<PaymentGatewayCertificatesHistoryListItem> {
+        const endpoint = 'payment-gateways/historical-certificates';
+        return this.request<PaymentGatewayCertificatesHistoryListItem>(endpoint)
     }
 }
 

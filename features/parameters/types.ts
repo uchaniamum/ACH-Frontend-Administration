@@ -1,9 +1,9 @@
 export interface ParameterListItem {
-    systemAcronym?: string
-    code?: string
-    value?: string
-    dataType?: string
-    description?: string
+    systemAcronym?: string;
+    code?: string;
+    value?: string;
+    dataType?: string;
+    description?: string;
 }
 
 export interface ParametersListResponse {
@@ -11,14 +11,14 @@ export interface ParametersListResponse {
 }
 
 export interface ParameterModalData {
-    systemAcronym?: string
-    code?: string
-    value?: string
-    dataType?: string
-    description?: string
+    systemAcronym?: string |  undefined;
+    code: string;
+    value?: string | undefined;
+    dataType?: string | undefined;
+    description?: string | undefined;
 }
 
-//Datos para editar 
+//Datos para Editar Parametros 
 export interface ParameterRequest {
     code: string;
     value: string;
@@ -39,15 +39,16 @@ export interface ParameterDetailResponse {
 
 
 export interface ParameterSaveResponse {
-    wasSaved: boolean
-    wasNew: boolean
-    summary: string
-    description: string
-    savedBy: string
-    savedAt: string
-    traceId: string
+    wasSaved: boolean;
+    wasNew: boolean;
+    summary: string;
+    description: string;
+    savedBy: string;
+    savedAt: string;
+    traceId: string;
 }
 
+//Datos para Historial de Parametros 
 export interface ParameterDetailHisto {
     updatedAt: string;
     updatedByUser: string;
@@ -59,4 +60,23 @@ export interface ParameterDetailHistorialResponse {
     dataType: string;
     description: string;
     parameters: ParameterDetailHisto[];
+}
+
+export interface ParameterHistoryItem {
+    paymentGatewayCode: string;
+    paymentGatewayAcronym: string;
+    changeNumber: number;
+    paymentGatewayParameterCode: string;
+    value: string;
+    dataType: string;
+    description: string;
+    isActive: boolean;
+    createdAt: string;
+    createdByUser: string;
+    updatedAt: string;
+    updatedByUser: string;
+}
+
+export interface ParameterHistoryListItem{
+    historicalParameters: ParameterHistoryItem[]
 }

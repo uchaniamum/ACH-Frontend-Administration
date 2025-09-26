@@ -4,6 +4,9 @@
             <XHeader 
                 :title="isMultipleBanks ? `${pageTitle} - Participantes (${contingencyData.length})` : pageTitle" 
                 @back-click="goBack"
+                :breadcrumb-items="itemsBreadContingencyEdit" 
+                :show-breadcrumb="true"
+                :show-back="true"
             />
             <span class="text-normal font-normal">
                 {{ pageDescription }}
@@ -54,7 +57,7 @@
                                 >
                                     <template #body="{ data }">
                                         <div class="flex justify-center">
-                                            <Checkbox 
+                                            <XRadioButton 
                                                 v-model="data.gateways[gateway.value]"
                                                 :binary="true"
                                                 @update:modelValue="onGatewayChange(data, gateway.value, { checked: $event })"
@@ -83,11 +86,26 @@
                                 <template #content>
                                     <div class="flex flex-row justify-between">
                                         <div class="self-center">
+<<<<<<< HEAD
                                             <div class="flex gap-4">
                                                 <span>Envío de transferencias interbancarias IASYNC</span>
                                                 <span v-tooltip="'Salida de transferencias regulares.'">
                                                     <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
                                                 </span>
+=======
+                                            <div class="flex flex-col gap-4">
+                                                <div class="flex gap-4">
+                                                    <span>Envío de transferencias interbancarias IASYNC</span>
+                                                    <span v-tooltip="'Salida de transferencias regulares.'">
+                                                        <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <XTag :severity="iasyncContingency ? 'danger' : 'success'" 
+                                                    :value="iasyncContingency ? 'En contingencia' : 'Operacional'"/>
+                                                </div>
+                                                
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                             </div>
                                             <XTag :severity="iasyncContingency ? 'danger' : 'success'" 
                                                 :value="iasyncContingency ? 'Con contingencia' : 'Sin contingencia'"/>
@@ -97,6 +115,7 @@
                                         </div>
                                     </div>
                                 </template>
+<<<<<<< HEAD
                             </XCard>
                             
                             <XCard class="border border-gray-200">
@@ -183,6 +202,109 @@
                                 label="Mensaje"
                                 :rules="requiredRule"
                             />
+=======
+                                    </XCard>
+
+                                    <XCard class="border border-gray-200">
+                                        <template #content>
+                                            <div class="flex flex-row justify-between">
+                                                <div class="self-center">
+                                                    <div class="flex flex-col gap-4">
+                                                        <div class="flex gap-4">
+                                                            <span>Envío de transferencias QR IQR</span>
+                                                            <span v-tooltip="'Procesamiento de transacciones de pago por QR.'">
+                                                                <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <XTag :severity="iqrContingency ? 'danger' : 'success'" 
+                                                            :value="iqrContingency ? 'En contingencia' : 'Operacional'"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="self-center">
+                                                    <XToggleSwitch v-model="iqrContingency"/>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </XCard>
+
+                                    <XCard class="border border-gray-200">
+                                        <template #content>
+                                            <div class="flex flex-row justify-between">
+                                                <div class="self-center">
+                                                    <div class="flex flex-col gap-4">
+                                                        <div class="flex gap-4">
+                                                            <span>Recepción transferencia interbancaria OASYNC</span>
+                                                            <span v-tooltip="'Salida de transferencias regulares.'">
+                                                                <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <XTag :severity="oasyncContingency ? 'danger' : 'success'" 
+                                                            :value="oasyncContingency ? 'En contingencia' : 'Operacional'"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="self-center">
+                                                    <XToggleSwitch v-model="oasyncContingency"/>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </XCard>
+
+                                    <XCard class="border border-gray-200">
+                                        <template #content>
+                                            <div class="flex flex-row justify-between">
+                                                <div class="self-center">
+                                                    <div class="flex flex-col gap-4">
+                                                        <div class="flex gap-4">
+                                                            <span>Recepción transferencia QR OQR</span>
+                                                            <span v-tooltip="'Procesamiento de transacciones de cobro por QR.'">
+                                                                <Icon name="x:info-empty" class="text-sky-500 w-[14.666px] h-[14.666px]"/>
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <XTag :severity="oqrContingency ? 'danger' : 'success'" 
+                                                            :value="oqrContingency ? 'En contingencia' : 'Operacional'" class="!text-medium"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="self-center">
+                                                    <XToggleSwitch v-model="oqrContingency"/>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </XCard>
+                                </div>
+                                <div v-if="shouldShowContingencyFields" class="flex flex-col gap-8">
+                                    <Divider align="left" type="solid">
+                                        <b>Mensaje de respuesta</b>
+                                    </Divider>
+                                    <span class="text-normal font-normal text-gray-700">
+                                        Define un mensaje de rechazo que se mostrará a los usuarios cuando intenten realizar transacciones hacia este participante.                               
+                                    </span>
+                                    <XInputText 
+                                        v-model="titleContingency"
+                                        name="tituloContingencia"
+                                        label="Titulo" 
+                                        label-required
+                                        placeholder="Ingresa el título del mensaje"
+                                        :rules="requiredRule"
+                                    />
+                                    <XTextarea 
+                                        v-model="messageContingency"
+                                        name="messageContingency" 
+                                        rows="5" 
+                                        class="w-full" 
+                                        placeholder="Ingresa el contenido del mensaje" 
+                                        label-required 
+                                        label="Mensaje"
+                                        :rules="requiredRule"
+                                    />
+                                </div>
+                            </div>
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                         </div>
                         
                         <!-- JUSTIFICACIÓN -->
@@ -193,6 +315,7 @@
                             <span class="text-normal font-normal text-gray-700">
                                 Detalla el motivo del cambio y adjunta el respaldo correspondiente.
                             </span>
+<<<<<<< HEAD
                             <XTextarea 
                                 v-model="justification"
                                 name="clarifications" 
@@ -203,6 +326,21 @@
                                 label="Justificación"
                                 :rules="requiredRule"
                             />
+=======
+                            <div class="flex flex-col gap-[0.357rem]">
+                                <XTextarea 
+                                    v-model="justification"
+                                    name="justification" 
+                                    rows="5" 
+                                    class="w-full" 
+                                    :placeholder="isChannelChange ? 'Describe el motivo del cambio de canal' : 'Describe el motivo de la contingencia'" 
+                                    label-required 
+                                    label="Justificación"
+                                    :rules="requiredRule"
+                                />
+                                <span class="text-gray-600 text-sm">Por razones de seguridad, este campo es requerido.</span>
+                            </div>
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                         </div>
                     </div>
                 </div>
@@ -318,7 +456,7 @@
 
 <script setup lang="ts">
 import { useOptions } from '~/componsables/useOptions';
-import type { PaymentGatewayBankDetail } from '~/features/contingency/type';
+import type { GatewayAnalysis, Participant, ParticipantDetailResponse, PaymentGateway, Transaction, TransactionRowData } from '~/features/contingency/type';
 import type { ValidationRuleResult } from '~/features/users/options.types';
 import { contingencyService } from '~/services/contingencySevice';
 
@@ -331,7 +469,7 @@ const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const error = ref<string | null>(null);
-const contingencyData = ref<PaymentGatewayBankDetail[]>([]);
+const contingencyData = ref<ParticipantDetailResponse[]>([]);
 
 // Estados de modales
 const visibleChangeCanal = ref(false);
@@ -349,30 +487,83 @@ const oasyncContingency = ref(false);
 const oqrContingency = ref(false);
 
 const hasContingencyInconsistencies = ref(false);
-const contingencyStats = ref({});
 
 
-const transactionData = ref([
-    {
-        id: 1,
-        transaction: 'Envío de transferencias interbancarias OASYNC',
-        transactionCode: 'OASYNC',
-        tooltip: 'Información sobre transferencias interbancarias',
-        gateways: {}
-    },
-    {
-        id: 2,
-        transaction: 'Envío de transferencias QR OQR',
-        transactionCode: 'OQR',
-        tooltip: 'Información sobre transferencias QR',
-        gateways: {}
+
+const transactionData = ref([]);
+
+<<<<<<< HEAD
+=======
+const isFormContingencyValid = computed(() => {
+    const baseValidation = justification.value?.trim();
+    
+    if (!shouldShowContingencyFields.value) {
+        return baseValidation;
     }
-])
+    
+    return baseValidation && 
+            titleContingency.value?.trim() && 
+            messageContingency.value?.trim();
+})
 
+// DETECTAR QUÉ TIPO DE OPERACIÓN ES
+const isChannelChange = computed(() => {
+    return route.query.type === 'channel' || route.path.includes('channel');
+});
+
+const isContingency = computed(() => {
+    return route.query.type === 'contingency' || route.path.includes('contingency');
+});
+
+// DETECTAR SI SON MÚLTIPLES BANCOS
+const isMultipleBanks = computed(() => {
+    return participantCodes.value.length > 1;
+});
+
+// TÍTULOS Y DESCRIPCIONES DINÁMICOS
+const pageTitle = computed(() => {
+    const action = isChannelChange.value ? 'Cambiar canal' : 'Configurar operabilidad ';
+    return isMultipleBanks.value ? action : `${action} - ${getBankNames.value}`;
+});
+
+const pageDescription = computed(() => {
+    return isChannelChange.value 
+        ? 'Realiza el cambio de canal asignado al participante para garantizar una correcta continuidad operativa.'
+        : 'Establece contingencias específicas para garantizar la continuidad de las operaciones.';
+});
+
+// COMPUTED PARA NOMBRES DE BANCOS
+const getBankNames = computed(() => {
+        // Primero intentar obtener desde query parameters (desde navegación)
+    if (route.query.bankName && typeof route.query.bankName === 'string') {
+        return route.query.bankName;
+    }
+    
+    if (route.query.bankNames && typeof route.query.bankNames === 'string') {
+        return route.query.bankNames; // Ya viene separado por comas
+    }
+    
+    // Fallback: obtener desde datos cargados (comportamiento original)
+    if (!contingencyData.value?.length) return 'Cargando...';
+    
+    return contingencyData.value
+        .map(bank => bank.participantName)
+        .join(',');
+});
+
+const getBankNamesArray = computed(() => {
+    const names = getBankNames.value;
+    if (typeof names === 'string' && names.includes(',')) {
+        return names.split(',').map(name => name.trim()).filter(name => name.length > 0);
+    }
+    return [names];
+});
+
+
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 // Usar el composable y cargar opciones
 const { 
     paymentGatewayOptions: optionsFromComposable, 
-    loading: optionsLoading, 
     loadAllOptions 
 } = useOptions();
 
@@ -387,14 +578,6 @@ const paymentGatewayOptions = computed(() => {
 
 const selectedChannelValue = ref('');
 
-// DETECTAR QUÉ TIPO DE OPERACIÓN ES
-const isChannelChange = computed(() => {
-    return route.query.type === 'channel' || route.path.includes('channel');
-});
-
-const isContingency = computed(() => {
-    return route.query.type === 'contingency' || route.path.includes('contingency');
-});
 
 // OBTENER CÓDIGOS DE PARTICIPANTES - VERSIÓN CORREGIDA
 const participantCodes = computed(() => {
@@ -442,58 +625,13 @@ const participantCodes = computed(() => {
     return [];
 });
 
-// DETECTAR SI SON MÚLTIPLES BANCOS
-const isMultipleBanks = computed(() => {
-    return participantCodes.value.length > 1;
-});
-
-// TÍTULOS Y DESCRIPCIONES DINÁMICOS
-const pageTitle = computed(() => {
-    const action = isChannelChange.value ? 'Cambiar canal' : 'Establecer contingencia';
-    return isMultipleBanks.value ? action : `${action} - ${getBankNames.value}`;
-});
-
-const pageDescription = computed(() => {
-    return isChannelChange.value 
-        ? 'Realiza el cambio de canal asignado al participante para garantizar una correcta continuidad operativa.'
-        : 'Establece contingencias específicas para garantizar la continuidad de las operaciones.';
-});
-
-// COMPUTED PARA NOMBRES DE BANCOS
-const getBankNames = computed(() => {
-        // Primero intentar obtener desde query parameters (desde navegación)
-    if (route.query.bankName && typeof route.query.bankName === 'string') {
-        return route.query.bankName;
-    }
-    
-    if (route.query.bankNames && typeof route.query.bankNames === 'string') {
-        return route.query.bankNames; // Ya viene separado por comas
-    }
-    console.log('bancos ruta', router.query.bankNames);
-    
-    // Fallback: obtener desde datos cargados (comportamiento original)
-    if (!contingencyData.value?.length) return 'Cargando...';
-    
-    return contingencyData.value
-        .map(bank => bank.participantName || bank.name)
-        .join(',');
-});
-
-const getBankNamesArray = computed(() => {
-    const names = getBankNames.value;
-    if (typeof names === 'string' && names.includes(',')) {
-        return names.split(',').map(name => name.trim()).filter(name => name.length > 0);
-    }
-    return [names];
-});
-
 // Detectar si los bancos tienen configuraciones inconsistentes
 const hasInconsistentConfigurations = computed(() => {
     if (!isMultipleBanks.value || contingencyData.value.length < 2) return false;
 
     const firstBank = contingencyData.value[0];
 
-    return contingencyData.value.some((bank, index) => {
+    return contingencyData.value.some((bank: Participant, index) => {
         if (index === 0) return false;
 
         // Comparar transacciones
@@ -514,28 +652,115 @@ const hasInconsistentConfigurations = computed(() => {
     });
 });
 
-const getSelectedChannelFromTable = computed(() => {
-    // Para cambio de canal, buscar qué canal está seleccionado en la tabla
-    if (!isChannelChange.value) return '';
+const shouldShowContingencyFields = computed(() => {
+    if (!contingencyData.value || contingencyData.value.length === 0) {
+        return false;
+    }
     
-    // Buscar en la primera transacción qué gateway está seleccionado
-    const firstTransaction = transactionData.value[0];
-    if (!firstTransaction) return '';
-    
-    // Encontrar el gateway que está marcado como true
-    const selectedGateway = paymentGatewayOptions.value.find(gateway => 
-        firstTransaction.gateways[gateway.value] === true
-    );
-    
-    return selectedGateway ? selectedGateway.label : '';
+
+    // Verificar si algún banco tiene al menos una transacción en contingencia
+    return contingencyData.value.some(bank => {
+        return bank.transactions?.some(transaction => 
+            transaction.isInContigency === true ||
+            iasyncContingency.value || 
+            iqrContingency.value || 
+            oasyncContingency.value || 
+            oqrContingency.value
+        );
+    });
 });
 
+<<<<<<< HEAD
 
 const onGatewayChange = (transactionRow, gatewayValue, event) => {
+=======
+const generateTransactionDataFromServer = (): void => {
+    console.log('=== GENERANDO transactionData DINÁMICAMENTE ===');
+    
+    if (!contingencyData.value || contingencyData.value.length === 0) {
+        console.log('Sin datos de contingencia para procesar');
+        return;
+    }
+
+    // Usar el primer banco como referencia para obtener las transacciones disponibles
+    const referenceBank = contingencyData.value[0];
+    
+    if (!referenceBank.transactions || referenceBank.transactions.length === 0) {
+        console.log('Sin transacciones en el banco de referencia');
+        return;
+    }
+
+    // Filtrar solo las transacciones outbound (IsInbound: false)
+    const outboundTransactions = referenceBank.transactions.filter(transaction => 
+        transaction.IsInbound === false
+    );
+
+    console.log('Transacciones outbound encontradas:', 
+        outboundTransactions.map(t => t.transactionCode).join(', ')
+    );
+
+    // Generar el transactionData dinámicamente
+    transactionData.value = outboundTransactions.map((transaction: Transaction, index: number) => ({
+        id: index + 1,
+        transaction: generateTransactionLabel(transaction.transactionCode),
+        transactionCode: transaction.transactionCode,
+        tooltip: generateTransactionTooltip(transaction.transactionCode),
+        gateways: {}
+    }));
+};
+
+const generateTransactionLabel = (transactionCode: string): string => {
+    // Mapeo para códigos conocidos
+    const knownTransactions: Record<string, string> = {
+        'OASYNC': 'Envío de transferencias interbancarias OASYNC',
+        'OQR': 'Envío de transferencias QR OQR',
+        'IASYNC': 'Recepción de transferencias interbancarias IASYNC',
+        'IQR': 'Recepción de transferencias QR IQR'
+    };
+
+    // Si existe en el mapeo, usar la descripción conocida
+    if (knownTransactions[transactionCode]) {
+        return knownTransactions[transactionCode];
+    }
+
+    return `Transacción ${transactionCode}`;
+};
+
+const generateTransactionTooltip = (transactionCode: string) => {
+    // Mapeo para tooltips conocidos
+    const knownTooltips: Record<string, string> = {
+        'OASYNC': 'Salida de transferencias regulares.',
+        'OQR': 'Procesamiento de transacciones de cobro por QR.',
+        'IASYNC': 'Entrada de transferencias regulares.',
+        'IQR': 'Procesamiento de transacciones de pago por QR.'
+    };
+
+    // Si existe en el mapeo, usar el tooltip conocido
+    if (knownTooltips[transactionCode]) {
+        return knownTooltips[transactionCode];
+    }
+
+    // Para códigos nuevos, generar un tooltip genérico
+    return `Información sobre transacción ${transactionCode}`;
+};
+
+
+const requiredRule = (value:unknown):ValidationRuleResult => {
+    return value !== null && value !== undefined && value !== '' 
+        ? true 
+        : 'El campo es requerido'
+}
+
+const onGatewayChange = (
+    transactionRow: TransactionRowData, 
+    gatewayValue: string, 
+    event: { checked?: boolean; target?: { checked?: boolean } }
+): void => {
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
     // FIX: PrimeVue Checkbox a veces no envía event.checked correctamente
     const isChecked = event?.checked ?? event?.target?.checked ?? !transactionRow.gateways[gatewayValue];
     
-    console.log('🔄 Cambio en gateway CORREGIDO:', {
+    console.log(' Cambio en gateway CORREGIDO:', {
         transaction: transactionRow.transaction,
         transactionCode: transactionRow.transactionCode,
         gateway: gatewayValue,
@@ -553,16 +778,64 @@ const onGatewayChange = (transactionRow, gatewayValue, event) => {
         paymentGatewayOptions.value.forEach(gateway => {
             if (gateway.value !== gatewayValue) {
                 transactionRow.gateways[gateway.value] = false;
-                console.log(`   ⬜ Deseleccionando ${gateway.label}`);
+                console.log(`    Deseleccionando ${gateway.label}`);
             }
         });
-        console.log(`   ✅ Seleccionando ${paymentGatewayOptions.value.find(opt => opt.value === gatewayValue)?.label}`);
+        console.log(`    Seleccionando ${paymentGatewayOptions.value.find(opt => opt.value === gatewayValue)?.label}`);
     }
     
     // Debug: Mostrar estado final de la fila
     console.log('   Estado final de la fila:', transactionRow.gateways);
 };
 
+
+const openChannelChangeModal = (): void => {
+    const entityText = contingencyData.value.length > 1 
+        ? `${contingencyData.value.length} entidades` 
+        : `${contingencyData.value.length} `
+
+    confirmDialog.value = {
+        visible: true,
+        options: {
+            title: 'Cambiar de canal',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            confirmLabel: 'Guardar',
+            cancelLabel: 'Cancelar',
+            message: `¿Estás seguro de cambiar de canal de  <span class="font-semibold">${entityText}</span>? Esta modificación podrá ser ajustada en el futuro.`,
+            onConfirm: async () => {
+                await saveConfirm()
+            },
+            onCancel: () => {
+                // Lógica adicional si es necesaria al cancelar
+            }
+        }
+    }
+}
+
+// Método para abrir modal de contingencia
+const openContingencyModal = (): void => {
+    const entityText = contingencyData.value.length > 1 
+        ? `${contingencyData.value.length} entidades` 
+        : `${contingencyData.value.length} `
+    confirmDialog.value = {
+        visible: true,
+        options: {  
+            title: 'Configurar operabilidad',
+            icon: 'x:warning-circle',
+            iconColor: 'text-yellow-500',
+            confirmLabel: 'Guardar',
+            cancelLabel: 'Cancelar',
+            message: `¿Estás seguro de guardar la configuración para <span class="font-semibold">${entityText}</span>? Esta modificación podrá ser ajustada en el futuro.`,
+            onConfirm: async () => {
+                await saveConfirm()
+            },
+            onCancel: () => {
+                // Lógica adicional si es necesaria al cancelar
+            }
+        }
+    }
+}
 
 // FUNCIÓN PARA MANEJAR CLICK EN GUARDAR/CAMBIAR
 const handleSaveClick = () => {
@@ -598,70 +871,30 @@ const validateGatewayState = (gateway) => {
         return { estado: 'primario_activo', isContingency: false, descripcion: 'Canal primario y activo',canBeSelected: true };
     }
 
-    // 2. Primario operativo pero en contingencia temporal
-    if (isPrimary_ && isOperational_ && isTemporarilyActive_) {
-        return {  estado: 'primario_contingencia_activa',  isContingency: true, descripcion: 'Primario operativo en contingencia', canBeSelected: false };
-    }
+    // // 2. Primario operativo pero en contingencia temporal
+    // if (isPrimary_ && isOperational_ && isTemporarilyActive_) {
+    //     return {  estado: 'primario_contingencia_activa',  isContingency: true, descripcion: 'Primario operativo en contingencia', canBeSelected: false };
+    // }
 
-    // 3. Primario fuera de servicio
-    if (isPrimary_ && !isOperational_ && !isTemporarilyActive_) {
-        return { 
-            estado: 'primario_fuera_servicio', 
-            isContingency: true, 
-            descripcion: 'Primario fuera de servicio',
-            canBeSelected: false 
-        };
-    }
+    // // 3. Primario fuera de servicio
+    // if (isPrimary_ && !isOperational_ && !isTemporarilyActive_) {
+    //     return { 
+    //         estado: 'primario_fuera_servicio', 
+    //         isContingency: true, 
+    //         descripcion: 'Primario fuera de servicio',
+    //         canBeSelected: false 
+    //     };
+    // }
 
-    // 4. Primario en contingencia (no operativo pero marcado temporal) - CORREGIDA
-    if (isPrimary_ && !isOperational_ && isTemporarilyActive_) {
-        return { 
-            estado: 'primario_contingencia', 
-            isContingency: true, 
-            descripcion: 'Primario en contingencia',
-            canBeSelected: false 
-        };
-    }
-
-    // 5. Canal secundario activo temporalmente (por contingencia)
-    if (!isPrimary_ && isOperational_ && isTemporarilyActive_) {
-        return { 
-            estado: 'secundario_contingencia', 
-            isContingency: true, 
-            descripcion: 'Canal secundario por contingencia',
-            canBeSelected: false // Ya está en uso por contingencia
-        };
-    }
-
-    // 6. Canal activo pero no temporal (posible promoción a primario)
-    if (!isPrimary_ && isOperational_ && !isTemporarilyActive_) {
-        return { 
-            estado: 'secundario_disponible', 
-            isContingency: false, 
-            descripcion: 'Canal secundario disponible',
-            canBeSelected: true // ESTE ES EL CLAVE - puede ser seleccionado
-        };
-    }
-
-    // 7. Estado inconsistente (no debería pasar)
-    if (!isPrimary_ && !isOperational_ && isTemporarilyActive_) {
-        return { 
-            estado: 'inconsistente', 
-            isContingency: true, 
-            descripcion: 'Estado inconsistente - inactivo pero temporal',
-            canBeSelected: false 
-        };
-    }
-
-    // 8. Canal disponible pero no en uso
-    if (!isPrimary_ && !isOperational_ && !isTemporarilyActive_) {
-        return { 
-            estado: 'disponible_sin_uso', 
-            isContingency: false, 
-            descripcion: 'Canal disponible sin uso',
-            canBeSelected: true 
-        };
-    }
+    // // 5. Canal secundario activo temporalmente (por contingencia)
+    // if (!isPrimary_ && isOperational_ && isTemporarilyActive_) {
+    //     return { 
+    //         estado: 'secundario_contingencia', 
+    //         isContingency: true, 
+    //         descripcion: 'Canal secundario por contingencia',
+    //         canBeSelected: false // Ya está en uso por contingencia
+    //     };
+    // }
 
     // Por defecto
     return { 
@@ -673,28 +906,60 @@ const validateGatewayState = (gateway) => {
 };
 
 //FUNCIÓN PARA FILTRAR SOLO TRANSACCIONES OUTBOUND
-const isOutboundTransaction = (transactionCode) => {
-    // Solo las transacciones de SALIDA pueden cambiar de canal
-    const outboundTransactions = ['OASYNC', 'OQR']; // Envío interbancarias y QR
-    return outboundTransactions.includes(transactionCode);
+const isOutboundTransaction = (transactionCode: string): boolean => {
+    // // Solo las transacciones de SALIDA pueden cambiar de canal
+    // const outboundTransactions = ['OASYNC', 'OQR']; // Envío interbancarias y QR
+    // return outboundTransactions.includes(transactionCode);
+    if (!contingencyData.value || contingencyData.value.length === 0) {
+        return false;
+    }
+
+    // Buscar la transacción en cualquier banco para verificar si es outbound
+    for (const bank of contingencyData.value) {
+        const transaction = bank.transactions?.find(t => t.transactionCode === transactionCode);
+        if (transaction) {
+            return transaction.IsInbound === false;
+        }
+    }
+
+    return false;
+};
+
+const getAllOutboundTransactionCodes = () => {
+    if (!contingencyData.value || contingencyData.value.length === 0) {
+        return [];
+    }
+
+    const outboundCodes = new Set();
+    
+    contingencyData.value.forEach(bank => {
+        bank.transactions?.forEach(transaction => {
+            if (transaction.IsInbound === false) {
+                outboundCodes.add(transaction.transactionCode);
+            }
+        });
+    });
+
+    return Array.from(outboundCodes);
 };
 
 //MARCAR CHECKS DE CANAL - VERSIÓN MEJORADA CON VALIDACIÓN
-const marcarCheckboxesAutomaticamente = () => {
-    console.log('🪄 === INICIANDO MARCADO AUTOMÁTICO ===');
+const marcarCheckboxesAutomaticamente = (): void => {
+    console.log(' === INICIANDO MARCADO AUTOMÁTICO ===');
     
-    // Primero, limpiar y mostrar opciones disponibles
-    console.log('Opciones de gateway disponibles:', 
-        paymentGatewayOptions.value.map(opt => `${opt.label} (${opt.value})`).join(', ')
-    );
+    // // Primero, limpiar y mostrar opciones disponibles
+    // console.log('Opciones de gateway disponibles:', 
+    //     paymentGatewayOptions.value.map(opt => `${opt.label} (${opt.value})`).join(', ')
+    // );
+
+    // Obtener códigos outbound dinámicamente
+    const outboundCodes = getAllOutboundTransactionCodes();
+    console.log('Códigos outbound dinámicos:', outboundCodes);
     
-    transactionData.value.forEach(filaTabla => {
-        console.log(`\n📋 Procesando ${filaTabla.transactionCode}:`);
+    transactionData.value.forEach((filaTabla: TransactionRowData) => {
+        console.log(` Procesando ${filaTabla.transactionCode}:`);
         
-        // FILTRAR: Solo procesar transacciones outbound
         if (!isOutboundTransaction(filaTabla.transactionCode)) {
-            console.log(`   ⏭️ Omitiendo ${filaTabla.transactionCode} - es transacción inbound`);
-            // Inicializar como vacío para transacciones inbound
             filaTabla.gateways = {};
             paymentGatewayOptions.value.forEach(opcion => {
                 filaTabla.gateways[opcion.value] = false;
@@ -709,204 +974,217 @@ const marcarCheckboxesAutomaticamente = () => {
         });
         
         // Analizar cada banco para esta transacción
-        console.log(`   🔍 Analizando ${contingencyData.value.length} bancos:`);
+        console.log(`Analizando ${contingencyData.value.length} bancos:`);
         
-        const analisisPorGateway = {};
-        
+        const analisisPorGateway: Record<string, GatewayAnalysis> = {};
+        let primaryGateway: PaymentGateway | undefined;
+
         contingencyData.value.forEach((banco, index) => {
-            console.log(`      🏦 Banco ${index + 1}: ${banco.participantName}`);
-            
-            const transaccionEncontrada = banco.transactions?.find(
-                t => t.transactionCode === filaTabla.transactionCode
-            );
-            
-            if (transaccionEncontrada) {
-                transaccionEncontrada.paymentGateways?.forEach(gatewayServer => {
-                    const estadoGateway = validateGatewayState(gatewayServer);
-                    const gatewayLabel = paymentGatewayOptions.value.find(
-                        opt => opt.value === gatewayServer.paymentGatewayCode
-                    )?.label || gatewayServer.paymentGatewayCode;
-                    
-                    if (!analisisPorGateway[gatewayServer.paymentGatewayCode]) {
-                        analisisPorGateway[gatewayServer.paymentGatewayCode] = {
-                            label: gatewayLabel,
-                            estados: [],
-                            puedeSeleccionarse: [],
-                            countDisponible: 0,
-                            countPrimarioActivo: 0
-                        };
-                    }
-                    
-                    const analysis = analisisPorGateway[gatewayServer.paymentGatewayCode];
-                    analysis.estados.push(estadoGateway.estado);
-                    analysis.puedeSeleccionarse.push(estadoGateway.canBeSelected);
-                    
-                    if (estadoGateway.canBeSelected) {
-                        analysis.countDisponible++;
-                    }
-                    
-                    if (estadoGateway.estado === 'primario_activo') {
-                        analysis.countPrimarioActivo++;
-                    }
-                    
-                    console.log(`         ${gatewayLabel}: ${estadoGateway.descripcion} (Seleccionable: ${estadoGateway.canBeSelected})`);
-                });
-            } else {
-                console.log(`         ❌ Sin esta transacción en el banco`);
-            }
-        });
+    console.log(`  Banco ${index + 1}: ${banco.participantName}`);
+    
+    const transaccionEncontrada = banco.transactions?.find(
+        t => t.transactionCode === filaTabla.transactionCode
+    );
+    
+    console.log('Transaccion encontrada: ', transaccionEncontrada);
+    
+    // CORRECCIÓN: Verificar si transaccionEncontrada existe y tiene paymentGateways
+    if (transaccionEncontrada && transaccionEncontrada.paymentGateways && transaccionEncontrada.paymentGateways.length > 0) {
+        console.log('trabsaccion payment: ', transaccionEncontrada.paymentGateways);
         
-        // Decidir qué marcar basado en el análisis
-        console.log(`   📊 Resumen de análisis:`);
+        // Buscar SOLAMENTE el PRIMER gateway con isPrimary: true
+        // Usamos find() que devuelve el primer elemento que cumple la condición
+        primaryGateway = transaccionEncontrada.paymentGateways.find(gw => gw.isPrimary === true);
+        console.log('Gateway primario encontrado: ', primaryGateway);
+        
+        if (primaryGateway) {
+            console.log('Gateway primario: ', primaryGateway.paymentGatewayAcronym);
+            
+            // Aquí puedes procesar el gateway primario según necesites
+            const gatewayCode = primaryGateway.paymentGatewayCode;
+            const gatewayLabel = paymentGatewayOptions.value.find(
+                opt => opt.value === gatewayCode
+            )?.label || gatewayCode;
+            
+            // Inicializar el análisis para este gateway si no existe
+            if (!analisisPorGateway[gatewayCode]) {
+                analisisPorGateway[gatewayCode] = {
+                    label: gatewayLabel,
+                    estados: [],
+                    puedeSeleccionarse: [],
+                    countDisponible: 0,
+                    countPrimarioActivo: 0
+                };
+            }
+            
+            // Actualizar el análisis
+            const analysis = analisisPorGateway[gatewayCode];
+            analysis.countDisponible++;
+            
+            // Verificar si es primario y está operativo
+            if (primaryGateway.isPrimary) {
+                analysis.countPrimarioActivo++;
+                analysis.estados.push('primario_activo');
+                analysis.puedeSeleccionarse.push(true);
+            } else {
+                analysis.estados.push('primario_inactivo');
+                analysis.puedeSeleccionarse.push(false);
+            }
+        } else {
+            console.log('No se encontró ningún gateway con isPrimary: true');
+        }
+    } else {
+        console.log(`Sin transacción o sin paymentGateways en el banco`);
+    }
+        });
+
         const totalBancos = contingencyData.value.length;
         
         Object.keys(analisisPorGateway).forEach(gatewayCode => {
             const analysis = analisisPorGateway[gatewayCode];
-            
-            console.log(`      ${analysis.label}:`);
-            console.log(`         - Disponible en ${analysis.countDisponible}/${totalBancos} bancos`);
-            console.log(`         - Primario activo en ${analysis.countPrimarioActivo}/${totalBancos} bancos`);
-            
             // REGLA: Solo marcar si es primario activo en TODOS los bancos
             if (analysis.countPrimarioActivo === totalBancos) {
                 filaTabla.gateways[gatewayCode] = true;
-                console.log(`         ✅ MARCADO - Canal actual activo`);
+                console.log(`    MARCADO - Canal actual activo`);
             } else if (analysis.countDisponible === totalBancos) {
-                console.log(`         🔵 Disponible pero no marcado - Canal alternativo`);
+                console.log(`Disponible pero no marcado - Canal alternativo`);
             } else {
-                console.log(`         ❌ No disponible completamente`);
+                console.log(`No disponible completamente`);
             }
         });
         
-        console.log(`   🎯 Estado final:`, filaTabla.gateways);
+        console.log(` Estado final:`, filaTabla.gateways);
     });
     
-    console.log('\n✅ === MARCADO AUTOMÁTICO COMPLETADO ===');
+};
+
+
+// CONTINGENCIA
+const verificarInconsistenciasContingencia = () =>{
+    if(!isMultipleBanks.value || contingencyData.value.length < 2){
+        hasContingencyInconsistencies.value = false;
+        return;
+    }
+
+    const transactionCode = ['IASYNC', 'IQR', 'OASYNC', 'OQR'];
+    let hasInconsistencies = false;
+
+    transactionCode.forEach(code =>{
+        const stateContingency = contingencyData.value.map(bank =>{
+            const transaction = bank.transactions?.find(t => t.transactionCode === code);
+            return transaction?.isContingency || false;
+        });
+
+        // Si no todos tienen el mismo estado, hay inconsistencia
+        const firtState = stateContingency[0];
+        const allEqual = stateContingency.every(estado => estado === firtState);
+
+        if(!allEqual){
+            console.log(`Inconsistencia detectada en ${code}:`, stateContingency);
+            hasInconsistencies = true;
+        }
+    });
+    hasContingencyInconsistencies.value = hasInconsistencies;
+    console.log('Tiene inconsistencias de contingencia:', hasInconsistencies);
+}
+
+const inicializarMensajesContingencia = () => {
+    console.log('Inicializando mensajes de contingencia desde el servidor...');
+    
+    // Buscar el primer mensaje de contingencia disponible en cualquier transacción
+    let tituloEncontrado = '';
+    let mensajeEncontrado = '';
+    
+    contingencyData.value.forEach(bank => {
+        bank.transactions?.forEach(transaction => {
+            // Solo buscar en transacciones que están en contingencia
+            if (transaction.isInContigency) {
+                transaction.paymentGateways?.forEach(gateway => {
+                    // Si encontramos título y mensaje, los usamos
+                    if (gateway.contingencyTitle && !tituloEncontrado) {
+                        tituloEncontrado = gateway.contingencyTitle;
+                    }
+                    if (gateway.contingencyDetail && !mensajeEncontrado) {
+                        mensajeEncontrado = gateway.contingencyDetail;
+                    }
+                });
+            }
+        });
+    });
 };
 
 
 const aplicarEstadosContingencia = () => {
-  console.log('🔄 Aplicando estados de contingencia a los switches...');
-  
-  // Mapeo de códigos de transacción a sus switches correspondientes
-  const mapeoSwitches = {
-    'IASYNC': 'iasyncContingency', // Envío interbancarias
-    'IQR': 'iqrContingency',    // Envío QR
-    'OASYNC': 'oasyncContingency', // Recepción interbancarias  
-    'OQR': 'oqrContingency'     // Recepción QR
-  };
-  
-  // Inicializar todos como false
-  iasyncContingency.value = false;
-  iqrContingency.value = false;
-  oasyncContingency.value = false;
-  oqrContingency.value = false;
-  
+    console.log('Apicando estados de contingencia desde la respuesta del servidor...');
+
+    // Inicializar todos como false
+    iasyncContingency.value = false;
+    iqrContingency.value = false;
+    oasyncContingency.value = false;
+    oqrContingency.value = false;
+
+    let hasIASYNCContingency = false;
+    let hasIQRContingency = false;
+    let hasOASYNCContingency = false;
+    let hasOQRContingency = false;
+
   // Recorrer todos los bancos y sus transacciones
-  contingencyData.value.forEach(bank => {
-    console.log(`🏦 Analizando ${bank.participantName}:`);
-    
-    bank.transactions?.forEach(transaction => {
-      const switchVariable = mapeoSwitches[transaction.transactionCode];
-      
-      if (switchVariable) {
-        let hayContingencia = false;
-        
-        transaction.paymentGateways?.forEach(gateway => {
-          const estado = validateGatewayState(gateway);
-          console.log(`  📋 ${transaction.transactionCode}: ${estado.descripcion} - Contingencia: ${estado.isContingency}`);
-          
-          if (estado.isContingency) {
-            hayContingencia = true;
-          }
-        });
-        
-        // Marcar el switch correspondiente
-        switch(switchVariable) {
-          case 'iasyncContingency':
-            iasyncContingency.value = hayContingencia;
-            break;
-          case 'iqrContingency':
-            iqrContingency.value = hayContingencia;
-            break;
-          case 'oasyncContingency':
-            oasyncContingency.value = hayContingencia;
-            break;
-          case 'oqrContingency':
-            oqrContingency.value = hayContingencia;
-            break;
-        }
-        
-        console.log(`  ✅ Switch ${switchVariable} = ${hayContingencia}`);
-      }
-    });
-  });
-  
-  console.log('🎯 RESULTADO FINAL DE SWITCHES:', {
-    IASYNC: iasyncContingency.value,
-    IQR: iqrContingency.value,
-    OASYNC: oasyncContingency.value,
-    OQR: oqrContingency.value
-  });
-};
-
-// FUNCIÓN PARA ESTADÍSTICAS BASADA EN SWITCHES (MANTIENE TU PAYLOAD ORIGINAL)
-const aplicarEstadisticasBasadasEnSwitches = () => {
-    console.log('Calculando estadísticas basadas en switches activados...');
-    
-    const stats = {
-        'IASYNC': { enContingencia: 0, total: 0 },
-        'IQR': { enContingencia: 0, total: 0 },
-        'OASYNC': { enContingencia: 0, total: 0 },
-        'OQR': { enContingencia: 0, total: 0 }
-    };
-
-    // Contar totales por cada transacción en todos los bancos
     contingencyData.value.forEach(bank => {
-        bank.transactions?.forEach(transaction => {
-            if (stats[transaction.transactionCode]) {
-                stats[transaction.transactionCode].total++;
+        console.log(`Analizando ${bank.participantName}:`);
+
+    bank.transactions?.forEach(transaction => {
+        console.log(`  ${transaction.transactionCode}: isInContigency = ${transaction.isInContigency}`);
+
+        switch(transaction.transactionCode){
+            case 'IASYNC':
+                if(transaction.isInContigency){
+                    hasIASYNCContingency = true;
+                }
+                break;
+            case 'IQR':
+                if(transaction.isInContigency){
+                    hasIQRContingency = true;
+                }
+                break;
+            case 'OASYNC':
+                if(transaction.isInContigency){
+                    hasOASYNCContingency = true;
+                }
+                break;
+            case 'OQR':
+                if(transaction.isInContigency){
+                    hasOQRContingency = true;
+                }
+                break;
             }
         });
     });
 
-    // Aplicar contingencia basada en los switches activados
-    // Si un switch está activado, TODAS las instancias de esa transacción entran en contingencia
-    if (iasyncContingency.value) {
-        stats['IASYNC'].enContingencia = stats['IASYNC'].total;
-    }
-    if (iqrContingency.value) {
-        stats['IQR'].enContingencia = stats['IQR'].total;
-    }
-    if (oasyncContingency.value) {
-        stats['OASYNC'].enContingencia = stats['OASYNC'].total;
-    }
-    if (oqrContingency.value) {
-        stats['OQR'].enContingencia = stats['OQR'].total;
-    }
+    // Asignar los valores finales a los switches
+    iasyncContingency.value = hasIASYNCContingency;
+    iqrContingency.value = hasIQRContingency;
+    oasyncContingency.value = hasOASYNCContingency;
+    oqrContingency.value = hasOQRContingency;
 
-    // Actualizar variables reactivas
-    contingencyStats.value = stats;
-    
-    // No hay inconsistencias cuando usamos switches (todos se comportan igual)
-    hasContingencyInconsistencies.value = false;
-
-    console.log('Estadísticas finales basadas en switches:', stats);
-    console.log('Switches activados:', {
+    console.log(' RESULTADO FINAL DE SWITCHES:', {
         IASYNC: iasyncContingency.value,
-        IQR: iqrContingency.value, 
+        IQR: iqrContingency.value,
         OASYNC: oasyncContingency.value,
         OQR: oqrContingency.value
     });
+
+     // También verificar si hay inconsistencias entre participantes
+    verificarInconsistenciasContingencia();
+    
+    // Inicializar mensajes de contingencia si existen
+    inicializarMensajesContingencia();
 };
 
-// CARGAR DATOS
-const loadPaymentGatewayData = async () => {
+const loadPaymentGatewayData = async (): Promise<void> => {
     try {
         loading.value = true;
         error.value = null;
         
-        console.log('CÓDIGOS A BUSCAR:', participantCodes.value);        
         if (!participantCodes.value.length) {
             throw new Error('No se encontraron códigos de participantes');
         }
@@ -915,21 +1193,26 @@ const loadPaymentGatewayData = async () => {
 
         contingencyData.value = response.participants || response;
         console.log('RESPUESTA DEL SERVIDOR: parseada', contingencyData.value)
+        
+        generateTransactionDataFromServer();
+        
         if(isChannelChange.value){
             marcarCheckboxesAutomaticamente();
 
             console.log('Vamos a revisar las transacciones de cada banco:');
             
             contingencyData.value.forEach(bank => {
-                console.log(`🏦 Banco: ${bank.participantName}`);
+                console.log(` Banco: ${bank.participantName}`);
                 if (bank.transactions && bank.transactions.length > 0) {
                     bank.transactions.forEach(transaction => {
                     console.log(`Transacción encontrada: ${transaction.transactionCode}`);
                     
-                    if (transaction.paymentGateways && transaction.paymentGateways.length > 0) {
+                    if (transaction.paymentGateways && transaction.paymentGateways.length > 0 && transaction.paymentGateways.isPrimary) {
+                        
                         transaction.paymentGateways.forEach(gateway => {
                             console.log(`Gateway: ${gateway.paymentGatewayAcronym} (código: ${gateway.paymentGatewayCode})`);
                         });
+                        
                     } else {
                         console.log(`No hay gateways para esta transacción`);
                     }
@@ -939,7 +1222,8 @@ const loadPaymentGatewayData = async () => {
                 }
             });
         } else if(isContingency.value){
-            console.log('Camino contingencia');
+            console.log('Procesando contingencia');
+            aplicarEstadosContingencia();
             contingencyData.value.forEach(bank => {
                 bank.transactions?.forEach(transaction => {
                     transaction.paymentGateways?.forEach(gateway => {
@@ -948,11 +1232,6 @@ const loadPaymentGatewayData = async () => {
                     });
                 });
             });
-            // AGREGAR - Inicializar switches basándose en estado actual del servidor
-    aplicarEstadosContingencia();
-    
-    // DESPUÉS calcular estadísticas basándose en los switches
-    aplicarEstadisticasBasadasEnSwitches();
         }
     } catch (err) {
         console.error('Error loading data:', err);
@@ -969,24 +1248,23 @@ const loadPaymentGatewayData = async () => {
     }
 };
 
-// VERSIÓN CON ORDEN CORRECTO PARA EL BACKEND
 const generateOrderedPayload = () => {
-    console.log('\n=== GENERANDO PAYLOAD CON ORDEN CORRECTO ===');
+    console.log('\n=== GENERANDO PAYLOAD SOLO CON CAMBIOS ===');
     
     const payload = {
-        participants: []
+        participants: [],
+        changeReason: justification.value
     };
 
     contingencyData.value.forEach((bank, bankIndex) => {
         console.log(`\n--- PROCESANDO BANCO ${bankIndex + 1}: ${bank.participantName} ---`);
         
         const participant = {
-            participantCode: bank.participantCode || bank.code,
+            participantCode: bank.participantCode || bank.participantName,
             transactions: []
         };
 
         transactionData.value.forEach((transactionRow) => {
-            console.log(`\nProcesando transacción ${transactionRow.transactionCode}`);
             
             if (!isOutboundTransaction(transactionRow.transactionCode)) {
                 console.log(`   Omitiendo ${transactionRow.transactionCode} - es inbound`);
@@ -1004,8 +1282,6 @@ const generateOrderedPayload = () => {
 
             const selectedGatewayLabel = paymentGatewayOptions.value
                 .find(opt => opt.value === selectedGatewayCode)?.label;
-            
-            console.log(`   Usuario seleccionó: ${selectedGatewayLabel} (${selectedGatewayCode})`);
 
             // Buscar transacción en el servidor
             const currentBankTransaction = bank.transactions?.find(
@@ -1017,137 +1293,165 @@ const generateOrderedPayload = () => {
                 return;
             }
 
+            const currentPrimaryGateway = currentBankTransaction.paymentGateways?.find(
+                gw => gw.isPrimary === true
+            );
+            
+            if (currentPrimaryGateway && currentPrimaryGateway.paymentGatewayCode === selectedGatewayCode) {
+                console.log(`   SIN CAMBIO: El gateway seleccionado (${selectedGatewayLabel}) ya es el primario actual`);
+                return;
+            }
+
             const transaction = {
                 transactionCode: transactionRow.transactionCode,
-                paymentGateways: []
+                paymentGatewayCode: selectedGatewayCode
             };
-
-            // PASO 2: SEGUNDO - Agregar el gateway SELECCIONADO (nuevo primario)
-            console.log(`\n   PASO 2: Agregando nuevo primario`);
-            console.log(`      Nuevo primario: ${selectedGatewayLabel} (${selectedGatewayCode})`);
-            console.log(`      🆕 AGREGANDO SEGUNDO - Promoviendo a primario`);
-            
-            // SEGUNDO: El gateway seleccionado como nuevo primario
-            transaction.paymentGateways.push({
-                paymentGatewayCode: selectedGatewayCode,
-                isPrimary: true,   // Nuevo primario
-                isOperational: true,
-                isTemporarilyActive: false,
-                changeReason: `Canal promovido a primario: ${justification.value}`
-            });
-
-            // // PASO 3: TERCERO - Mantener otros gateways existentes (si los hay)
-            // console.log(`\n   PASO 3: Verificando otros gateways existentes`);
-            
-            // let otherGatewaysAdded = 0;
-            // currentBankTransaction.paymentGateways?.forEach(existingGateway => {
-            //     const alreadyIncluded = transaction.paymentGateways.some(
-            //         pg => pg.paymentGatewayCode === existingGateway.paymentGatewayCode
-            //     );
-
-            //     if (!alreadyIncluded) {
-            //         const label = paymentGatewayOptions.value
-            //             .find(opt => opt.value === existingGateway.paymentGatewayCode)?.label;
-                    
-            //         console.log(`      Manteniendo: ${label} con estado actual`);
-                    
-            //         transaction.paymentGateways.push({
-            //             paymentGatewayCode: existingGateway.paymentGatewayCode,
-            //             isPrimary: existingGateway.isPrimary,
-            //             isOperational: existingGateway.isOperational,
-            //             isTemporarilyActive: existingGateway.isTemporarilyActive,
-            //             changeReason: `Estado mantenido: ${justification.value}`
-            //         });
-                    
-            //         otherGatewaysAdded++;
-            //     }
-            // });
-            
-            // if (otherGatewaysAdded === 0) {
-            //     console.log(`      No hay otros gateways para mantener`);
-            // }
 
             participant.transactions.push(transaction);
         });
 
         if (participant.transactions.length > 0) {
             payload.participants.push(participant);
+        } else {
+            console.log(`   Participante ${bank.participantName} no tiene cambios`);
         }
     });
+
+    console.log('\nPAYLOAD FINAL (solo cambios):');
+    console.log(JSON.stringify(payload, null, 2));
 
     return payload;
 };
 
+const establishContingency = async () =>{
+// Mapeo de switches a códigos de transacción
+    const transactionSwitches = {
+        'IASYNC': iasyncContingency.value,
+        'IQR': iqrContingency.value,
+        'OASYNC': oasyncContingency.value,
+        'OQR': oqrContingency.value
+    };
 
-const validateSelectionBeforePayload = () => {
-    console.log('\n🔍 === VALIDANDO SELECCIONES ANTES DEL PAYLOAD ===');
-    
-    let isValid = true;
-    let validationDetails = [];
-    
-    transactionData.value.forEach(row => {
-        if (!isOutboundTransaction(row.transactionCode)) {
-            return; // Skip inbound transactions
-        }
+    console.log('Estableciendo contingencia: ',transactionSwitches) 
+
+
+    const payload = {
+        contingencyTitle: titleContingency.value,
+        contingencyDetail: messageContingency.value,
+        changeReason: justification.value,
         
-        const selectedGateways = Object.keys(row.gateways)
-            .filter(key => row.gateways[key] === true);
-            
-        const detail = {
-            transactionCode: row.transactionCode,
-            selectedCount: selectedGateways.length,
-            selectedGateways: selectedGateways.map(code => {
-                const label = paymentGatewayOptions.value.find(opt => opt.value === code)?.label;
-                return `${label} (${code})`;
-            }),
-            isValid: selectedGateways.length === 1
+        participants: []
+    };
+    // Para cada banco/participante
+    contingencyData.value.forEach((bank, bankIndex) => {
+        console.log(`\n--- PROCESANDO BANCO ${bankIndex + 1}: ${bank.participantName} ---`);
+
+        const participant = {
+            participantCode: bank.participantCode,
+            transactions: []
         };
-        
-        validationDetails.push(detail);
-        
-        if (!detail.isValid) {
-            isValid = false;
-        }
-        
-        console.log(`${row.transactionCode}:`);
-        console.log(`   Seleccionados: ${detail.selectedCount}`);
-        console.log(`   Detalles: ${detail.selectedGateways.join(', ') || 'Ninguno'}`);
-        console.log(`   Estado: ${detail.isValid ? '✅ Válido' : '❌ Inválido'}`);
-    });
-    
-    console.log(`\nRESULTADO GENERAL: ${isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO'}`);
-    
-    return { isValid, details: validationDetails };
-};
 
-const verifyPayloadOrder = (payload) => {
-    console.log('\n🔍 === VERIFICANDO ORDEN DEL PAYLOAD ===');
-    
-    payload.participants.forEach(participant => {
-        console.log(`\nParticipante: ${participant.participantCode}`);
-        
-        participant.transactions.forEach(transaction => {
-            console.log(`\n  Transacción: ${transaction.transactionCode}`);
-            console.log(`  Cantidad de gateways: ${transaction.paymentGateways.length}`);
+        // Procesar solo las transacciones donde el switch está activado
+        Object.entries(transactionSwitches).forEach(([transactionCode, switchValue]) => {
+            console.log(`\nAnalizando ${transactionCode}:`);
+            console.log(`   Switch actual: ${switchValue ? 'ON' : 'OFF'}`);
             
-            transaction.paymentGateways.forEach((pg, index) => {
-                const label = paymentGatewayOptions.value.find(opt => opt.value === pg.paymentGatewayCode)?.label;
-                const role = pg.isPrimary ? 'PRIMARIO' : 'SECUNDARIO';
-                const order = index === 0 ? 'PRIMERO' : index === 1 ? 'SEGUNDO' : `POSICIÓN ${index + 1}`;
-                
-                console.log(`    ${order}: ${label} - ${role}`);
-                
-                // Validar orden correcto según el backend
-                if (index === 0 && pg.isPrimary === true) {
-                    console.log(`      ⚠️  ATENCIÓN: El primer gateway es primario - puede causar problemas`);
+            // Buscar la transacción en los datos del banco
+            const bankTransaction = bank.transactions?.find(t => t.transactionCode === transactionCode);
+            
+            if (!bankTransaction) {
+                console.log(`  Transacción ${transactionCode} no encontrada en banco`);
+                return;
+            }
+
+            // VERIFICAR ESTADO ACTUAL DE CONTINGENCIA EN EL SERVIDOR
+            const currentContingencyState = bankTransaction.isInContigency || false;
+            console.log(`   Estado contingencia servidor: ${currentContingencyState ? 'ON' : 'OFF'}`);
+
+
+            if (currentContingencyState === switchValue) {
+                console.log(`  SIN CAMBIO: Switch ${transactionCode} ya está ${switchValue ? 'activado' : 'desactivado'}`);
+                return;
+            }
+
+            console.log(`   HAY CAMBIO: ${currentContingencyState ? 'ON' : 'OFF'} → ${switchValue ? 'ON' : 'OFF'}`);
+
+            const primaryGateway = bankTransaction.paymentGateways?.find(gw => gw.isPrimary === true);
+            console.log(`   Gateway primario: ${primaryGateway?.paymentGatewayCode}`);
+
+            if (switchValue) {
+                if (primaryGateway) {
+                    console.log('Llega aqui');
+
+                    const transaction = {
+                        transactionCode: transactionCode,
+                        paymentGatewayCode: primaryGateway.paymentGatewayCode,
+                        isInContigency: true,
+                    };
+                    participant.transactions.push(transaction);
                 }
-                if (index === 1 && pg.isPrimary === true) {
-                    console.log(`      ✅ CORRECTO: El segundo gateway es el nuevo primario`);
-                }
-            });
+            } else {
+                console.log('Aqui Llega aqui');
+                // Switch desactivado: enviar para quitar contingencia
+                const transaction = {
+                    transactionCode: transactionCode,
+                    paymentGatewayCode: primaryGateway.paymentGatewayCode,
+                    isInContigency: true,
+                };
+                participant.transactions.push(transaction);
+                
+            }
         });
+
+        // Solo agregar participante si tiene transacciones con cambios
+        if (participant.transactions.length > 0) {
+            payload.participants.push(participant);
+            console.log(` Participante agregado con ${participant.transactions.length} cambios`);
+        } else {
+            console.log(`Participante omitido: sin cambios`);
+        }
     });
-};
+
+    console.log(' RESUMEN DE CAMBIOS:');
+    console.log(`   Participantes afectados: ${payload.participants.length}`);
+    console.log(`   Total transacciones: ${payload.participants.reduce((total, p) => total + p.transactions.length, 0)}`);
+
+    if (payload.participants.length === 0) {
+        console.log('No hay cambios que enviar');
+        toast.add({
+            severity: 'info',
+            summary: 'Sin Cambios',
+            detail: 'No se detectaron modificaciones en el estado de contingencia',
+            life: 3000
+        });
+        return;
+    }
+
+    console.log('\n PAYLOAD FINAL (solo cambios reales):');
+    console.log(JSON.stringify(payload, null, 2));
+
+    try {
+        const responseContingency = await contingencyService.updateContingency(payload);
+        
+        if (responseContingency) {
+            toast.add({
+                severity: 'success',
+                summary: responseContingency.summary,
+                // detail: `Cambios aplicados a ${payload.participants.length} participantes`,
+                detail: responseContingency.description,
+                life: 5000
+            });
+        }
+    } catch (error) {
+        console.error('Error al establecer contingencia:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo establecer la contingencia',
+            life: 5000
+        });
+    }
+}
 
 const saveConfirm = async () => {
     try {
@@ -1155,6 +1459,7 @@ const saveConfirm = async () => {
 
         if (isChannelChange.value) {
             
+<<<<<<< HEAD
              console.log('\n🚀 === INICIANDO CAMBIO DE CANAL CON ORDEN CORRECTO ===');
             
             // Validar selecciones
@@ -1168,14 +1473,14 @@ const saveConfirm = async () => {
                 });
                 return;
             }
+=======
+            console.log('\n=== INICIANDO CAMBIO DE CANAL CON ORDEN CORRECTO ===');
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
             // Generar payload con orden correcto
             const payload = generateOrderedPayload();
             
-            // Verificar orden antes de enviar
-            verifyPayloadOrder(payload);
-            
-            console.log('\n📋 PAYLOAD FINAL CON ORDEN CORRECTO:');
+            console.log('\nPAYLOAD FINAL CON ORDEN CORRECTO:');
             console.log(JSON.stringify(payload, null, 2));
 
             // const responseChannel = await contingencyService.updateChangeChannel(payload);
@@ -1190,147 +1495,14 @@ const saveConfirm = async () => {
             // }
             
         }else {
-                    // Mapeo de switches a códigos de transacción
-        const transactionSwitches = {
-            'IASYNC': iasyncContingency.value,
-            'IQR': iqrContingency.value,
-            'OASYNC': oasyncContingency.value,
-            'OQR': oqrContingency.value
-        };
-
-        // Validar que hay al menos un switch activado
-        const hasActiveSwitch = Object.values(transactionSwitches).some(value => value === true);
-        
-        if (!hasActiveSwitch) {
-            // Si no hay switches activados, significa que queremos QUITAR la contingencia
-            console.log('🟢 Quitando contingencia - todos los switches están desactivados');
-            
-            const payload = {
-                contingencyTitle: "Fin de contingencia",
-                contingencyDetail: "Normalización de servicios - fin de contingencia",
-                isOperational: true, // TRUE para indicar que volvemos a operación normal
-                participants: []
-            };
-
-            // Incluir TODOS los participantes para normalizar
-            contingencyData.value.forEach(bank => {
-                const participant = {
-                    participantCode: bank.participantCode || bank.code,
-                    transactions: []
-                };
-
-                // Incluir TODAS las transacciones para normalizar
-                bank.transactions?.forEach(bankTransaction => {
-                    const transaction = {
-                        transactionCode: bankTransaction.transactionCode,
-                        paymentGateways: []
-                    };
-
-                    bankTransaction.paymentGateways?.forEach(gateway => {
-                        transaction.paymentGateways.push({
-                            paymentGatewayCode: gateway.paymentGatewayCode,
-                            changeReason: `Normalización de servicios - fin de contingencia`
-                        });
-                    });
-
-                    if (transaction.paymentGateways.length > 0) {
-                        participant.transactions.push(transaction);
-                    }
-                });
-
-                if (participant.transactions.length > 0) {
-                    payload.participants.push(participant);
-                }
-            });
-
-            console.log('🔄 Payload para QUITAR contingencia:', payload);
-            
-            const responseContingency = await contingencyService.updateContingency(payload);
-            
-            if(responseContingency) {
-                toast.add({
-                    severity: 'success',
-                    summary: 'Contingencia Finalizada',
-                    detail: `Servicios normalizados exitosamente para ${payload.participants.length} participantes`,
-                    life: 5000
-                });
-            }
-            
-        } else {
-            // Si hay switches activados, establecer contingencia
-            console.log('🔴 Estableciendo contingencia - switches activados:', 
-                Object.entries(transactionSwitches).filter(([key, value]) => value));
-            
-            const payload = {
-                contingencyTitle: titleContingency.value,
-                contingencyDetail: messageContingency.value,
-                isOperational: false, // FALSE para indicar contingencia activa
-                participants: []
-            };
-
-            // Para cada banco/participante
-            contingencyData.value.forEach(bank => {
-                const participant = {
-                    participantCode: bank.participantCode || bank.code,
-                    transactions: []
-                };
-
-                // Procesar solo las transacciones donde el switch está activado
-                Object.entries(transactionSwitches).forEach(([transactionCode, switchValue]) => {
-                    if (switchValue) {
-                        // Buscar la transacción en los datos del banco
-                        const bankTransaction = bank.transactions?.find(t => t.transactionCode === transactionCode);
-                        
-                        if (bankTransaction) {
-                            const transaction = {
-                                transactionCode: transactionCode,
-                                paymentGateways: []
-                            };
-
-                            // Para cada gateway de esta transacción
-                            bankTransaction.paymentGateways?.forEach(gateway => {
-                                transaction.paymentGateways.push({
-                                    paymentGatewayCode: gateway.paymentGatewayCode,
-                                    changeReason: `Contingencia establecida para ${gateway.paymentGatewayAcronym}: ${justification.value}`
-                                });
-                            });
-
-                            if (transaction.paymentGateways.length > 0) {
-                                participant.transactions.push(transaction);
-                            }
-                        }
-                    }
-                });
-
-                // Solo agregar participante si tiene transacciones con cambios
-                if (participant.transactions.length > 0) {
-                    payload.participants.push(participant);
-                }
-            });
-
-            console.log('🔄 Payload para ESTABLECER contingencia:', payload);
-
-            const responseContingency = await contingencyService.updateContingency(payload);
-            
-            if(responseContingency) {
-                toast.add({
-                    severity: 'warn',
-                    summary: 'Contingencia Establecida',
-                    detail: `Contingencia establecida exitosamente para ${payload.participants.length} participantes`,
-                    life: 5000
-                });
-            }
+            establishContingency();
         }
-            
-        }
-        // Cerrar modales
-            visibleChangeCanal.value = false;
-            visibleContingency.value = false;
-
-            // // Redirigir después de un breve delay
-            // setTimeout(() => {
-            //     router.push('/admin/configuration/contingency');
-            // }, 1500);
+        visibleChangeCanal.value = false;
+        visibleContingency.value = false; 
+        // Redirigir después de un breve delay
+        setTimeout(() => {
+            router.push('/admin/configuration/contingency');
+        }, 1500);
         
     } catch (err) {
         console.error('Error saving changes:', err);
@@ -1350,11 +1522,7 @@ const goBack = () => {
     router.back();
 };
 
-const requiredRule = (value:unknown):ValidationRuleResult => {
-    return value !== null && value !== undefined && value !== '' 
-        ? true 
-        : 'El campo es requerido'
-}
+
 
 onMounted(async () => {
     // Cargar las opciones primero
@@ -1374,14 +1542,6 @@ onMounted(async () => {
         initializeDefaultValues();
     }
 });
-
-// Agregar esto después de tus variables reactivas
-watch([iasyncContingency, iqrContingency, oasyncContingency, oqrContingency], () => {
-    // Recalcular estadísticas cada vez que cambia un switch
-    if (isContingency.value && contingencyData.value.length > 0) {
-        aplicarEstadisticasBasadasEnSwitches();
-    }
-}, { deep: true });
 
 </script>
 

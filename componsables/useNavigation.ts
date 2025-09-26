@@ -1,37 +1,36 @@
-import { ref, computed, type Component } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import menuConfigACH from '~/router/menuRoutes'
 import type { MenuBarAdminItem } from '~/types/admin/menu.types'
 
-interface CurrentComponent {
-  component: Component
-  props?: Record<string, any>
-}
 
 export const useMenuNavigation = () => {
   const router = useRouter()
   const route = useRoute()
+<<<<<<< HEAD
   
   // Estado reactivo
   const selectedItemKey = ref<string>('')
   const currentComponent = ref<CurrentComponent | null>(null)
+=======
 
-  // Usar la configuración del menú existente
-  const menuItems = computed(() => {
-    return menuConfigACH.items.map(item => ({
-      ...item,
-      key: item.key || generateKeyFromPath(item.to || item.label)
-    }))
-  })
+  const activeKeys = ref<string[]>([])
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
-  // Generar key desde la ruta o label
-  const generateKeyFromPath = (path: string): string => {
-    return path.toLowerCase()
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
+  const menuItems = computed(() => menuConfigACH.items)
+
+  const findItemByKey = (key: string, items = menuItems.value): MenuBarAdminItem | null => {
+    for (const item of items) {
+      if (item.key === key) return item
+      if (item.items) {
+        const found = findItemByKey(key, item.items)
+        if (found) return found
+      }
+    }
+    return null
   }
 
+<<<<<<< HEAD
   // Función para aplanar el menú jerárquico y obtener todos los items
   const flattenMenuItems = (items: MenuBarAdminItem[]): MenuBarAdminItem[] => {
     const flattened: MenuBarAdminItem[] = []
@@ -44,56 +43,63 @@ export const useMenuNavigation = () => {
         }
         flattened.push(itemWithKey)
         
+=======
+  // Buscar item por ruta
+  const findItemByRoute = (routePath: string): MenuBarAdminItem | null => {
+    const findInItems = (items: MenuBarAdminItem[]): MenuBarAdminItem | null => {
+      for (const item of items) {
+        if (item.to === routePath) return item
         if (item.items) {
-          flatten(item.items)
+          const found = findInItems(item.items)
+          if (found) return found
         }
-      })
+      }
+      return null
     }
+    return findInItems(menuItems.value)
+  }
+
+  // Obtener path completo (padre + hijo)
+  const getItemPath = (targetKey: string): string[] => {
+    const findPath = (items: MenuBarAdminItem[], currentPath: string[] = []): string[] | null => {
+      for (const item of items) {
+        const newPath = [...currentPath, item.key!]
+
+        if (item.key === targetKey) {
+          return newPath
+        }
+
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
+        if (item.items) {
+          const found = findPath(item.items, newPath)
+          if (found) return found
+        }
+      }
+      return null
+    }
+<<<<<<< HEAD
     
     flatten(items)
     return flattened
+=======
+
+    return findPath(menuItems.value) || []
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
   }
 
-  // Obtener todos los items aplanados para búsquedas
-  const allItems = computed(() => flattenMenuItems(menuItems.value))
-
-  // Función para buscar un item por key
-  const findItemByKey = (key: string): MenuBarAdminItem | null => {
-    return allItems.value.find(item => {
-      const itemKey = item.key || generateKeyFromPath(item.to || item.label)
-      return itemKey === key
-    }) || null
-  }
-
-  // Función para buscar un item por ruta
-  const findItemByRoute = (routePath: string): MenuBarAdminItem | null => {
-    return allItems.value.find(item => {
-      if (!item.to) return false
-      // Comparar rutas exactas o si la ruta actual comienza con la ruta del item
-      return item.to === routePath || routePath.startsWith(item.to)
-    }) || null
-  }
-
-  // Manejo del click en el menú
   const handleMenuClick = (item: MenuBarAdminItem) => {
-    const itemKey = item.key || generateKeyFromPath(item.to || item.label)
-    selectedItemKey.value = itemKey
+    if (!item.key) return
 
-    // Si tiene subitems, no navegar (es un item padre)
-    if (item.items && item.items.length > 0) {
-      currentComponent.value = null
-      return
-    }
+    const itemPath = getItemPath(item.key)
+    activeKeys.value = itemPath
 
-    // Si tiene una ruta, navegar
     if (item.to) {
-      currentComponent.value = null
       router.push(item.to)
     }
   }
 
-  // Inicializar desde la ruta actual
   const initializeFromRoute = () => {
+<<<<<<< HEAD
     const currentPath = route.path
     
     // Buscar el item que mejor coincida con la ruta actual
@@ -112,17 +118,19 @@ export const useMenuNavigation = () => {
     if (matchingItem) {
       const itemKey = matchingItem.key || generateKeyFromPath(matchingItem.to || matchingItem.label)
       selectedItemKey.value = itemKey
+=======
+    const item = findItemByRoute(route.path)
+    if (item?.key) {
+      activeKeys.value = getItemPath(item.key)
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
     }
   }
 
-  // Función para seleccionar un item programáticamente
-  const selectItem = (key: string) => {
-    const item = findItemByKey(key)
-    if (item) {
-      handleMenuClick(item)
-    }
+  const isItemActive = (item: MenuBarAdminItem): boolean => {
+    return item.key ? activeKeys.value.includes(item.key) : false
   }
 
+<<<<<<< HEAD
   // Computed para obtener el item actualmente seleccionado
   const selectedItem = computed(() => {
     return findItemByKey(selectedItemKey.value)
@@ -154,20 +162,14 @@ export const useMenuNavigation = () => {
     return filterItems(menuItems.value)
   })
 
+=======
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
   return {
-    // Estado
-    menuItems: visibleMenuItems,
-    selectedItemKey,
-    currentComponent,
-    selectedItem,
-
-    // Métodos
+    menuItems,
+    activeKeys,
     handleMenuClick,
     initializeFromRoute,
-    selectItem,
-    findItemByKey,
-    findItemByRoute,
-    isItemVisible,
-    hasPermission
+    isItemActive,
+    findItemByKey
   }
 }

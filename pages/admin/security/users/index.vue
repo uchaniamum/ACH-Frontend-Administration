@@ -1,6 +1,10 @@
 <template>
     <div class="flex flex-col gap-16">
+<<<<<<< HEAD
         <XHeader title="Gestión de usuarios">
+=======
+        <XHeader title="Gestión de usuarios" :breadcrumb-items="itemsBreadUsers" :show-breadcrumb="true" :show-back="true">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
             <template #description>
                 <p class="text-gray-800">Crea usuarios y asigna los roles correspondientes, procura garantizar que cada usuario cuente con los permisos adecuados para sus funciones.</p>
             </template>
@@ -21,16 +25,16 @@
                     class="!w-[150px]"/>
             </div>
 
-            <div v-if="hasUsers" class="flex flex-col gap-8">
+            <div v-if="hasUsers" class="flex flex-col gap-12">
                 <div class="flex flex-row justify-between">
                     <div class="self-center">
                         <XIconField>
                             <InputText 
-                                v-model="filters['global'].value"
-                                placeholder="Buscar..." 
+                                v-model="searchTermUser"
+                                placeholder="Buscar" 
                                 class="!w-[250px]"
                             />
-                            <XInputIcon icon="search" @click="handleSearch" />
+                            <XInputIcon icon="search" />
                         </XIconField>
                     </div>
                     <div class="self-center">
@@ -44,22 +48,30 @@
                 <div class="flex flex-col gap-12">
                     <DataTable 
                         v-if="hasUsers"
-                        :value="paginatedUsers" 
+                        :value="paginatedItems" 
                         v-model:filters="filters"
                         :rowsPerPageOptions="[10, 25, 50, 100]"
                         :loading="loading || optionsLoading"
                         dataKey="id"
-                        filterDisplay="row"
                         :globalFilterFields="['email', 'fullname', 'roleDescription', 'code', 'statusDescription']"
                     >
-                        <template #empty> <span class="flex justify-center">No se encontraron usuarios.</span> </template>
-                        <template #loading> <span class="flex justify-center">Cargando datos de usuarios. Por favor espere.</span> </template>
+                        <template #empty> 
+                            <span class="flex justify-center">
+                                {{ filteredUsers.length === 0 && searchTermUser.trim() ? 
+                                    'No se encontraron usuarios que coincidan con la búsqueda.' : 
+                                    'No se encontraron usuarios para el canal seleccionado.' }}
+                            </span> 
+                        </template>
 
+<<<<<<< HEAD
                         <Column field="codigo" header="Código" sortable class="w-[158px]" :showFilterMenu="false">
+=======
+                        <Column field="codigo" header="Código de usuario" class=" text-left" :showFilterMenu="false">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.code }}
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -70,14 +82,18 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
+<<<<<<< HEAD
                         <Column field="fullname" header="Nombre" sortable class="w-[280px]" :showFilterMenu="false">
+=======
+                        <Column field="fullname" header="Nombre" sortable class=" text-left" :showFilterMenu="false">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.fullname }}
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -88,14 +104,18 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
+<<<<<<< HEAD
                         <Column field="email" header="Correo Electrónico" sortable class="w-[225px]" :showFilterMenu="false">
+=======
+                        <Column field="email" header="Correo Electrónico" sortable class="text-left" :showFilterMenu="false">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 {{ data.email }}
                             </template>
-                            <template #filter="{ filterModel , filterCallback}">
+                            <!-- <template #filter="{ filterModel , filterCallback}">
                                 <IconField>
                                     <InputText 
                                         v-model="filterModel.value" 
@@ -106,17 +126,21 @@
                                     />
                                     <XInputIcon icon="search" />
                                 </IconField>
-                            </template>
+                            </template> -->
                         </Column>
                     
+<<<<<<< HEAD
                         <Column field="roleDescription" header="Rol" sortable class="w-[158px]" :showFilterMenu="false">
+=======
+                        <Column field="roleDescription" header="Rol" sortable :showFilterMenu="false">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.roleDescription" 
                                     severity="neutral"
                                 />
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <XSelect 
                                     name="filterRole"
                                     v-model="filterModel.value" 
@@ -128,17 +152,21 @@
                                     class="!w-56" 
                                     :showClear="true"
                                 />
-                            </template>
+                            </template> -->
                         </Column>
                     
+<<<<<<< HEAD
                         <Column field="statusDescription" header="Estado" sortable class="w-[158px]" :showFilterMenu="false">
+=======
+                        <Column field="statusDescription" header="Estado" sortable class="text-left" :showFilterMenu="false">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                             <template #body="{ data }">
                                 <Tag 
                                     :value="data.statusDescription" 
                                     :severity="data.isActive ? 'success' : 'danger'"
                                 />
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
+                            <!-- <template #filter="{ filterModel, filterCallback }">
                                 <XSelect 
                                     name="filterIsActive"
                                     v-model="filterModel.value" 
@@ -150,7 +178,7 @@
                                     class="!w-56" 
                                     :showClear="true"
                                 />
-                            </template>
+                            </template> -->
                         </Column>
                         <Column header="Acciones" class="w-[133px]">
                             <template #body="{ data }">
@@ -171,6 +199,7 @@
                             </template>
                         </Column>
                     </DataTable>
+<<<<<<< HEAD
 
                     <Paginator 
                         v-if="hasUsers"
@@ -180,6 +209,24 @@
                         :rowsPerPageOptions="[10, 25, 50, 100]"
                         @page="onPage"
                     />
+=======
+                    <div class="flex justify-center">
+                        <Paginator 
+                            v-if="hasUsers"
+                            :rows="rowsPagination"
+                            :totalRecords="totalRecords"
+                            :first="firstPagination"
+                            :rowsPerPageOptions="[10, 25, 50, 100]"
+                            @page="onPage"
+                            template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                        >
+                            <template #start="slotProps">
+                                Página: {{ slotProps.state.page + 1 }}, Filas: 
+                            </template>
+                        </Paginator>
+                    </div>
+                    
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                 </div>
             </div>
         </div>
@@ -208,29 +255,33 @@
 import { FilterMatchMode } from '@primevue/core';
 import ConfirmDialogWrapper from '~/components/overlay/ConfirmDialogWrapper.vue';
 import { useOptions } from '~/componsables/useOptions';
-import { useUserService } from '~/componsables/useUsers';
-import type { ModalMode, ServiceError, UserListItem, UserModalData } from '~/features/users/types';
+import { useUserService } from '~/componsables/user/useUsers';
+import type { ModalMode, UserModalData } from '~/features/users/types';
 import UserModal from '~/features/users/UserModal.vue';
+<<<<<<< HEAD
 import UserModalReset from '~/features/users/UserModalReset.vue';
 import { userService } from '~/services/userService';
+=======
+import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
+import { useUserFilters } from '../../../../componsables/user/useUserFilters';
+import { usePagination } from '~/componsables/usePagination';
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
 // Composables 
-const toast = useToast()
+const { users, loading, loadUsers, showToast } = useUserService()
+const { searchTermUser, filteredUsers, selectedRole, selectedStatus } = useUserFilters(users)
+const { firstPagination, rowsPagination, paginatedItems, totalRecords, onPage, resetPagination } = usePagination(filteredUsers);
+
 const {  
     roleFilterOptions, 
     statusFilterOptions,
     loading: optionsLoading,
-    error: optionsError,
     loadAllOptions 
 } = useOptions()
 
 const { saveResetPassword } = useUserService()
 // State
-const users = ref<UserListItem[]>([]);
-const loading = ref(false)
-const searchTerm = ref('')
-const first = ref(0)
-const rows = ref(10)
+const itemsBreadUsers = getBreadcrumbItems('users', 'list');
 
 // Filters
 const filters = ref({
@@ -242,15 +293,10 @@ const filters = ref({
     statusDescription: { value: null, matchMode: FilterMatchMode.EQUALS  }
 });
 
-// Paginator
-const paginatedUsers = computed(() => {
-    return users.value.slice(first.value, first.value + rows.value)
-})
-
-const onPage = (event: any) => {
-    first.value = event.first
-    rows.value = event.rows
-}
+// Resetear paginación cuando cambien los filtros
+watch([searchTermUser, selectedRole, selectedStatus], () => {
+    resetPagination();
+});
 
 // State para el modal principal
 const modalStateUser = ref<{
@@ -278,7 +324,8 @@ const confirmDialog = ref({
     options: {
         title: '',
         message: '',
-        onConfirm: () => {}
+        onConfirm: () => {},
+        onCancel: () => {}
     }
 })
 
@@ -288,12 +335,17 @@ const openRevertPassModal = (userData: UserModalData): void => {
         options: {
             title: 'Reseteo de contraseña',
             icon: 'x:warning-circle',
+            confirmLabel: 'Resetear',
+            cancelLabel: 'Cancelar',
             iconColor: 'text-yellow-500',
             message: `¿Estás seguro de resetear la contraseña de ${userData.fullname}? 
-                        Se enviará la nueva contraseña a su correo electrónico 
+                        Se enviará la nueva contraseña al correo electrónico 
                         <span class="font-semibold">${userData.email}</span>`,
             onConfirm: async () => {
                 await saveResetPassword(userData.code)
+            },
+            onCancel: () => {
+                // Lógica adicional si es necesaria al cancelar
             }
         }
     }
@@ -304,57 +356,6 @@ const hasUsers = computed(() => {
     return users.value && users.value.length > 0
 })
 
-// Methods
-const loadUsers = async (): Promise<void> => {
-    loading.value = true
-    try {
-        const response = await userService.getUsers()
-        if(response){
-            users.value = response.users
-        }
-    } catch (error) {
-        console.error('Error loading users:', error)
-        const serviceError = error as ServiceError
-
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: serviceError.message || 'Error al cargar los usuarios',
-            life: 5000
-        })
-    } finally {
-        loading.value = false
-    }
-}
-
-const handleSearch = async (): Promise<void> => {
-    // Si hay término de búsqueda, hacer búsqueda en servidor
-    if (searchTerm.value.trim()) {
-        loading.value = true
-        
-        try {
-            const response = await userService.getUsers({ 
-                search: searchTerm.value.trim() 
-            })
-            
-            users.value = response.users
-        } catch (error) {
-            console.error('Error searching users:', error)
-            const serviceError = error as ServiceError
-
-            toast.add({
-                severity: 'error',
-                summary: 'Error de búsqueda',
-                detail: serviceError.message || 'Error al buscar usuarios',
-                life: 5000
-            })
-        } finally {
-            loading.value = false
-        }
-    } else {
-        await loadUsers()
-    }
-}
 
 const openCreateModal = (): void => {
     modalStateUser.value = {
@@ -389,21 +390,20 @@ const handlePasswordReset = (userData?: UserModalData): void => {
 
 // Lifecycle
 onMounted(async () => {
-    // Cargar opciones y usuarios en paralelo
-    await Promise.all([
-        loadUsers(),
-        loadAllOptions()
-    ])
-    
-    // Manejar errores de opciones si es necesario
-    if (optionsError.value) {
-        toast.add({
-            severity: 'warn',
-            summary: 'Advertencia',
-            detail: 'Algunas opciones de filtro pueden no estar disponibles',
-            life: 3000
-        })
-    }
+    try {
+        await Promise.all([
+            loadUsers(),
+            loadAllOptions()
+        ]);
+    } catch (error) {
+        console.error('Error loading data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar los datos';
+        showToast({
+            severity: 'error',
+            summary: 'Error de carga',
+            detail: errorMessage,
+            life: 5000
+        });
+    } 
 })
 </script>
-

@@ -40,6 +40,8 @@ export interface OptionsResponse {
     users: {
         userRoles: UserRoleOp[];
         UserStatuses: UserStatusOp[];
+        userFeatures: UserStatusOp[];
+        userFeatureCategories: UserStatusOp[];
     };
     paymentGateways: {
         paymentGatewaysActive: PaymentGatewayOp[];

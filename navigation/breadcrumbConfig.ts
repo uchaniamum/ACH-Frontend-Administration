@@ -35,12 +35,12 @@ export const breadcrumbConfig = {
         contingency:{
             list:[
                 { label: 'Inicio', route: '/' },
-                { label: 'Contingencia' }
+                { label: 'Enrutamiento y operabilidad' }
             ],
             edit: [
                 { label: 'Inicio',  route: '/' },
                 { 
-                    label: 'Contingencia', 
+                    label: 'Enrutamiento y operabilidad', 
                     route: '/admin/configuration/contingency' 
                 },
                 { label: 'Cambiar Canal' }
@@ -50,8 +50,62 @@ export const breadcrumbConfig = {
         users:{
             list:[
                 { label: 'Inicio', route: '/' },
+                { label: 'Usuario' }
             ]
-        }
+        },
+        // AccessandRoles
+        roles:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Accesos y roles' }
+            ]
+        },
+        //Processes
+        processes:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Procesos' }
+            ]
+        },
+        //HistoryContingency
+        historyContingency:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitacora de Contingencia' }
+            ] 
+        },
+        //HistoryUser
+        historyUser:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Usuarios' }
+            ] 
+        },
+        //HistoryParameter
+        historyParameter:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Parámetros' }
+            ] 
+        },
+        historyChannels:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Administrador canales' }
+            ] 
+        },
+        historySchedule:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Horarios' }
+            ] 
+        },
+        historyProcess:{
+            list:[
+                { label: 'Inicio', route: '/' },
+                { label: 'Bitácora de Procesos' }
+            ] 
+        },
     }
 } as const;
 

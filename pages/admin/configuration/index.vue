@@ -4,7 +4,7 @@
       <template #item="{ item, props }">
         <a
           v-ripple
-          :class="{ 'menu-selected': selectedItemKey === item.key }"
+          :class="{ 'menu-active': isItemActive(item) }"
           v-bind="props.action"
           @click="handleMenuClick(item)"
         >
@@ -15,13 +15,8 @@
     </XMenuBar>
 
     <div class="content-area">
-      <component 
-        v-if="currentComponent"
-        :is="currentComponent.component" 
-        v-bind="currentComponent.props"
-        :key="selectedItemKey"
-      />
-      <router-view v-else />
+      
+      <router-view />
     </div>
   </div>
 </template>
@@ -30,17 +25,17 @@
 <script setup lang="ts">
 import { useMenuNavigation } from '~/componsables/useNavigation';
 
+const route = useRoute()
 
-const { 
-  menuItems, 
-  selectedItemKey, 
-  currentComponent, 
-  handleMenuClick,
-  initializeFromRoute 
-} = useMenuNavigation()
+const { menuItems, handleMenuClick, initializeFromRoute, isItemActive } = useMenuNavigation()
+
 
 onMounted(() => {
   initializeFromRoute()
 })
 
+
+watch(() => route.path, () => {
+  initializeFromRoute()
+})
 </script>

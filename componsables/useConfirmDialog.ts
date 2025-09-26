@@ -17,6 +17,7 @@ export const useConfirmDialog = () => {
     const options = ref<ConfirmDialogOptions>({
         title: '',
         message: '',
+        icon:'',
         confirmLabel: 'Aceptar',
         cancelLabel: 'Cancelar',
         onConfirm: () => {},

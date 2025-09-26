@@ -36,19 +36,6 @@ class OptionsService {
         '8': 'Expired'
     }
 
-    private getKeyFromMapping(textValue: string, mapping: Record<string, string>): string {
-        // Normalizar el texto para comparación (case insensitive)
-        const normalizedText = textValue.toLowerCase().trim();
-
-        // Buscar la clave cuyo valor mapeado coincida (también normalizado)
-        const entry = Object.entries(mapping).find(([key, val]) =>
-            val.toLowerCase() === normalizedText
-        );
-
-        return entry ? entry[0] : textValue; // Devolver la clave numérica si se encuentra
-    }
-
-
     private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
         try {
             const url = `${this.baseUrl}/${endpoint}`;
@@ -111,6 +98,36 @@ class OptionsService {
         }
     }
 
+    async getUserFeaturesCategories(): Promise<UserStatusOp[]> {
+        try {
+            const response = await this.getOptions()
+
+            if (response.users?.userFeatureCategories) {
+                return response.users.userFeatureCategories.filter(status => status.isActive)
+            }
+
+            return []
+        } catch (error) {
+            console.error('Error getting user statuses:', error)
+            return []
+        }
+    }
+
+    async getUserFeatures(): Promise<UserStatusOp[]> {
+        try {
+            const response = await this.getOptions()
+
+            if (response.users?.userFeatures) {
+                return response.users.userFeatures.filter(status => status.isActive)
+            }
+
+            return []
+        } catch (error) {
+            console.error('Error getting user statuses:', error)
+            return []
+        }
+    }
+
     async getPaymentGateways(): Promise<PaymentGatewayOp[]> {
         try {
             const response = await this.getOptions()
@@ -138,7 +155,6 @@ class OptionsService {
         return statuses
             .sort((a, b) => a.order - b.order)
             .map(status => ({
-                // label: this.formatCodeToLabel(status.code),
                 label: status.displayName,
                 value: status.code,
             }))
@@ -150,7 +166,7 @@ class OptionsService {
             .sort((a, b) => a.order - b.order)
             .map(role => ({
                 label: role.displayName,
-                value: this.formatCodeToLabel(role.code),
+                value: role.displayName,
             }))
     }
 
@@ -160,12 +176,20 @@ class OptionsService {
             .map(status => ({
                 // label: this.formatCodeToLabel(status.code),
                 label: status.displayName,
-                value: this.formatCodeToLabel(status.code),// Usar la clave numérica para el value
+                value: status.displayName,
+            }))
+    }
+    
+    mapRolesAccessOptions(roles: UserRoleOp[]) {
+        return roles
+            .sort((a, b) => a.order - b.order)
+            .map(role => ({
+                label: role.displayName,
+                value: role.code,
             }))
     }
 
-        // Nuevos métodos para PaymentGateways
-    mapPaymentGatewaysToSelectOptions(gateways: PaymentGatewayOp[]) {
+    mapPaymentGatewaysToSelectButtonOptions(gateways: PaymentGatewayOp[]) {
         return gateways
             .sort((a, b) => a.order - b.order)
             .map(gateway => ({

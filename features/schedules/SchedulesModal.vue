@@ -172,7 +172,6 @@ const confirmSave = async (): Promise<void> => {
 
         console.log('Resultado de la operación:', result);
         if(result){
-            // Emitir evento de éxito al padre
             emit('success', {
                 summary: isEditMode.value ? 'Edición exitosa' : 'Horario extraordinario programado con éxito',
                 detail: isEditMode.value ? 'El horario extraordinario se actualizó correctamente' : 'El nuevo horario extraordinario se ha programado correctamente'

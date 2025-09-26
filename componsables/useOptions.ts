@@ -6,12 +6,17 @@ export function useOptions() {
     // State
     const roleOptions = ref<{ label: string; value: string }[]>([])
     const roleFilterOptions = ref<{ label: string; value: string }[]>([])
+    const roleAccessOptions = ref<{ label: string; value: string }[]>([])
+
+    const roleUserFeatures = ref<{ label: string; value: string }[]>([])
+    const roleUserFeaturesCategories = ref<{ label: string; value: string }[]>([])
 
     const statusOptions = ref<{ label: string; value: string }[]>([])
     const statusFilterOptions = ref<{ label: string; value: string }[]>([])
 
     const paymentGatewayOptions = ref<{ label: string; value: string }[]>([])
     const paymentGatewayFilterOptions = ref<{ label: string; value: string }[]>([])
+    const paymentGatewaySelectButtonOptions = ref<{ value: string }[]>([])
 
     const loading = ref(false)
     const error = ref<string | null>(null)
@@ -66,20 +71,22 @@ export function useOptions() {
             loading.value = true
             error.value = null
             const gateways = await optionsService.getPaymentGateways()
-            paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(gateways)
+
+            // Para Select normal
+            paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(gateways)
+
+            // Para SelectButton específicamente
+            paymentGatewaySelectButtonOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(gateways)
+
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar las pasarelas de pago'
             console.error('Error loading payment gateway options:', err)
-            // Fallback en caso de error
-            paymentGatewayOptions.value = [
-                { label: 'PayPal', value: 'PAYPAL' },
-                { label: 'Stripe', value: 'STRIPE' }
-            ]
         } finally {
             loading.value = false
         }
     }
+
 
     const loadAllOptions = async () => {
         try {
@@ -89,12 +96,14 @@ export function useOptions() {
             const response = await optionsService.getOptions()
 
             if (response.users) {
-                const { userRoles, UserStatuses } = response.users
+                const { userRoles, UserStatuses, userFeatures, userFeatureCategories} = response.users
 
                 if (userRoles) {
                     const activeRoles = userRoles.filter((role: UserRoleOp) => role.isActive)
+                    console.log('tive: ', activeRoles);
                     roleOptions.value = optionsService.mapRolesToSelectOptions(activeRoles)
                     roleFilterOptions.value = optionsService.mapRolesToFilterOptions(activeRoles)
+                    roleAccessOptions.value = optionsService.mapRolesAccessOptions(activeRoles)
                 }
 
                 if (UserStatuses) {
@@ -102,15 +111,25 @@ export function useOptions() {
                     statusOptions.value = optionsService.mapStatusesToSelectOptions(activeStatuses)
                     statusFilterOptions.value = optionsService.mapStatusesToFilterOptions(activeStatuses)
                 }
+
+                if(userFeatures){
+                    const activeFeatures = userFeatures.filter((status: UserStatusOp) => status.isActive)
+                    roleUserFeatures.value = optionsService.mapRolesAccessOptions(activeFeatures)
+                }
+
+                if(userFeatureCategories){
+                    const activeFeaturesCategories = userFeatureCategories.filter((status: UserStatusOp) => status.isActive)
+                    roleUserFeaturesCategories.value = optionsService.mapRolesAccessOptions(activeFeaturesCategories)
+                }
             }
 
             if (response.paymentGateways?.paymentGatewaysActive) {
                 const activeGateways = response.paymentGateways.paymentGatewaysActive.filter(
                     (gateway: PaymentGatewayOp) => gateway.isActive
                 )
-                paymentGatewayOptions.value = optionsService.mapPaymentGatewaysToSelectOptions(activeGateways)
-                paymentGatewayFilterOptions.value = optionsService.mapPaymentGatewaysToFilterOptions(activeGateways)
-                console.log('Payment Gateway Options: ', paymentGatewayOptions.value);
+
+                // Para SelectButton - usar el método correcto
+                paymentGatewayFilterOptions.value = optionsService.mapPaymentGatewaysToSelectButtonOptions(activeGateways)
             }
 
         } catch (err) {
@@ -118,13 +137,6 @@ export function useOptions() {
             error.value = serviceError.message || 'Error al cargar las opciones'
             console.error('Error loading options:', err)
 
-            // Fallback options
-            roleOptions.value = [{ label: 'Administrador', value: 'ADMIN' }]
-            statusOptions.value = [{ label: 'Activo', value: 'ACTIVE' }]
-            paymentGatewayOptions.value = [
-                { label: 'PayPal', value: 'PAYPAL' },
-                { label: 'Stripe', value: 'STRIPE' }
-            ]
         } finally {
             loading.value = false
         }
@@ -134,6 +146,11 @@ export function useOptions() {
         roleOptions.value = []
         statusOptions.value = []
         roleFilterOptions.value = []
+        roleAccessOptions.value = []
+
+        roleUserFeatures.value = []
+        roleUserFeaturesCategories.value = []
+
         statusFilterOptions.value = []
         paymentGatewayOptions.value = []
         paymentGatewayFilterOptions.value = []
@@ -145,6 +162,9 @@ export function useOptions() {
         roleOptions: readonly(roleOptions),
         statusOptions: readonly(statusOptions),
         roleFilterOptions: readonly(roleFilterOptions),
+        roleAccessOptions: readonly(roleAccessOptions),
+        roleUserFeatures: readonly(roleUserFeatures),
+        roleUserFeaturesCategories: readonly(roleUserFeaturesCategories),
         statusFilterOptions: readonly(statusFilterOptions),
         paymentGatewayOptions: readonly(paymentGatewayOptions),
         paymentGatewayFilterOptions: readonly(paymentGatewayFilterOptions),
@@ -154,6 +174,8 @@ export function useOptions() {
         // Methods
         loadRoleOptions,
         loadStatusOptions,
+        loadPaymentGatewayOptions,
+        paymentGatewaySelectButtonOptions,
         loadAllOptions,
         resetOptions
     }

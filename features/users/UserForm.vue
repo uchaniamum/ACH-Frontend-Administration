@@ -29,7 +29,7 @@
             name="correo"
             label="Correo electrónico" 
             label-required
-            placeholder="Ingresa el correo"
+            placeholder="Ingresa un correo electrónico"
             :rules="[
                 requiredRule,
                 emailRule
@@ -52,7 +52,7 @@
             :options="roleOptions" 
             optionLabel="label" 
             optionValue="value"
-            placeholder="Seleccionar" 
+            placeholder="Selecciona un rol" 
             :loading="optionsLoading"
             :dropdown="true"
             appendTo="body"
@@ -201,7 +201,7 @@ const onSubmit = () => {
             verificationHash: ""
         },
         roleCode: optionsService.convertToBackendFormat(formData.value.rol),
-        isActive: formData.value.isActive
+        isACtive: formData.value.isActive
     }
 
     console.log('Lo que se manda: ', apiPayload);

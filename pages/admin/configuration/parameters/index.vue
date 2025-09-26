@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-col gap-20">
-        <XHeader title="Parámetros" :breadcrumb-items="itemsBreadParameters" :show-breadcrumb="true">
+        <XHeader title="Parámetros" :breadcrumb-items="itemsBreadParameters" :show-breadcrumb="true" :show-back="true">
             <template #description>
-                <p class="text-gray-800">Consulta r todos los parámetros configurados en el sistema y realizar las modificaciones necesarias. Además te presenta el historial de cambios para asegurar un control adecuado.</p>
+                <p class="text-gray-800">Verifica todos los parámetros configurados en el sistema y realiza las modificaciones necesarias. Asegúrate de tener un control adecuado.</p>
             </template>
         </XHeader>
 
@@ -43,7 +43,7 @@
                 <div class="flex flex-col">
                     <div class="flex flex-col gap-12">
                         <DataTable
-                            :value="paginatedParameters" 
+                            :value="paginatedItems" 
                             :loading="loading"
                             dataKey="id"
                             :globalFilterFields="['code', 'value', 'description', 'dataType', 'systemAcronym']"
@@ -55,41 +55,62 @@
                                         'No se encontraron parámetros para el canal seleccionado.' }}
                                 </span> 
                             </template>
-                            <template #loading> 
-                                <span class="flex justify-center">Cargando datos de parámetros. Por favor espere.</span> 
-                            </template>
 
+<<<<<<< HEAD
                             <Column field="systemAcronym" header="Canal" sortable style="min-width: 100px;">
+=======
+                            <Column field="systemAcronym" header="Canal" style="min-width: 100px;" class="text-left">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.systemAcronym }}
                                 </template>
                             </Column>
 
+<<<<<<< HEAD
                             <Column field="code" header="Código" sortable headerStyle="width: 100px;" bodyStyle="width: 100px;">
+=======
+                            <Column field="code" header="Código" headerStyle="width: 100px;" bodyStyle="width: 100px;" class="text-left">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.code }}
                                 </template>
                             </Column>
                         
+<<<<<<< HEAD
                             <Column field="value" header="Valor" sortable style="min-width: 160px;">
+=======
+                            <Column field="value" header="Valor" style="min-width: 160px;" class="text-left">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.value }}
                                 </template>
                             </Column>
 
+<<<<<<< HEAD
                             <Column field="dataType" header="Tipo de Dato" sortable style="min-width: 100px;">
+=======
+                            <Column field="dataType" header="Tipo de Dato" style="min-width: 100px;" class="text-left">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.dataType }}
                                 </template>
                             </Column> 
 
+<<<<<<< HEAD
                             <Column field="description" header="Descripción" sortable class="min-w-[275px]">
+=======
+                            <Column field="description" header="Descripción" class="min-w-[275px] text-left" >
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     {{ data.description }}
                                 </template>
                             </Column>
 
+<<<<<<< HEAD
                             <Column header="Acciones" class="min-w-[210px]">
+=======
+                            <Column header="Acción" class="min-w-[210px] text-left">
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
                                 <template #body="{ data }">
                                     <div class="flex gap-4">
                                         <XButton 
@@ -99,22 +120,30 @@
                                             v-tooltip="{ value: 'Editar parámetro', hideDelay: 300 }"
                                             @click="openEditModal(data)"
                                         />
-                                        <XButton 
+                                        <!-- <XButton 
                                             label="Ver historial"
                                             @click="openHistoModal(data)"
-                                        />
+                                        /> -->
                                     </div>
                                 </template>
                             </Column>
                         </DataTable>
 
-                        <Paginator 
-                            v-if="filteredParameters.length > 0"
-                            v-model:first="first"
-                            v-model:rows="rows"
-                            :totalRecords="filteredParameters.length"
-                            :rowsPerPageOptions="[2, 10, 25, 50, 100]"
-                        />
+                        <div class="flex justify-center">
+                            <Paginator 
+                                v-if="filteredParameters.length > 0"
+                                v-model:first="firstPagination"
+                                v-model:rows="rowsPagination"
+                                :totalRecords="totalRecords"
+                                :rowsPerPageOptions="[10, 25, 50, 100]"
+                                @page="onPage"
+                                template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                            >
+                                <template #start="slotProps">
+                                    Página: {{ slotProps.state.page + 1 }}, Filas: 
+                                </template>
+                            </Paginator>
+                        </div>
                     </div>
                 </div>
         </div>
@@ -123,29 +152,39 @@
             v-model="modalStateParameter.modalParameter" 
             :parameterData="modalStateParameter.parameterData"
             @save="handleParameterSaved"
-            @success="handleParameterSuccess"
-            @error="handleParameterError"
         />
 
         <ParameterHistorialModal 
             v-model="modalStateHistoParameter.modalParameterHistorial" 
             :parameterHistoData="modalStateHistoParameter.parameterHistoData"
         />
-         <Toast />
+        <Toast />
     </div>
 </template>
 
 <script setup lang="ts">
+import { useOptions } from '~/componsables/useOptions';
+import { useParameterService } from '~/componsables/parameters/useParameters';
 import ParameterHistorialModal from '~/features/parameters/ParameterHistorialModal.vue';
 import ParameterModal from '~/features/parameters/ParameterModal.vue';
 import type { ParameterListItem, ParameterModalData } from '~/features/parameters/types';
+<<<<<<< HEAD
 import type { ServiceError } from '~/features/users/types';
 import { parametersService } from '~/services/parametersService';
+=======
+import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
+import { useParameterFilters } from '~/componsables/parameters/useParameterFilters';
+import { usePagination } from '~/componsables/usePagination';
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
-// Composables 
-const toast = useToast()
+// Composables
+const { parameters, loading, loadParameters, showToast} = useParameterService()
+const { paymentGatewayFilterOptions, loadAllOptions } = useOptions()
+const { searchTermParameter, selectedChannel, filteredParameters } = useParameterFilters(parameters)
+const { firstPagination, rowsPagination, paginatedItems, totalRecords, onPage, resetPagination } = usePagination(filteredParameters);
 
 // State
+<<<<<<< HEAD
 const parameters = ref<ParameterListItem[]>([]);
 const loading = ref(false);
 const searchTermParameter = ref('')
@@ -157,58 +196,20 @@ const itemsBreadParameters = ref([
     { label: 'Configuracion'},
     { label: 'Parámetros'}
 ])
+=======
+const itemsBreadParameters = getBreadcrumbItems('parameters', 'list');
+>>>>>>> 6abac5dfde0a97019fd77fecbcfe51fbf9bd7058
 
-// SelectButton de canales
-const selectedChannel = ref({ value: 'Todos' });
-
-// Computed para generar las opciones dinámicamente
 const channelOptions = computed(() => {
-    const uniqueChannels = [...new Set(parameters.value.map(param => param.systemAcronym))];
-    const channelOpts = uniqueChannels.map(channel => ({ value: channel }));
-    
     return [
         { value: 'Todos' },
-        ...channelOpts.sort((a:any, b:any) => a.value.localeCompare(b.value))
-    ];
-});
-
-// Computed para filtrar parámetros por canal seleccionado y término de búsqueda
-const filteredParameters = computed(() => {
-    if (!parameters.value.length) return [];
-    
-    let filtered = parameters.value;
-    
-    // Filtrar por canal
-    if (selectedChannel.value?.value !== 'Todos') {
-        filtered = filtered.filter(param => param.systemAcronym === selectedChannel.value.value);
-    }
-    
-    // Filtrar por término de búsqueda
-    if (searchTermParameter.value.trim()) {
-        const search = searchTermParameter.value.toLowerCase().trim();
-        filtered = filtered.filter(param => 
-            param.code?.toLowerCase().includes(search) ||
-            param.value?.toLowerCase().includes(search) ||
-            param.description?.toLowerCase().includes(search) ||
-            param.dataType?.toLowerCase().includes(search) ||
-            param.systemAcronym?.toLowerCase().includes(search)
-        );
-    }
-    
-    return filtered;
-});
-
-// Computed para obtener los parámetros paginados
-const paginatedParameters = computed(() => {
-    const start = first.value;
-    const end = start + rows.value;
-    return filteredParameters.value.slice(start, end);
-});
-
+        ...paymentGatewayFilterOptions.value.map(opt => ({ value: opt.label })).sort((a, b) => a.value.localeCompare(b.value))
+    ]
+})
 
 // Resetear paginación cuando cambien los filtros
 watch([selectedChannel, searchTermParameter], () => {
-    first.value = 0;
+    resetPagination();
 });
 
 // Modal state
@@ -228,32 +229,11 @@ const modalStateHistoParameter = ref<{
     parameterHistoData: undefined
 })
 
-// Methods
-const loadParameters = async (): Promise<void> => {
-    loading.value = true
-    try {
-        const response = await parametersService.getParameters()
-        parameters.value = response.parameters
-    } catch (error) {
-        console.error('Error loading parameters:', error)
-        const serviceError = error as ServiceError
-
-        toast.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: serviceError.message || 'Error al cargar los parámetros',
-            life: 5000
-        })
-    } finally {
-        loading.value = false
-    }
-}
-
 const openEditModal = (parameterData: ParameterListItem) => {
     modalStateParameter.value = {
         modalParameter: true,
         parameterData: {
-            code: parameterData.code,
+            code: parameterData.code || '',
             value: parameterData.value,
             description: parameterData.description,
             dataType: parameterData.dataType,
@@ -261,45 +241,42 @@ const openEditModal = (parameterData: ParameterListItem) => {
     }
 }
 
-const openHistoModal = (parameterData: ParameterListItem) => {
-    console.log('Opening historial modal for:', parameterData);
+// const openHistoModal = (parameterData: ParameterListItem) => {
     
-    modalStateHistoParameter.value = {
-        modalParameterHistorial: true,
-        parameterHistoData: {
-            code: parameterData.code,
-            value: parameterData.value,           // Agregar estos campos
-            description: parameterData.description, // que faltaban
-            dataType: parameterData.dataType,      // en la función original
-            systemAcronym: parameterData.systemAcronym
-        }
-    }
-}
+//     modalStateHistoParameter.value = {
+//         modalParameterHistorial: true,
+//         parameterHistoData: {
+//             code: parameterData.code || '',
+//             value: parameterData.value,
+//             description: parameterData.description, 
+//             dataType: parameterData.dataType,     
+//             systemAcronym: parameterData.systemAcronym
+//         }
+//     }
+// }
 
 const handleParameterSaved = (): void => {
     loadParameters()
 }
 
-const handleParameterSuccess = (message: string): void => {
-    toast.add({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: message,
-        life: 5000
-    })
-}
-
-const handleParameterError = (message: string): void => {
-    toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: message,
-        life: 5000
-    })
-}
 
 // Lifecycle
-onMounted(() => {
-    loadParameters()
+onMounted(async () => {
+    try {
+        await Promise.all([
+            loadParameters(),
+            loadAllOptions()
+        ]);
+    } catch (error) {
+        console.error('Error loading data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar los datos';
+        
+        showToast({
+            severity: 'error',
+            summary: 'Error de carga',
+            detail: errorMessage,
+            life: 5000
+        });
+    } 
 })
 </script>
