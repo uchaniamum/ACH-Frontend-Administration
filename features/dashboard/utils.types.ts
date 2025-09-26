@@ -1,11 +1,12 @@
-// Interfaces para tipar el gráfico
-interface ChartDataSet {
+// INTERFACES Y TIPOS
+export interface ChartDataSet {
   label: string;
   data: number[];
   backgroundColor: string;
+  hidden?: boolean;
 }
 
-interface ChartDataResponse {
+export interface ChartData {
   labels: string[];
   datasets: ChartDataSet[];
 }

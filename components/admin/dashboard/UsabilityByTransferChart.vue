@@ -11,9 +11,8 @@
         </span>
         <div class="relative flex-shrink-0">
           <Icon name="x:paste-clipboard"
-            class="text-[#0A44C6] w-6 h-6 sm:w-8 sm:h-8 cursor-pointer hover:text-[#0C55F8]" 
-            @click="handleCopiar" />
-       
+            class="text-[#0A44C6] w-6 h-6 sm:w-8 sm:h-8 cursor-pointer hover:text-[#0C55F8]" @click="handleCopiar" />
+
         </div>
       </div>
 
@@ -34,13 +33,8 @@
     <!-- Checkbox Ver todas las cifras -->
     <div class="flex items-center gap-2 mb-2">
       <div ref="verCifras" class="flex items-center cursor-pointer transition-all">
-        <XCheckBox 
-          v-model="seleccionado" 
-          name="mostrarValoresPie" 
-          value="seleccionarDatos" 
-          @click="toggleValores"
-          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" 
-        />
+        <XCheckBox v-model="seleccionado" name="mostrarValoresPie" value="seleccionarDatos" @click="toggleValores"
+          :class="{ 'border-[#0C55F8]': seleccionado === 'seleccionarDatos' }" />
         <span class="font-normal text-[11px] sm:text-[12px] ml-2">Ver todas las cifras</span>
       </div>
     </div>
@@ -48,40 +42,38 @@
     <!-- Contenedor que se copiará (gráfico + labels) -->
     <div ref="graficoContenido" class="w-full flex flex-col items-center gap-4 sm:gap-6">
       <!-- Gráfico Pie responsivo -->
-      <div class="flex justify-center items-center w-full max-w-[400px] h-[300px] sm:max-w-[420px] sm:h-[350px] md:max-w-[450px] md:h-[400px]">
+      <div
+        class="flex justify-center items-center w-full max-w-[400px] h-[300px] sm:max-w-[420px] sm:h-[350px] md:max-w-[450px] md:h-[400px]">
         <PieChart ref="grafico" :data="chartData" :options="chartOptions" />
       </div>
 
       <!-- Leyenda personalizada -->
-      <div class="flex flex-col gap-2 sm:gap-3 border border-[#92ACE5] p-3 rounded-lg bg-white w-[90%] sm:w-[55%] mx-auto mt-20">
+      <div
+        class="flex flex-col gap-2 sm:gap-3 border border-[#92ACE5] p-3 rounded-lg bg-white w-[100%] sm:w-[55%] mx-auto mt-20">
         <div class="text-[13px] sm:text-[14px] font-semibold text-[#5F6A7B] mb-1 sm:mb-2 text-left">
           {{ chartData.datasets[0].label }}
         </div>
-        <div 
-          v-for="(label, index) in chartData.labels" 
-          :key="index"
-          class="flex justify-between items-center w-full p-1 flex-wrap"
-        >
+        <div v-for="(label, index) in chartData.labels" :key="index"
+          class="flex justify-between items-center w-full p-1 flex-wrap">
           <div class="flex items-center gap-1 sm:gap-2 min-w-[120px] sm:min-w-[140px] flex-1">
-            <span 
-              class="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0"
-              :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"
-            ></span>
-            <span class="text-[10px] sm:text-[11px] font-medium text-[#5F6A7B]">
+            <span class="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0"
+              :style="{ backgroundColor: chartData.datasets[0].backgroundColor[index] }"></span>
+            <span class="text-[16px] sm:text-[11px] font-Semibold text-[#5F6A7B]">
               {{ label }}
             </span>
           </div>
-          <span class="text-[10px] sm:text-[11px] font-medium text-[#5F6A7B] text-right flex-shrink-0 ml-1 sm:ml-2">
+          <span class="text-[12px] sm:text-[11px] font-medium text-[#5F6A7B] text-right flex-shrink-0 ml-1 sm:ml-2">
             {{ formatPercentage(chartData.datasets[0].data[index], total) }}%
           </span>
         </div>
       </div>
     </div>
     <Transition name="fade">
-      <div v-if="copiado" class="fixed top-4 right-4 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
+      <div v-if="copiado"
+        class="fixed top-4 right-4 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
         Gráfico copiado al portapapeles
       </div>
-    </Transition>  
+    </Transition>
   </div>
 </template>
 
@@ -96,21 +88,9 @@ import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
 import { seriesService } from "~/services/dashboard/seriesService";
 import { useToast } from "#imports";
 import { XCheckBox } from "#components";
-
+import type { ChartData } from "~/features/dashboard/utils.types"
 // Types
 import type { SerieUsabilityTransferResponse } from "~/features/dashboard/serieUsabilityTransfer.types";
-
-// INTERFACES Y TIPOS
-interface ChartDataSet {
-  label: string;
-  data: number[];
-  backgroundColor: string[];
-}
-
-interface ChartData {
-  labels: string[];
-  datasets: ChartDataSet[];
-}
 
 type ModeType = 'sent' | 'received';
 type SelectionType = 'enviados' | 'recibidos';
@@ -131,11 +111,11 @@ ChartJS.register(
 
 // CONFIGURACIÓN DE COLORES Y MAPEOS
 const CHART_COLORS = [
-  "#0C55F8", 
-  "#021132", 
-  "#9EBBFC", 
-  "#6F8CCE", 
-  "#073395", 
+  "#0C55F8",
+  "#021132",
+  "#9EBBFC",
+  "#6F8CCE",
+  "#073395",
   "#F2A900"
 ] as const;
 
@@ -189,7 +169,7 @@ const periodo = useState<string | null>('periodo');
 const toast = useToast();
 
 // Composables
-const { copiarGrafico, copiado } = useChartUtilitarios();
+const { copiarGrafico, copiado, formatPercentage, shouldGroupAsOthers } = useChartUtilitarios();
 
 // COMPUTED PROPERTIES
 const chartTitle = computed(() => {
@@ -208,8 +188,8 @@ const chartOptions = computed(() => ({
     mostrarValoresPie: mostrarValoresPie.value,
   },
   layout: { padding: 20 },
-  elements: { 
-    arc: { borderWidth: 5, radius: "80%" } 
+  elements: {
+    arc: { borderWidth: 6, radius: "80%" }
   },
 }));
 
@@ -228,13 +208,7 @@ function getTransactionDisplayName(transactionCode: string): string {
   return TRANSACTION_NAME_MAP[upperCode] || transactionCode;
 }
 
-function formatPercentage(value: number, total: number): string {
-  return ((value / total) * 100).toFixed(1);
-}
 
-function shouldGroupAsOthers(items: any[]): boolean {
-  return items.length > 6 || items.some(item => item.percent < THRESHOLD_PERCENTAGE);
-}
 
 function buildChartData(items: any[], mode: ModeType): ChartData {
   // Verificar si necesitamos agrupar items pequeños
@@ -254,22 +228,22 @@ function buildChartData(items: any[], mode: ModeType): ChartData {
   // Separar items principales y pequeños
   const mainItems = items.filter(item => item.percent >= THRESHOLD_PERCENTAGE);
   const smallItems = items.filter(item => item.percent < THRESHOLD_PERCENTAGE);
-  
+
   // Calcular suma de items pequeños
   const othersSum = smallItems.reduce((sum, item) => sum + item.percent, 0);
-  
+
   // Construir arrays finales con nombres amigables
   const labels = mainItems.map(item => getTransactionDisplayName(item.transactionCode));
   const data = mainItems.map(item => item.percent);
   const colors = [...CHART_COLORS];
-  
+
   // Agregar "Otros" si hay items pequeños
   if (smallItems.length > 0 && othersSum > 0) {
     labels.push('Otros');
     data.push(othersSum);
     colors.push(OTHERS_COLOR);
   }
-  
+
   return {
     labels,
     datasets: [
@@ -292,11 +266,11 @@ function updateChart() {
 
 function updateChartData(mode: ModeType) {
   if (!usabilityTransferData.value) return;
-  
-  const items = mode === 'sent' 
-    ? usabilityTransferData.value.sent.items 
+
+  const items = mode === 'sent'
+    ? usabilityTransferData.value.sent.items
     : usabilityTransferData.value.received.items;
-    
+
   chartData.value = buildChartData(items, mode);
 }
 
@@ -325,14 +299,9 @@ function handleRecibidos(): void {
 // FUNCIONES DE DATOS
 async function loadUsabilityTransferData(periodo: string) {
   try {
-    console.log(`Cargando datos de usabilidad de transferencia: Período=${periodo}`);
-    
     loading.value = true;
     error.value = null;
-    
     const response = await seriesService.getSerieUsabilityByTransferByCode(periodo);
-    console.log("Datos de usabilidad de transferencia:", response);
-    
     if (response) {
       usabilityTransferData.value = response;
       updateChartData('sent'); // Cargar datos enviados por defecto
@@ -340,11 +309,11 @@ async function loadUsabilityTransferData(periodo: string) {
   } catch (err: any) {
     console.error('Error loading transfer usability data:', err);
     error.value = err.message || 'Error al cargar la información de transferencia';
-    toast.add({ 
-      severity: 'error', 
-      summary: 'Error', 
-      detail: error.value, 
-      life: 5000 
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.value,
+      life: 5000
     });
   } finally {
     loading.value = false;
@@ -363,7 +332,7 @@ onMounted(async () => {
   if (periodo.value) {
     await loadUsabilityTransferData(periodo.value);
   }
-  
+
   if (error.value) {
     console.warn('No se pudieron cargar los datos de usabilidad de transferencia:', error.value);
   }
@@ -379,11 +348,13 @@ onMounted(async () => {
 }
 
 /* Transición para el toast de copiado */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 

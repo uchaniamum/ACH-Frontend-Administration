@@ -1,15 +1,110 @@
-// ~/composables/chartUtilitarios.js
-import { ref } from 'vue';
-import html2canvas from 'html2canvas';
+// ~/composables/useChartUtilitarios.ts
+import { ref } from "vue";
+import html2canvas from "html2canvas";
+import type { Plugin, ChartData } from "chart.js";
+
+// Types
+interface DatasetColors {
+  [key: string]: string;
+}
+
+interface LabelMap {
+  [key: string]: string;
+}
+
+interface ChartReference {
+  chart: any;
+}
+
+interface CombinedData {
+  label: string;
+  valores: number[];
+  suma: number;
+}
 
 export function useChartUtilitarios() {
   const copiado = ref(false);
 
-  // Copiar gráfico al portapapeles
-  const copiarGrafico = async (containerEl) => {
+  // Constants
+  const DATASET_COLORS: DatasetColors = {
+    QR: "#FFFFFF",
+    Express: "#FFFFFF",
+    Asincrono: "#1F2937",
+  };
+
+  const LABEL_MAP: LabelMap = {
+    ASYNC: "ASINCRONO",
+    EXPRESS: "EXPRESS",
+    QR: "QR",
+  };
+
+  const FONT_CONFIG = {
+    family: "Work Sans",
+    weight: "400" as const,
+    size: {
+      small: 8,
+      medium: 10,
+      large: 12,
+    },
+  };
+
+  // Funcion Formatear numeros
+  function formatNumber(value: number): string {
+    const suffixes = ["", "K", "M", "B", "T"];
+    let newValue = value;
+    let suffixIndex = 0;
+
+    while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
+      newValue /= 1000;
+      suffixIndex++;
+    }
+
+    const formatted = newValue.toLocaleString("es-BO", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 1,
+    });
+
+    return formatted + suffixes[suffixIndex];
+  }
+
+  function getTextColor(datasetLabel: string): string {
+    return DATASET_COLORS[datasetLabel] || "#333333";
+  }
+
+  function calculateBarCenter(
+    bar: any,
+    indexAxis: string
+  ): { x: number; y: number } {
+    if (indexAxis === "y") {
+      return {
+        x: (bar.base + bar.x) / 2,
+        y: bar.y,
+      };
+    } else {
+      return {
+        x: bar.x,
+        y: (bar.base + bar.y) / 2,
+      };
+    }
+  }
+
+  function setupTextContext(
+    ctx: CanvasRenderingContext2D,
+    color: string,
+    fontSize: number = FONT_CONFIG.size.medium
+  ): void {
+    ctx.fillStyle = color;
+    ctx.font = `${FONT_CONFIG.weight} ${fontSize}px ${FONT_CONFIG.family}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+  }
+
+  // Main Functions
+  const copiarGrafico = async (containerEl: HTMLElement): Promise<void> => {
     if (!containerEl) return;
 
     const scale = 4 * (window.devicePixelRatio || 1);
+
     try {
       const canvas = await html2canvas(containerEl, {
         scale,
@@ -26,25 +121,29 @@ export function useChartUtilitarios() {
         await navigator.clipboard.write([item]);
 
         copiado.value = true;
-        setTimeout(() => (copiado.value = false), 2000); // mensaje desaparece
+        setTimeout(() => (copiado.value = false), 2000);
       }, "image/png");
     } catch (err) {
       console.error("Error al copiar la imagen:", err);
+      throw err;
     }
   };
 
-  // Ordenar barras por sumatoria
-  const ordenarBarras = (chartRef, chartData, ordenAscendenteRef) => {
+  const ordenarBarras = (
+    chartRef: ChartReference,
+    chartData: ChartData,
+    ordenAscendenteRef: { value: boolean }
+  ): void => {
     if (!chartData || !chartRef?.chart) return;
 
-    const labels = [...chartData.labels];
+    const labels = [...(chartData.labels as string[])];
     const datasets = chartData.datasets.map((d) => ({
       ...d,
-      data: [...d.data],
+      data: [...(d.data as number[])],
     }));
 
-    const combined = labels.map((label, i) => {
-      const valores = datasets.map((d) => d.data[i]);
+    const combined: CombinedData[] = labels.map((label, i) => {
+      const valores = datasets.map((d) => (d.data as number[])[i]);
       const suma = valores.reduce((acc, val) => acc + val, 0);
       return { label, valores, suma };
     });
@@ -53,7 +152,7 @@ export function useChartUtilitarios() {
       ordenAscendenteRef.value ? a.suma - b.suma : b.suma - a.suma
     );
 
-    const newChartData = {
+    const newChartData: ChartData = {
       labels: combined.map((c) => c.label),
       datasets: datasets.map((d, i) => ({
         ...d,
@@ -61,38 +160,125 @@ export function useChartUtilitarios() {
       })),
     };
 
-    // Alternar orden
     ordenAscendenteRef.value = !ordenAscendenteRef.value;
-
-    // Actualizar chart
     chartRef.chart.data = newChartData;
     chartRef.chart.update();
   };
-  //mostrar tooltip burbuja chart pie
-  const labelMap = {
-  ASYNC: "ASINCRONO",
-  EXPRESS: "EXPRESS",
-  QR: "QR",
-  // agrega todos los que necesites
-};
 
-  const mostrarTooltipBurbujaPlugin = {
+  // Plugins
+  const mostrarValoresPlugin: Plugin = {
+    id: "mostrarValoresPlugin",
+    afterDatasetsDraw(chart: any) {
+      const pluginEnabled =
+        chart.config.options.plugins?.mostrarValoresPlugin?.enabled;
+      if (!pluginEnabled) return;
+
+      const ctx = chart.ctx;
+      const indexAxis = chart.config.options.indexAxis || "x";
+      const pluginConfig =
+        chart.config.options.plugins?.mostrarValoresPlugin || {};
+
+      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+
+        meta.data.forEach((bar: any, index: number) => {
+          const value = dataset.data[index];
+          if (value <= 0) return;
+
+          const textColor = getTextColor(dataset.label);
+          const fontSize = pluginConfig.font?.size || FONT_CONFIG.size.medium;
+          const { x, y } = calculateBarCenter(bar, indexAxis);
+
+          ctx.save();
+          setupTextContext(ctx, textColor, fontSize);
+          ctx.fillText(formatNumber(value), x, y);
+          ctx.restore();
+        });
+      });
+    },
+  };
+
+  const mostrarValoresPluginSumatoria: Plugin = {
+    id: "mostrarValoresPluginSumatoria",
+    afterDatasetsDraw(chart: any) {
+      const pluginEnabled =
+        chart.config.options.plugins?.mostrarValoresPluginSumatoria?.enabled;
+      if (!pluginEnabled) return;
+
+      const ctx = chart.ctx;
+      const indexAxis = chart.config.options.indexAxis || "x";
+
+      // Mostrar valores internos
+      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+
+        meta.data.forEach((bar: any, index: number) => {
+          const value = dataset.data[index];
+          if (value <= 0) return;
+
+          const textColor = getTextColor(dataset.label);
+          const { x, y } = calculateBarCenter(bar, indexAxis);
+          const fontSize = Math.max(11, chart.height * 0.015); // Reducido el multiplicador
+
+          ctx.save();
+          setupTextContext(ctx, textColor, fontSize);
+          ctx.fillText(formatNumber(value), x, y);
+          ctx.restore();
+        });
+      });
+
+      // Mostrar sumatorias totales
+      chart.data.labels.forEach((_: any, index: number) => {
+        let total = 0;
+        let barRef: any = null;
+
+        chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          if (meta.hidden) return;
+
+          const value = dataset.data[index] || 0;
+          total += value;
+
+          const bar = meta.data[index];
+          if (bar) barRef = bar;
+        });
+
+        if (total > 0 && barRef) {
+          const fontSize = Math.max(12, chart.height * 0.02); // Reducido el multiplicador
+
+          ctx.save();
+          setupTextContext(ctx, "#000000", fontSize);
+          ctx.textBaseline = "bottom";
+
+          if (indexAxis === "y") {
+            ctx.fillText(formatNumber(total), barRef.x + 25, barRef.y);
+          } else {
+            ctx.fillText(formatNumber(total), barRef.x, barRef.y - 10);
+          }
+          ctx.restore();
+        }
+      });
+    },
+  };
+
+  const mostrarTooltipBurbujaPlugin: Plugin = {
     id: "mostrarTooltipBurbujaPlugin",
-    afterDatasetsDraw(chart) {
-      // Leer la opción del gráfico
+    afterDatasetsDraw(chart: any) {
       const mostrar = chart.options.plugins?.mostrarValoresPie;
       if (!mostrar) return;
 
       const ctx = chart.ctx;
       const dataset = chart.data.datasets[0];
       const meta = chart.getDatasetMeta(0);
+      const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+      const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
 
-      meta.data.forEach((sector, i) => {
+      meta.data.forEach((sector: any, i: number) => {
         const value = dataset.data[i];
         const rawLabel = chart.data.labels[i];
-        const label = labelMap[rawLabel] || rawLabel; // si no está en el map, usamos el label original
-        const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
-        const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+        const label = LABEL_MAP[rawLabel] || rawLabel;
 
         const midAngle = (sector.startAngle + sector.endAngle) / 2;
         const radius = sector.outerRadius + Math.min(35, chart.width * 0.07);
@@ -101,25 +287,29 @@ export function useChartUtilitarios() {
         let y = centerY + radius * Math.sin(midAngle);
 
         const texto = `${label} ${value}%`.toUpperCase();
-
-        ctx.font = "12px Work Sans";
         const paddingX = 10;
+        const boxHeight = 24;
+
+        ctx.font = `${FONT_CONFIG.size.large}px ${FONT_CONFIG.family}`;
         const textWidth = ctx.measureText(texto).width;
         const boxWidth = textWidth + paddingX * 2;
-        const boxHeight = 24;
+
         let boxX = x - boxWidth / 2;
         let boxY = y - boxHeight / 2;
 
-        // Ajuste para que no se corte
-        if (boxX + boxWidth > chart.chartArea.right)
-          boxX = chart.chartArea.right - boxWidth - 5;
-        if (boxX < chart.chartArea.left) boxX = chart.chartArea.left + 5;
-        if (boxY < chart.chartArea.top) boxY = chart.chartArea.top + 5;
-        if (boxY + boxHeight > chart.chartArea.bottom)
-          boxY = chart.chartArea.bottom - boxHeight - 5;
+        // Boundary adjustments
+        boxX = Math.max(
+          chart.chartArea.left + 5,
+          Math.min(boxX, chart.chartArea.right - boxWidth - 5)
+        );
+        boxY = Math.max(
+          chart.chartArea.top + 5,
+          Math.min(boxY, chart.chartArea.bottom - boxHeight - 5)
+        );
 
         ctx.save();
-        // Dibujar piquito
+
+        // Draw pointer
         ctx.fillStyle = "#5C667A";
         ctx.beginPath();
         ctx.moveTo(boxX, boxY + boxHeight / 2);
@@ -128,12 +318,12 @@ export function useChartUtilitarios() {
         ctx.closePath();
         ctx.fill();
 
-        // Caja redondeada
+        // Draw rounded box
         ctx.beginPath();
         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 12);
         ctx.fill();
 
-        // Texto
+        // Draw text
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -143,254 +333,97 @@ export function useChartUtilitarios() {
     },
   };
 
-
-
-//Función utilitaria para formatear números
-function formatNumber(value: number): string {
-  const suffixes = ["", "K", "M", "B", "T"];
-  let newValue = value;
-  let suffixIndex = 0;
-
-  while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
-    newValue /= 1000;
-    suffixIndex++;
+  function drawPointCircle(ctx: any, point: any, color: string) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    ctx.restore();
   }
-  const formatted = newValue.toLocaleString("es-BO", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-  return formatted + suffixes[suffixIndex];
-}
 
-// Plugin: Mostrar valores internos + sumatoria total de la pila x o y 
-const mostrarValoresPluginSumatoria: Plugin = {
-  id: "mostrarValoresPluginSumatoria",
-  afterDatasetsDraw(chart: any) {
-    const pluginEnabled = chart.config.options.plugins?.mostrarValoresPluginSumatoria?.enabled;
-    if (!pluginEnabled) return;
+  function drawValueTooltip(ctx: any, point: any, value: number) {
+    const texto = formatNumber(value);
 
-    const ctx = chart.ctx;
-    const indexAxis = chart.config.options.indexAxis || "x"; // 'x' = vertical, 'y' = horizontal
-    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
-      const meta = chart.getDatasetMeta(datasetIndex);
-      if (meta.hidden) return;
+    ctx.save();
+    ctx.translate(point.x, point.y - 25);
+    ctx.rotate(-Math.PI / 3);
 
-      meta.data.forEach((bar: any, index: number) => {
-        const value = dataset.data[index];
-        if (value <= 0) return;
+    const paddingX = 8;
+    const paddingY = 4;
+    const textWidth = ctx.measureText(texto).width;
+    const width = textWidth + paddingX * 2;
+    const height = 18;
 
-        const color = ["QR", "Express"].includes(dataset.label)
-          ? "#FFFFFF"
-          : "#2A303A";
+    // Dibujar burbuja redondeada
+    drawRoundedRect(ctx, -width / 2, -height / 2, width, height, 6, "#6F8CCE");
 
-        const fontSize = Math.max(11, chart.height * 0.025);
+    // Texto centrado
+    ctx.fillStyle = "white";
+    ctx.font = "10px Work Sans";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(texto, 0, 0);
 
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.font = `${fontSize}px Work Sans`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        let x: number, y: number;
-
-        if (indexAxis === "y") {
-          // Barras horizontales
-          x = (bar.base + bar.x) / 2;
-          y = bar.y;
-        } else {
-          // Barras verticales
-          x = bar.x;
-          y = (bar.base + bar.y) / 2;
-        }
-
-        ctx.fillText(formatNumber(value), x, y);
-        ctx.restore();
-      });
-    });
-
-    //  Mostrar sumatoria total por cada pila
-    chart.data.labels.forEach((_: any, index: number) => {
-      let total = 0;
-      let barRef: any = null;
-
-      chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
-        const meta = chart.getDatasetMeta(datasetIndex);
-        if (meta.hidden) return;
-        const value = dataset.data[index] || 0;
-        total += value;
-
-        const bar = meta.data[index];
-        if (bar) barRef = bar; // última barra visible
-      });
-
-      if (total > 0 && barRef) {
-        const fontSize = Math.max(12, chart.height * 0.03);
-
-        ctx.save();
-        ctx.fillStyle = "#000000";
-        ctx.font = `${fontSize}px Work Sans`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-
-        if (indexAxis === "y") {
-          // Totales para barras horizontales → al final
-          ctx.fillText(formatNumber(total), barRef.x + 25, barRef.y);
-        } else {
-          // Totales para barras verticales → encima
-          ctx.fillText(formatNumber(total), barRef.x, barRef.y - 10);
-        }
-
-        ctx.restore();
-      }
-    });
-  },
-};
-// Plugin: Mostrar valores internos sin sumatoria  de la pila x o y 
-const mostrarValoresPlugin: Plugin = {
-  id: "mostrarValoresPlugin",
-  afterDatasetsDraw(chart: any) {
-    const pluginEnabled = chart.config.options.plugins?.mostrarValoresPlugin?.enabled;
-    if (!pluginEnabled) return;
-
-    const ctx = chart.ctx;
-    const indexAxis = chart.config.options.indexAxis || "x"; // 'x' = vertical (default), 'y' = horizontal
-
-    chart.data.datasets.forEach((dataset: any, datasetIndex: number) => {
-      const meta = chart.getDatasetMeta(datasetIndex);
-      if (meta.hidden) return;
-
-      meta.data.forEach((bar: any, index: number) => {
-        const value = dataset.data[index];
-        if (value <= 0) return;
-
-        const color = ["QR", "Express"].includes(dataset.label)
-          ? "#FFFFFF"
-          : "#2A303A";
-
-        const fontSize = Math.max(11, chart.height * 0.025);
-
-        ctx.save();
-        ctx.fillStyle = color;
-        ctx.font = `${fontSize}px Work Sans`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        let x: number, y: number;
-
-        if (indexAxis === "y") {
-          // Barras horizontales
-          x = (bar.base + bar.x) / 2;
-          y = bar.y;
-        } else {
-          // Barras verticales (default)
-          x = bar.x;
-          y = (bar.base + bar.y) / 2;
-        }
-
-        ctx.fillText(formatNumber(value), x, y);
-        ctx.restore();
-      });
-    });
-  },
-};
-//plugin Mostrar toltips de charts lineal 
-const puntosColorYDatos = {
-  id: 'puntosColorYDatos',
-  afterDatasetsDraw(chart: any) {
-    const { ctx } = chart;
-
-    chart.data.datasets.forEach((dataset: any) => {
-      const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
-      if (!meta) return;
-
-      meta.data.forEach((point: any, index: number) => {
-        // Dibujar círculo
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = dataset.borderColor || '#000';
-        ctx.stroke();
-        ctx.restore();
-
-        // Solo mostrar tooltip si está seleccionado
-        if (!seleccionado.value || dataset.label !== seleccionado.value) return;
-
-        const value = dataset.data[index];
-        const texto = formatNumber(value);
-
-        ctx.save();
-        ctx.translate(point.x, point.y - 25); // un poco arriba
-        ctx.rotate(-Math.PI / 3); // rotación si quieres
-
-        const paddingX = 8;
-        const paddingY = 4;
-        const textWidth = ctx.measureText(texto).width;
-        const width = textWidth + paddingX * 2;
-        const height = 18;
-
-        // Ajustar la burbuja
-        ctx.beginPath();
-        const radius = 6; // esquinas redondeadas
-        ctx.moveTo(-width / 2 + radius, -height / 2);
-        ctx.lineTo(width / 2 - radius, -height / 2);
-        ctx.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
-        ctx.lineTo(width / 2, height / 2 - radius);
-        ctx.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
-        ctx.lineTo(-width / 2 + radius, height / 2);
-        ctx.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - radius);
-        ctx.lineTo(-width / 2, -height / 2 + radius);
-        ctx.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + radius, -height / 2);
-        ctx.closePath();
-
-        ctx.fillStyle = '#6F8CCE';
-        ctx.fill();
-
-        // Texto centrado
-        ctx.fillStyle = 'white';
-        ctx.font = '10px Work Sans';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(texto, 0, 0);
-
-        ctx.restore();
-      });
-    });
+    ctx.restore();
   }
-};
 
+  function drawRoundedRect(
+    ctx: any,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number,
+    fillColor: string
+  ) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
 
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
 
-  
-  // Función para formatear números
-/*  function formatNumber(value: number): string {
-    const suffixes = ["", "K", "M", "B", "T"];
-    let newValue = value;
-    let suffixIndex = 0;
-
-    while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
-      newValue /= 1000;
-      suffixIndex++;
-    }
-
-    const formatted = newValue.toLocaleString("es-BO", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-
-    return formatted + suffixes[suffixIndex];
-  }*/
+  function formatPercentage(value: number, total: number): string {
+    return ((value / total) * 100).toFixed(1);
+  }
+  function shouldGroupAsOthers(items: any[]): boolean {
+    return items.length > 6 || items.some((item) => item.percent < 3);
+  }
 
   return {
+    // State
     copiado,
+
+    // Functions
     copiarGrafico,
     ordenarBarras,
-    mostrarTooltipBurbujaPlugin,
     formatNumber,
-    mostrarValoresPluginSumatoria,
+    drawPointCircle,
+    drawValueTooltip,
+    formatPercentage,
+    shouldGroupAsOthers,
+
+    // Plugins
     mostrarValoresPlugin,
-    
+    mostrarValoresPluginSumatoria,
+    mostrarTooltipBurbujaPlugin,
+
+    // Constants (exposed for external use if needed)
+    DATASET_COLORS,
+    LABEL_MAP,
+    FONT_CONFIG,
   };
 }

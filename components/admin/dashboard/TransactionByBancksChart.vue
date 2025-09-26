@@ -34,9 +34,9 @@
                 </div>
               </div>
               <!-- Contenedor del gráfico con scroll vertical -->
-              <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto">
-                <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10" @click="toggleManual">
-                  <div class="flex items-center justify-center">
+              <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px;">
+                <div class="left-2 top-2 flex items-center cursor-pointer z-10" >
+                  <div class="flex items-center justify-center" @click="toggleManual">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19" fill="none"
                       class="transition-all duration-200">
                       <path
@@ -48,10 +48,15 @@
                     </svg>
                   </div>
                   <span class="font-normal text-[13px] ml-2 select-none">Ver todas las cifras</span>
+                                  <Icon name="x:sort" class="text-[#0C55F8] w-7 h-7 ml-2 cursor-pointer" @click="handleOrdenar" />
+
                 </div>
                 <!-- Gráfico -->
-                <BarChart ref="chartRefMonto" :data="chartData" :options="chartOptionsComputed" />
-              </div>
+                <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto;">
+                  <div :style="{ height: chartHeight, minHeight: '500px' }">
+                    <BarChart ref="chartRefMonto" :data="chartData" :options="chartOptionsComputed" />
+                  </div>
+                </div>              </div>
 
             </div>
           </XTabPanel>
@@ -79,9 +84,10 @@
                 </div>
               </div>
               <!-- Contenedor del gráfico con scroll vertical -->
-              <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto">
-                <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10" @click="toggleManual">
-                  <div class="flex items-center justify-center">
+              <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; ">
+
+                <div class="left-2 top-2 flex items-center cursor-pointer z-10" >
+                  <div class="flex items-center justify-center"          @click="toggleManual"  >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19" fill="none"
                       class="transition-all duration-200">
                       <path
@@ -89,13 +95,20 @@
                         :fill="mostrarValores ? '#0C55F8' : 'white'" :stroke="mostrarValores ? '#0C55F8' : '#A9B6C9'"
                         class="transition-all duration-200" />
                       <path v-if="mostrarValores" d="M5 9.5l2.5 2.5 5.5-5.5" stroke="white" stroke-width="1.5"
-                        stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    </svg>
+                        stroke-linecap="round" stroke-linejoin="round" fill="none" />          
+                      </svg>
                   </div>
                   <span class="font-normal text-[13px] ml-2 select-none">Ver todas las cifras</span>
+                <Icon name="x:sort" class="text-[#0C55F8] w-7 h-7 ml-2 cursor-pointer" @click="handleOrdenar" />
+
                 </div>
                 <!-- Gráfico -->
-                <BarChart ref="chartRefCantidad" :data="chartData" :options="chartOptionsComputed" />
+                <!-- Gráfico con altura dinámica -->
+                <div class="relative w-full border-gray-200 rounded-lg p-2" style="height: 500px; overflow-y: auto;">
+                  <div :style="{ height: chartHeight, minHeight: '500px' }">
+                    <BarChart ref="chartRefCantidad" :data="chartData" :options="chartOptionsComputed" />
+                  </div>
+                </div>
               </div>
             </div>
           </XTabPanel>
@@ -122,10 +135,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-  type ChartData,
-  type Plugin,
-  type ChartOptions,
-  LogarithmicScale,
+  type ChartData, 
 } from "chart.js";
 import { Bar as BarChart } from "vue-chartjs";
 import { useChartUtilitarios } from "~/componsables/useChartUtilitarios";
@@ -167,6 +177,8 @@ const mostrarValores = ref(false);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const selected = ref<SelectionType>("enviados");
+const ordenAscendente = ref(true);
+
 
 // Computed para obtener la referencia del gráfico actual
 const currentChartRef = computed(() => {
@@ -185,6 +197,7 @@ const chartOptionsComputed = computed(() => ({
   interaction: {
     intersect: false,
   },
+
   scales: {
     x: {
       stacked: true,
@@ -196,6 +209,10 @@ const chartOptionsComputed = computed(() => ({
           family: "Work Sans",
         },
       },
+      grid: {
+        display: true,
+        drawBorder: true,
+      }
     },
     y: {
       stacked: true,
@@ -204,11 +221,25 @@ const chartOptionsComputed = computed(() => ({
           size: 11,
           family: "Work Sans",
         },
+        grid: {
+          display: false,
+        },
+
       },
     },
   },
   plugins: {
-    mostrarValoresPlugin: { enabled: mostrarValores.value },
+    mostrarValoresPlugin: { enabled: mostrarValores.value,
+     font: {
+      size: 10,        // tamaño más pequeño
+      family: "Work Sans",
+      weight: "400",
+    },
+color: "#333",      // color del texto
+    anchor: "end",      // posición del texto
+    align: "end",       // alineación
+    offset: 4           // espacio respecto a la barra    
+      },
     tooltip: {
       callbacks: {
         label: function (context: any) {
@@ -239,6 +270,17 @@ const chartOptionsComputed = computed(() => ({
     },
   },
 }));
+
+// Agregar computed para altura dinámica scroll bar
+const chartHeight = computed(() => {
+  const dataLength = chartData.value.labels?.length || 0;
+  const minHeight = 500;
+  const heightPerBar = 40; // Altura por barra
+  const calculatedHeight = Math.max(minHeight, dataLength * heightPerBar + 100);
+  return `${calculatedHeight}px`;
+});
+
+
 
 // FUNCIONES UTILITARIAS
 function formatNumber(value: number): string {
@@ -283,7 +325,10 @@ function generateCustomLabels(chart: any) {
 const buildChartData = async (participants: any[]) => {
   try {
     const bancks = await filtersService.getFilterBanck();
+          console.log("mis bancos sonnnnnnnn ",bancks);
+
     if (!bancks || bancks.length === 0) {
+      
       return buildChartDataFallback(participants);
     }
 
@@ -505,6 +550,30 @@ async function handleCopiar() {
     });
   }
 }
+
+async function handleOrdenar() {
+  try {
+    await nextTick();
+    const chartRef = currentChartRef.value;
+
+    if (chartRef?.$el) {
+      await ordenarBarras(chartRef.$el,chartData.value,ordenAscendente);
+      console.log(`ordenado desde tab: ${activeTab.value === "0" ? "Monto" : "Cantidad"}`);
+    } else {
+      throw new Error("No se pudo obtener la referencia ");
+    }
+  } catch (error) {
+    console.error("Error al copiar el gráfico:", error);
+    toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Error al copiar el gráfico",
+      life: 3000,
+    });
+  }
+}
+
+
 
 async function toggleManual() {
   mostrarValores.value = !mostrarValores.value;

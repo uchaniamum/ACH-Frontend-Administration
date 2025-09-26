@@ -11,8 +11,11 @@
         {{ sumaryData?.panel || 'No hay descripción disponible' }}
       </h2>
       <XSelect name="periodo" v-model="selectedPeriod" :options="periodsOptions" optionLabel="label" optionValue="value"
-        placeholder="Seleccionar" :loading="optionsLoading" :dropdown="true" appendTo="body"
-        class="w-full sm:w-90 max-w-xs" />
+        placeholder="Seleccionar" :loading="optionsLoading" :dropdown="true" appendTo="body" style="
+    width: 100%;
+    max-width: 243px;
+    height: 40px;
+  " />
     </div>
   </div>
 
@@ -30,7 +33,7 @@
       style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
 
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#6D99FB] rounded-t-3xl mb-4">
-        <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
+        <h2 class="text-[20px] text-white font-semibold text-center">
           Total Movimientos de Transacciones
         </h2>
       </div>
@@ -39,7 +42,7 @@
         <!-- Recibidos -->
         <div class="flex-1 p-3 sm:p-4 bg-white border border-gray-200 flex flex-col rounded-none md:rounded-bl-3xl">
           <div class="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 class="text-black font-bold text-[16px] sm:text-[18px] m-0">Recibidos</h3>
+            <h3 class="text-black font-semibold text-[16px] m-0">Recibidos</h3>
             <Icon name="x:arrow-br-circle" class="text-[#92ACE5] w-8 h-8 sm:w-11 sm:h-11 flex-shrink-0" />
           </div>
 
@@ -63,7 +66,9 @@
         <!-- Enviados -->
         <div class="flex-1 p-3 sm:p-4 bg-white border border-gray-200 flex flex-col rounded-none md:rounded-br-3xl">
           <div class="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 class="text-black font-bold text-[16px] sm:text-[18px] m-0">Enviados</h3>
+            <h3 class="text-black font-semibold text-[16px] m-0">
+              Enviados
+            </h3>
             <Icon name="x:arrow-tr-circle" class="text-[#92ACE5] w-8 h-8 sm:w-11 sm:h-11 flex-shrink-0" />
           </div>
           <div
@@ -91,8 +96,8 @@
       style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
 
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#92ACE5] rounded-t-3xl mb-4">
-        <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
-          Total Cantidad de Transacciones
+        <h2 class="text-[20px] text-white font-semibold text-center">
+          Total Movimientos de Transacciones
         </h2>
       </div>
 
@@ -100,7 +105,9 @@
         <!-- Recibidos -->
         <div class="flex-1 p-3 sm:p-4 bg-white border border-gray-200 flex flex-col rounded-none md:rounded-bl-3xl">
           <div class="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 class="text-black font-bold text-[16px] sm:text-[18px] m-0">Recibidos</h3>
+            <h3 class="text-black font-semibold text-[16px] m-0">
+              Recibidos
+            </h3>
             <Icon name="x:arrow-br-circle" class="text-[#92ACE5] w-8 h-8 sm:w-11 sm:h-11 flex-shrink-0" />
           </div>
 
@@ -126,7 +133,9 @@
         <!-- Enviados -->
         <div class="flex-1 p-3 sm:p-4 bg-white border border-gray-200 flex flex-col rounded-none md:rounded-br-3xl">
           <div class="flex justify-between items-center mb-4 sm:mb-6">
-            <h3 class="text-black font-bold text-[16px] sm:text-[18px] m-0">Enviados</h3>
+            <h3 class="text-black font-semibold text-[16px] m-0">
+              Enviados
+            </h3>
             <Icon name="x:arrow-tr-circle" class="text-[#92ACE5] w-8 h-8 sm:w-11 sm:h-11 flex-shrink-0" />
           </div>
 
@@ -155,7 +164,7 @@
       style="box-shadow: -4px 0 6px -1px rgba(0,0,0,0.1), 4px 0 6px -1px rgba(0,0,0,0.1), 0 -4px 6px -1px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.1);">
 
       <div class="px-4 sm:px-6 py-3 border border-gray-200 bg-[#052263] rounded-t-3xl mb-4">
-        <h2 class="text-[16px] sm:text-[18px] text-white font-bold text-center">
+        <h2 class="text-[20px] text-white font-semibold text-center">
           Eficiencia
         </h2>
       </div>

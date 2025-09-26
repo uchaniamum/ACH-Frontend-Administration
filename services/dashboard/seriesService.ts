@@ -43,7 +43,6 @@ class SeriesService {
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
       `analytics/dashboard/series/${tipo}/period/${code}`
     );
-    console.log("DEBUG - respuesta del servidor:", response); 
     return response;
   }
 
@@ -68,7 +67,6 @@ class SeriesService {
     const response = await this.request<SerieUsabilityChannelResponse>(
       `analytics/dashboard/transfers/usability/payment-channel/period/${code}`
     );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
@@ -81,7 +79,6 @@ class SeriesService {
     const response = await this.request<SerieUsabilityTransferResponse>(
       `analytics/dashboard/transfers/usability/transfer/period/${code}` // cxambiar ruta
     );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
@@ -109,7 +106,6 @@ class SeriesService {
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
       `analytics/dashboard/regions/${tipo}/period/${code}` // cxambiar ruta
     );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 
@@ -122,7 +118,6 @@ class SeriesService {
     const response = await this.request<SerieTotalTransactionsRegionResponse>(
       `analytics/dashboard/regions/count/period/${code}` // cxambiar ruta
     );
-    console.log("DEBUG - respuesta del servidor:", response); // <-- aquí
     return response;
   }
 }
