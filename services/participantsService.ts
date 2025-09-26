@@ -114,6 +114,27 @@ class ParticipantsService {
         return response
      }
 
+    async gethistoricalParticipants(){
+       const { participants } = await this.request<any>('external-participants/historical-payment-gateway-participants', {
+           method: 'GET'
+       })
+       return participants
+    }
+
+    async getHistoricalCertificates(){
+        const { participantPaymentGatewaysCertificates } = await this.request<any>('external-participants/historical-payment-gateway-certificates', {
+            method: 'GET'
+        })
+        return participantPaymentGatewaysCertificates
+    }
+
+    async getHistoricalGateway(){
+        const { historicalPaymentGatewayParticipants } = await this.request<any>('external-participants/historical-payment-gateways', {
+            method: 'GET'
+        })
+        return historicalPaymentGatewayParticipants
+    }
+
 }
 
 export const participantsService = new ParticipantsService();

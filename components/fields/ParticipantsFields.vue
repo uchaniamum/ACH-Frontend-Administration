@@ -1,52 +1,37 @@
 <template>
     <div v-if="!loading && currentParticipants?.length" class="flex flex-col gap-12">
-        <XCard 
-            v-for="participant in currentParticipants"
-            :key="participant.code"
-            class="border border-gray-400 flex gap-2 text-gray-900"
-        >
-            <template #header>
-                <div class="flex justify-between items-start mt-10">
-                    <!-- Parte izquierda: Logo + Nombre -->
-                    <div class="flex gap-12">
-                        <XAvatar
-                            v-if="participant.urlIcon"
-                            :image="participant.urlIcon"
-                            class="w-20 h-20"
-                        />
-                        <Icon v-else name="x:bank" class="w-20 h-20 text-gray-400" />
-                        <div>
-                            <p class="text-sm text-gray-500">Entidad</p>
-                            <p class="text-base font-semibold text-gray-900">{{ participant.name }}</p>
+        <XCard v-for="participant in currentParticipants" :key="participant.code"
+            class="border border-gray-400 flex gap-2 text-gray-900 p-6">
+            <template #content>
+                <div class="grid grid-cols-12 gap-8">
+                    <div class="col-span-4 flex justify-between items-start">
+                        <div class="flex gap-12">
+                            <XAvatar v-if="participant.urlIcon" :image="participant.urlIcon" class="w-20 h-20" />
+                            <Icon v-else name="x:bank" class="w-20 h-20 text-gray-400" />
+                            <div>
+                                <p class="text-sm text-gray-500">Entidad</p>
+                                <p class="text-base font-semibold text-gray-900">{{ participant.name }}</p>
+                            </div>
                         </div>
                     </div>
-                    <!-- <XButton @Click="router.push(`participants/edith/${participant.participantCode}`)"  label="Editar banco" icon="edit-pencil" variant="text" class="flex items-center gap-1" /> -->
-                </div>
-            </template>
-            <template #content>
-                <div class="grid grid-cols-3 mt-12">
-                    <div class="flex-col gap-2">
+                    <div class="col-span-1 flex-col gap-2">
                         <p class="font-sm text-gray-600">Código</p>
                         <span class="font-lg font-semi bold">{{ participant.participantCode }}</span>
                     </div>
-                    <div class="flex-col gap-2">
+                    <div class="col-span-1 flex-col gap-2">
                         <p class="font-sm text-gray-600">Siglas</p>
                         <span class="font-lg font-semi bold">{{ participant.acronym }}</span>
-                    </div> 
-                    <div class="flex-col gap-2">
+                    </div>
+                    <div class="col-span-3 flex-col gap-2">
                         <p class="font-sm text-gray-600">Canales</p>
                         <span class="font-lg font-semi bold">
                             {{ formatPaymentSystems(participant.paymentSystems) }}
                         </span>
                     </div>
+                    <div class="col-span-3 flex justify-end items-center">
+                        <XButton label="Editar" variant="outlined" class="w-65" @click="checkCanales(participant)" />
+                    </div>
                 </div>
-            </template>
-            <template #footer>
-            <div class="mt-6  flex justify-end gap-10">
-                <!-- {{ participant.participantCode }} -->
-                <!-- <XButton label="Ver Historial"  variant="outlined" class="w-65" @click="router.push(`participants/historial/${participant.participantCode}`)"/> -->
-                <XButton label="Editar"  variant="outlined" class="w-65" @click="checkCanales(participant)"/>
-            </div>
             </template>
         </XCard>
     </div>
@@ -74,16 +59,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const checkCanales = (participant: string) => {
     console.log(participant)
-    if(participant.isSelf){
-        emit('participantSelected', participant.code);
-    }else{
+    if (participant.isSelf) {
+        emit('participantSelected', 'edith');
+    } else {
         emit('participantSelected', participant.participantCode);
     }
     // emit('participantSelected', participant.isSelf ? participant.code : participant.participantCode);
 };
 
 const emit = defineEmits<{
-    'participantSelected': [participant: ParticipantsDetail],
+    'participantSelected': [participant: ParticipantsDetail | string],
 }>();
 
 const currentParticipants = computed(() => {
@@ -97,6 +82,4 @@ const formatPaymentSystems = (paymentSystems?: Array<{ paymentSystemAcronym: str
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -42,6 +42,23 @@ export function useAlertsService() {
         }
     }
 
+    const alertHistorical = async (): Promise<any | null> => {
+        try {
+            const response = await alertsService.getAlertsHistorical();
+            return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: serviceError.message || 'No se pudieron cargar los datos de alerta',
+                life: 5000
+            })
+            return null
+        }
+    }
+
     const getAlertCode = async (data:any): Promise<Alert> => {
         try {
             console.log('el valor dara ',data)
@@ -82,6 +99,7 @@ export function useAlertsService() {
         showToast,
         loadAlerts,
         getAlertCode,
-        updateEmails
+        updateEmails,
+        alertHistorical
     }
 }

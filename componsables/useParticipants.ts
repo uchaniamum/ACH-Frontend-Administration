@@ -170,6 +170,75 @@ export function usePartipantsService() {
         }
     }
 
+    
+    const getParticipantOwn = async(): Promise<any> => {
+        try {
+            return await participantsService.getParticipantsOwn();
+        } catch (error) {
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: serviceError.message || 'No se pudo registrar al participante',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    const getHistoricParticipants = async (): Promise<any> => {
+        try {
+            const response = await participantsService.gethistoricalParticipants()
+            return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al cargar el historial de participantes',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    const getHistoricCertificates = async (): Promise<any> => {
+        try {
+            const response = await participantsService.getHistoricalCertificates()
+            return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al cargar el historial de certificados',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    const getHistoricGateways = async (): Promise<any> => {
+        try {
+            const response = await participantsService.getHistoricalGateway()
+            return response
+        } catch (error) {
+            console.error('Error loading user details:', error)
+            const serviceError = error as ServiceError
+            showToast({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Error al cargar el historial de canales',
+                life: 5000
+            })
+            return null
+        }
+    }
+
+    
+
     return{
         loadParticipantExternal,
         registerParticipant,
@@ -179,6 +248,10 @@ export function usePartipantsService() {
         updateCertificatePublicParticipantExternal,
         UpdateParticipantExrternal,
         registerParticipantOwn,
-        getHistorial
+        getHistorial,
+        getHistoricParticipants,
+        getHistoricCertificates,
+        getHistoricGateways,
+        getParticipantOwn
     }
 }

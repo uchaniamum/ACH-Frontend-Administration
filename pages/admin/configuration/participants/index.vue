@@ -10,7 +10,7 @@
             <h3 class="text-[1.429rem] font-semibold">Mi Perfil</h3>
             <div v-if="participants.ownParticipants?.length < 1" class="flex justify-end">
                 <XButton 
-                    @click="navigateToNewParticipant('own')"
+                    @click="navigateToNewParticipantOwn('create')"
                     label="Nuevo Participante" 
                     icon="think-plus" 
                     size="large" />
@@ -40,7 +40,7 @@
                 </div>
                 <div class="self-center">
                     <XButton 
-                        @click="navigateToNewParticipant('new')"
+                        @click="navigateToNewParticipantExternal(null)"
                         label="Nuevo Participante" 
                         icon="think-plus" 
                         size="large" />
@@ -78,6 +78,10 @@ import type { ParticipantsList } from '~/features/participants/types';
 import type { ServiceError } from '~/features/users/types';
 import { participantsService } from '~/services/participantsService';
 
+definePageMeta({
+    middleware: 'menu'
+})
+
 const router = useRouter();
 
 const participantCode = ref()
@@ -86,14 +90,16 @@ const participantCodeMain = ref()
 watch(participantCodeMain, (newCode) => {
     if (newCode) {
         console.log(newCode)
-        router.push(`/admin/configuration/participants/edith/${newCode}`);
+        // router.push(`/admin/configuration/participants/edith/${newCode}`);
+        router.push(`/admin/configuration/participants/${newCode}-own-participant`);
     }
 });
 
 watch(participantCode, (newCode) => {
     if (newCode) {
         console.log(newCode)
-        router.push(`/admin/configuration/participants/edith/${newCode}`);
+        // router.push(`/admin/configuration/participants/edith/${newCode}`);
+        router.push(`/admin/configuration/participants/${newCode}-external-participant`);
     }
 });
 
@@ -198,8 +204,16 @@ onMounted(() => {
 //     router.push('/admin/configuration/participants/NewParticipant');
 // };
 
-const navigateToNewParticipant = (create:string) => {
-    router.push(`/admin/configuration/participants/create/${create}`);
+const navigateToNewParticipantOwn = (type:string) => {
+    router.push(`/admin/configuration/participants/${type}-own-participant`);
 };
+
+const navigateToNewParticipantExternal = (code:any) => {
+    router.push(`/admin/configuration/participants/${code}-external-participant`);
+}
+
+// const navigateToNewParticipant = (create:string) => {
+//     router.push(`/admin/configuration/participants/create/${create}`);
+// };
 
 </script>

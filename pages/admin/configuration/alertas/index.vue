@@ -1,27 +1,22 @@
 <template>
-    <div class="flex flex-col gap-20">
+    <div class="flex flex-col">
         <XHeader title="Configuración de alertas">
             <template #description>
                 Incorpora y actualiza los destinatarios de los mensajes de alerta, se cuidadoso y ten en cuenta que ellos serán los que recibirán las notificaciones cuando corresponda.
             </template>
         </XHeader>
-        <div class="flex flex-col">
-            <DataTable :value="listAlerts" tableStyle="min-width: 50rem" class="my-10">
+        <div>
+            <InputText v-model="globalFilterAlerts" @input="onGlobalFilterChangeAlerts" placeholder="Buscar"
+                class="my-12" />
+            <DataTable v-model:filters="filtersAlerts" :value="listAlerts" paginator :rows="5"
+                :rowsPerPageOptions="[5, 10, 20, 50]">
                 <Column field="alertDescription" header="Alerta"></Column>
                 <Column field="paymentGatewayDescription" header="Canal"></Column>
-                <Column header="Destinatarios" style="min-width: 250px; white-space: normal;">
-                    <template #body="{ data: { emailRecipientAddress } }">
-                        <div class="whitespace-normal break-words flex flex-col gap-4">
-                            <Chip v-for="(email, index ) in emailRecipientAddress" :key="index">
-                                {{ email }}
-                            </Chip>
-                        </div>
-                    </template>
-                </Column>
+                <Column field="recipientCounter" header="Destinatarios" />
                 <Column field="name" header="Acción">
                     <template #body="{data: { paymentGatewayAlertCode, paymentGatewayCode}}">
                         <div class="flex flex-row">
-                            <XButton label="Asignar" @click="router.push(`alertas/asignacion/${paymentGatewayAlertCode}-${paymentGatewayCode}`)"/>
+                            <XButton label="Asignar" @click="router.push(`/admin/configuration/alertas/asignacion/${paymentGatewayAlertCode}-${paymentGatewayCode}`)"/>
                         </div>
                     </template>
                 </Column>                
@@ -34,8 +29,17 @@
 
 import { useAlertsService } from '~/componsables/useAlerts'
 import { useRouter } from 'vue-router'
-const { loadAlerts, getAlertByCode } = useAlertsService();
+import { FilterMatchMode } from '@primevue/core'; 
 
+const { loadAlerts } = useAlertsService();
+
+const globalFilterAlerts = ref("");
+const onGlobalFilterChangeAlerts = (e: any) => {
+  filtersAlerts.value["global"].value = e.target.value;
+};
+const filtersAlerts = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+})
 
 const router = useRouter();
 const listAlerts = ref([])

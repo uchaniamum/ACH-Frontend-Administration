@@ -37,6 +37,15 @@ class AlertsService {
         return this.request<ListAlerts[]>(endpoint);
     }
 
+    async getAlertsHistorical(filters?: { search?: string }): Promise<any[]> {
+        let endpoint = 'payment-gateways-alert/historical';
+        if (filters?.search) {
+            const params = new URLSearchParams({ search: filters.search })
+            endpoint += `?${params.toString()}`
+        }
+        return this.request<any[]>(endpoint);
+    }
+
     async getAlertsByCode(data:any): Promise<Alert> {
         console.log('el valor service es: ', data)
         return this.request<Alert>(`payment-gateways-alert/${data.code}/payment-gateways/${data.gateway}/emails`)

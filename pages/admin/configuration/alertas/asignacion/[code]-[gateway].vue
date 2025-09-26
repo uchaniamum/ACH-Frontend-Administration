@@ -12,7 +12,7 @@
          </div>
          <XDivider class="my-6"/>
          <div class="flex flex-row justify-end gap-4">
-            <XButton variant="outlined" label="Cancelar" @click="router.back()"/>
+            <XButton variant="outlined" label="Cancelar" @click="router.push('/admin/configuration/alertas')"/>
             <XButton label="Guardar" @click="saveEmails()"/>
          </div>
       </div>
@@ -21,17 +21,17 @@
 <script lang="ts" setup>
 import { useAlertsService } from '~/componsables/useAlerts'
 import { useRoute } from 'vue-router';
-import { useToast } from 'primevue/usetoast'
+import { useGlobalToast } from '~/componsables/useGlobalToast';
+
+const globalToast = useGlobalToast();
+
 const { getAlertCode, updateEmails } = useAlertsService();
 const router = useRouter();
 const { params: { code, gateway }} = useRoute();
 const alert = ref()
-const emails = ref()
-const toast = useToast();
+const emails = ref<string | null>("")
 onMounted(async () => {
     alert.value = await getAlertCode({ code, gateway })
-    console.log('el valor alert',alert.value)
-    console.log(code, gateway)
     emails.value = convertListToString(alert.value.emailRecipientAddress)
 })
 
@@ -54,18 +54,11 @@ async function saveEmails(){
    try {
       const response = await updateEmails(data, code, gateway)
       if(response) {
-         toast.add({
-            severity: 'success',
-            summary: 'Registro de correo',
-            detail: 'El registro se realizo correctamente',
-            life: 5000
-         })
-         router.back()
+         globalToast.success('Registro exitoso');
+         router.push('/admin/configuration/alertas')
       }
-      console.log(response)
-      console.log('result',convert)
    } catch (error) {
-      console.log(error)
+      globalToast.error('Registro de polar');
    }
 }
 
