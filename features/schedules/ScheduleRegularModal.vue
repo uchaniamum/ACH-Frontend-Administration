@@ -168,8 +168,8 @@ const handleSubmit = async (formData: ScheduleFormRegular): Promise<void> => {
             modalScheduleRegular.value = false
             toast.add({
                 severity: 'success',
-                summary: 'Éxito',
-                detail: 'Horario regular actualizado correctamente',
+                summary: 'Edición exitosa',
+                detail: 'Los cambios en el horario de la transacción se guardaron con éxito.',
                 life: 5000
             })
         }

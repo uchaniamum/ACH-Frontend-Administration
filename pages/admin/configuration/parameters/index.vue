@@ -198,19 +198,6 @@ const openEditModal = (parameterData: ParameterListItem) => {
     }
 }
 
-// const openHistoModal = (parameterData: ParameterListItem) => {
-    
-//     modalStateHistoParameter.value = {
-//         modalParameterHistorial: true,
-//         parameterHistoData: {
-//             code: parameterData.code || '',
-//             value: parameterData.value,
-//             description: parameterData.description, 
-//             dataType: parameterData.dataType,     
-//             systemAcronym: parameterData.systemAcronym
-//         }
-//     }
-// }
 
 const handleParameterSaved = (): void => {
     loadParameters()

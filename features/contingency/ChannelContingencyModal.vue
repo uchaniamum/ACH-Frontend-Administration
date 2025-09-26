@@ -128,7 +128,7 @@ const confirmDialogGatewayContingency = ref({
     options: {
         title: '',
         message: '',
-        onConfirm: () => {}
+        onConfirm: () => {},
     }
 })
 
@@ -158,7 +158,7 @@ const handleSubmitPaymentGateway = async () => {
                 iconColor: 'text-yellow-500',
                 confirmLabel: 'Guardar',
                 cancelLabel: 'Cancelar',
-                message: `¿Estás seguro de guardar la configuración para el canal <span class="font-semibold"> ${props.paymentGatewayData?.paymentGatewayAcronym}</span>? 
+                message: `¿Estás seguro de guardar la configuración para el canal <span class="font-semibold"> ${props.paymentGatewayData?.paymentGatewayAcronym}</span>?
                             <p>Esta modificación es delicada y afectará a todos los participantes que utilicen el canal.</p>`,
                 onConfirm: async () => {
                     await confirmSaveGateway();

@@ -100,7 +100,8 @@ const confirmDialogSchedules = ref({
     options: {
         title: '',
         message: '',
-        onConfirm: () => {}
+        onConfirm: () => {},
+        onCancel: () => {}
     }
 })
 
@@ -117,7 +118,12 @@ const openConfirmModalSave = (formData: ScheduleFormData): void => {
             title: isEditMode.value ? 'Editar horario extraordinario' : 'Nuevo horario extraordinario',
             icon: 'x:warning-circle',
             iconColor: 'text-yellow-500',
+
             confirmLabel: 'Programar',
+
+            confirmLabel:  isEditMode.value ? 'Guardar' : 'Programar',
+            cancelLabel:'Cancelar',
+
             message: isEditMode.value
                 ? `¿Estás seguro de guardar los cambios del horario extraordinario? 
                     El horario quedará programado para el <span class="font-semibold">${formatDate(formData.scheduleEffectiveDate)} </span>
@@ -127,6 +133,9 @@ const openConfirmModalSave = (formData: ScheduleFormData): void => {
                     Ten en cuenta que este horario tendrá prioridad sobre el horario regular actualmente establecido para la transacción.`,
             onConfirm: async () => {
                 await confirmSave();
+            },
+            onCancel: () => {
+                console.log('Usuario canceló la acción');
             }
         }
     };
@@ -168,7 +177,7 @@ const confirmSave = async (): Promise<void> => {
         if(result){
             emit('success', {
                 summary: isEditMode.value ? 'Edición exitosa' : 'Horario extraordinario programado con éxito',
-                detail: isEditMode.value ? 'El horario extraordinario se actualizó correctamente' : 'El nuevo horario extraordinario se ha programado correctamente'
+                detail: isEditMode.value ? '' : 'El nuevo horario extraordinario se ha programado correctamente'
             })
         }
         emit('save', requestData)

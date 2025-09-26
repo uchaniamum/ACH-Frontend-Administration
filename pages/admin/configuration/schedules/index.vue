@@ -6,14 +6,14 @@
             </template>
         </XHeader>
         <div class="flex flex-col gap-12">
-            <div class="flex justify-end gap-4">
-                Definiciones:  
-                <div class="flex items-center gap-6">
-                    <Icon name="x:arrow-bl" class="text-orange-500 text-[12px] font-semibold"/>
+            <div class="flex justify-end gap-8">
+                <span class="text-gray-700">Definiciones:</span>  
+                <div class="flex items-center gap-4">
+                    <Icon name="x:arrow-bl " class="text-orange-500 text-[12px] font-semibold"/>
                     <span class="text-gray-700">Recibidas</span>
                 </div> 
 
-                <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4">
                     <Icon name="x:arrow-tr" class="text-sky-500 text-[12px] font-semibold"/>
                     <span class="text-gray-700">Enviadas</span>
                 </div> 
@@ -23,38 +23,28 @@
                 <div class="flex items-center gap-4">
                     <div class="self-center">
                         <XIconField>
-                            <XInputText name="codigo" placeholder="Buscar" v-model="searchSchedules"/>
+                            <XInputText name="codigo" placeholder="Buscar" v-model="searchSchedules" class="min-w-[250px]"/>
                             <XInputIcon icon="search"/>
                         </XIconField>
                     </div>
-                    <!-- Botón para limpiar filtros (opcional) -->
-                    <XButton 
-                        v-if="searchSchedules.trim() || selectedChannel !== 'todos'"
-                        variant="outlined" 
-                        icon="filter-x"
-                        class="p-2"
-                        v-tooltip.top="{ value: 'Limpiar filtros', hideDelay: 300 }"
-                        @click="clearFilters"
-                    />
                 </div>
                 <div class="self-center">
                     <SelectButton 
-                        v-model="selectedChannel" 
-                        :options="channelOptions" 
-                        optionLabel="label" 
-                        optionValue="value"
-                        dataKey="value" 
-                        aria-labelledby="custom"
-                        :pt="{
-                            root: { class: 'bg-white gap-6' },
-                        }"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex items-center justify-center max-w-70 w-50">
-                                <span class="font-medium">{{ slotProps.option.label }}</span>
-                            </div>
-                        </template>
-                    </SelectButton>
+                            v-model="selectedChannel" 
+                            :options="channelOptions" 
+                            optionLabel="value" 
+                            dataKey="value" 
+                            aria-labelledby="custom"
+                            :pt="{
+                                root: { class: 'bg-white gap-6 p-0' },
+                            }"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex items-center justify-center max-w-70 w-50">
+                                    <span class="font-medium">{{ slotProps.option.value }}</span>
+                                </div>
+                            </template>
+                        </SelectButton>
                 </div>
             </div>
 
@@ -140,20 +130,20 @@
                                         variant="outlined" 
                                         icon="clock"
                                         class="p-2"
-                                        v-tooltip.top="{ value: 'Ver horario(s) extraordinario(s)', hideDelay: 300 }"
+                                        v-tooltip.top="{ value: 'Ver horario(s) extraordinario(s)', showDelay: 1000, hideDelay: 600 }"
                                         @click="viewExtraordinarySchedule(data)"
                                     />
                                     <XButton 
                                         variant="outlined" 
                                         icon="alarm"
                                         class="p-2"
-                                        v-tooltip.top="{ value: 'Nuevo horario extraordinario', hideDelay: 300 }"
+                                        v-tooltip.top="{ value: 'Nuevo horario extraordinario', showDelay: 1000, hideDelay: 600 }"
                                         @click="createScheduleModal(data)" 
                                     />
                                     <XButton 
                                         icon="edit-pencil"
                                         class="p-2"
-                                        v-tooltip.top="{ value: 'Editar horario', hideDelay: 300 }"
+                                        v-tooltip.top="{ value: 'Editar horario',showDelay: 1000, hideDelay: 600 }"
                                         @click="editScheduleRegularModal(data)"
                                     />
                                 </div>
@@ -220,6 +210,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core';
+import { useOptions } from '~/componsables/useOptions';
 import ScheduleDetail from '~/features/schedules/ScheduleDetail.vue';
 import ScheduleRegularModal from '~/features/schedules/ScheduleRegularModal.vue';
 import SchedulesModal from '~/features/schedules/SchedulesModal.vue';
@@ -231,7 +222,18 @@ import { scheduleService } from '~/services/scheduleService';
 // Composables 
 const toast = useToast()
 
+
 const itemsBreadSchedules = getBreadcrumbItems('schedule', 'list');
+
+const itemsBreadSchedules = getBreadcrumbItems('schedule', 'list');
+const { paymentGatewayFilterOptions, loadAllOptions } = useOptions()
+
+const itemsBreadSchedules = ref([
+    { label: 'Inicio', to: '/' },
+    { label: 'Configuracion', to: '/admin/configuration' },
+    { label: 'Horarios' }
+])
+
 
 // State - Cambio importante: ahora es Schedule[] directamente
 const schedules = ref<ScheduleResponseList[]>([])
@@ -300,34 +302,42 @@ const flatSchedules = computed(() => {
     return allSchedules;
 });
 
-// Computed para las opciones del canal basado en los datos actuales
-const channelOptions = computed(() => {
-    // Siempre incluir "Todos" como primera opción
-    const baseOptions = [{ label: 'Todos', value: 'todos' }];
+// // Computed para las opciones del canal basado en los datos actuales
+// const channelOptions = computed(() => {
+//     // Siempre incluir "Todos" como primera opción
+//     const baseOptions = [{ label: 'Todos', value: 'todos' }];
     
-    if (!flatSchedules.value || flatSchedules.value.length === 0) {
-        return baseOptions;
-    }
+//     if (!flatSchedules.value || flatSchedules.value.length === 0) {
+//         return baseOptions;
+//     }
 
-    // Obtener todos los canales únicos
-    const uniqueChannels = [...new Set(
-        flatSchedules.value
-            .map(schedule => schedule.acronym)
-            .filter(acronym => acronym && acronym.trim() !== '')
-    )].sort();
+//     // Obtener todos los canales únicos
+//     const uniqueChannels = [...new Set(
+//         flatSchedules.value
+//             .map(schedule => schedule.acronym)
+//             .filter(acronym => acronym && acronym.trim() !== '')
+//     )].sort();
 
-    // Crear las opciones finales
-    const options = [
-        ...baseOptions,
-        ...uniqueChannels.map(channel => ({
-            label: channel,
-            value: channel
-        }))
-    ];
+//     // Crear las opciones finales
+//     const options = [
+//         ...baseOptions,
+//         ...uniqueChannels.map(channel => ({
+//             label: channel,
+//             value: channel
+//         }))
+//     ];
 
-    console.log('Channel options generated:', options);
-    return options;
-});
+//     console.log('Channel options generated:', options);
+//     return options;
+// });
+
+const channelOptions = computed(() => {
+    return [
+        { value: 'Todos' },
+        ...paymentGatewayFilterOptions.value.map(opt => ({ value: opt.label })).sort((a, b) => a.value.localeCompare(b.value))
+    ]
+})
+
 
 // Filtrado actualizado - ahora incluye filtro por canal
 const filteredSchedule = computed(() => {
@@ -538,6 +548,7 @@ const clearFilters = () => {
 // Lifecycle
 onMounted(async () => {
     await loadSchedule()
+    loadAllOptions()
 })
 
 </script>
