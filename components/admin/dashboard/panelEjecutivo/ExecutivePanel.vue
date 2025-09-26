@@ -261,7 +261,7 @@ const loadSumaryData = async () => {
 // Cargar opciones al montar el componente
 onMounted(async () => {
   await loadperiodsOptions()
-   // Si hay opciones disponibles y no hay valor seleccionado, tomar la primera
+  // Si hay opciones disponibles y no hay valor seleccionado, tomar la primera
   if (periodsOptions.value.length > 0 && !selectedPeriod.value) {
     selectedPeriod.value = periodsOptions.value[0].value
   }
