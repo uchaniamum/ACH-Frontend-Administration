@@ -27,7 +27,7 @@
                         :options="daysOptions" 
                         optionLabel="name" 
                         optionValue="key"
-                        :maxSelectedLabels="3" 
+                        :maxSelectedLabels="Infinity"
                         showClear 
                     /> 
 

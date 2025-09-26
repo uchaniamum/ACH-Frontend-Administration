@@ -2,6 +2,7 @@
     <XDialog 
         v-model:visible="modalScheduleDetail" 
         modal
+        :closable="false"
         header="Ver horario(s) extraordinario(s)"
         :style="{ width: '720px !important' }" 
     > 
@@ -24,12 +25,11 @@
                         <span>{{ schedulesDetails?.transactionCodeDescription || schedulesDetails?.description || 'No disponible' }}</span>
                     </div>
                 </div>
-                <!-- Horarios extraordinarios/excepciones -->
-                    <div v-if="activeScheduleExceptions && activeScheduleExceptions.length > 0">
-                        <div v-for="(exception, index) in activeScheduleExceptions" 
-                                :key="exception.code + index">
-                                <XAccordion value="0">
-                                    <XAccordionPanel value="0">
+                <div v-if="activeScheduleExceptions && activeScheduleExceptions.length > 0">
+                    <div v-for="(exception, index) in activeScheduleExceptions" 
+                        :key="exception.code + index">
+                        <XAccordion :value="accordionStates[index]">
+                            <XAccordionPanel :value="index.toString()">
                                         <XAccordionHeader>Horario Extraordinario {{ index+1 }}</XAccordionHeader>
                                         <XAccordionContent>
                                             <div class="flex flex-col gap-12">
@@ -69,11 +69,10 @@
                                                 </div>
                                             </div>
                                         </XAccordionContent>
-                                    </XAccordionPanel>
-                                </XAccordion>
-                        </div>
+                            </XAccordionPanel>
+                        </XAccordion>
+                    </div>
                 </div>
-
                 <div v-else>
                     <div class="flex flex-col gap-4">
                         <div class="flex gap-4">
@@ -94,7 +93,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="flex flex-col gap-4 col-span-2">
+                    <XDivider />
+                    <div class="flex justify-end gap-4">
+                        <XButton 
+                            label="Aceptar" 
+                            class="!w-[130px]" 
+                            @click="closeModal()" 
+                            :disabled="loading"
+                        />
+                    </div>
+                </div>
             </div>
+
+                
         </div>
     </XDialog>
     <ConfirmDialogWrapper
@@ -122,6 +135,7 @@ interface Emits {
     (e: 'update:modelValue', value: boolean): void
     (e: 'editException', data: { exception: ScheduleFormData, index: number }): void
     (e: 'delete', data: { exception: ScheduleFormData, index: number }): void
+    
 }
 
 const props = defineProps<Props>()
@@ -137,6 +151,9 @@ const {
 } = useScheduleModalDetail();
 
 const loadingDetails = ref(false)
+
+// Nuevo estado para controlar los acordeones
+const accordionStates = ref<string[]>([])
 
 // State para el modal de confirmación
 const confirmDialogInActiveSchedule = ref({
@@ -167,6 +184,31 @@ const activeScheduleExceptions = computed(() => {
     });
 });
 
+// Función para inicializar los estados de acordeón
+const initializeAccordionStates = () => {
+    // if (activeScheduleExceptions.value.length > 0) {
+    //     // Solo el primer acordeón abierto (index 0), los demás vacíos
+    //     accordionStates.value = activeScheduleExceptions.value.map((_, index) => 
+    //         index === 0 ? '0' : ''
+    //     );
+    // }
+
+    if (activeScheduleExceptions.value.length > 0) {
+        // Si hay horarios extraordinarios, inicializar sus acordeones
+        accordionStates.value = activeScheduleExceptions.value.map((_, index) => 
+            index === 0 ? index.toString() : ''
+        );
+    } else {
+        // Si no hay horarios extraordinarios, asegurar que el estado esté vacío
+        accordionStates.value = [];
+    }
+}
+
+// Watch para reinicializar acordeones cuando cambian las excepciones
+watch(activeScheduleExceptions, () => {
+    initializeAccordionStates();
+}, { immediate: true });
+
 const openConfirmModalDelete = (scheduleInActive: ScheduleInActiveException, index: number): void => {
     deleteFormData.value = {
         scheduleData: scheduleInActive,
@@ -179,9 +221,14 @@ const openConfirmModalDelete = (scheduleInActive: ScheduleInActiveException, ind
             title:'Eliminar horario extraordinario',
             icon: 'x:warning-circle',
             iconColor: 'text-yellow-500',
+            confirmLabel: 'Eliminar',
+            cancelLabel:'Cancelar',
             message: '¿Estás seguro de eliminar el horario extraordinario? Ten en cuenta que esta acción es irreversible.',
             onConfirm: async () => {
                 await confirmDelete();
+            },
+            onCancel: () => {
+                console.log('Usuario canceló la acción');
             }
         }
     };
