@@ -10,7 +10,7 @@
           <XTab value="0">Monto</XTab>
           <XTab value="1">Cantidad</XTab>
         </XTabList>
-        
+
         <XTabPanels class="w-full">
           <!-- Panel Monto -->
           <XTabPanel value="0" class="w-full">
@@ -24,7 +24,8 @@
                 </h3>
 
                 <!-- Botones Enviados/Recibidos -->
-                <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+                <div
+                  class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
                   <button @click="handleEnviados" :class="getButtonClasses('enviados')">
                     <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
                     Enviados
@@ -42,29 +43,14 @@
                 <!-- Toggle Ver todas las cifras -->
                 <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10" @click="toggleManual">
                   <div class="flex items-center justify-center">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="18" 
-                      height="19" 
-                      viewBox="0 0 18 19" 
-                      fill="none"
-                      class="transition-all duration-200"
-                    >
-                      <path 
-                        d="M2 1.38855H16C16.8284 1.38855 17.5 2.06012 17.5 2.88855V16.8885C17.5 17.717 16.8284 18.3885 16 18.3885H2C1.17157 18.3885 0.5 17.717 0.5 16.8885V2.88855C0.5 2.06012 1.17157 1.38855 2 1.38855Z" 
-                        :fill="mostrarValores ? '#0C55F8' : 'white'" 
-                        :stroke="mostrarValores ? '#0C55F8' : '#A9B6C9'"
-                        class="transition-all duration-200"
-                      />
-                      <path 
-                        v-if="mostrarValores"
-                        d="M5 9.5l2.5 2.5 5.5-5.5" 
-                        stroke="white" 
-                        stroke-width="1.5" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round"
-                        fill="none"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19" fill="none"
+                      class="transition-all duration-200">
+                      <path
+                        d="M2 1.38855H16C16.8284 1.38855 17.5 2.06012 17.5 2.88855V16.8885C17.5 17.717 16.8284 18.3885 16 18.3885H2C1.17157 18.3885 0.5 17.717 0.5 16.8885V2.88855C0.5 2.06012 1.17157 1.38855 2 1.38855Z"
+                        :fill="mostrarValores ? '#0C55F8' : 'white'" :stroke="mostrarValores ? '#0C55F8' : '#A9B6C9'"
+                        class="transition-all duration-200" />
+                      <path v-if="mostrarValores" d="M5 9.5l2.5 2.5 5.5-5.5" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" fill="none" />
                     </svg>
                   </div>
                   <span class="font-normal text-[13px] ml-2 select-none">Ver todas las cifras</span>
@@ -75,7 +61,7 @@
               </div>
             </div>
           </XTabPanel>
-          
+
           <!-- Panel Cantidad -->
           <XTabPanel value="1" class="w-full">
             <div class="flex flex-col w-full">
@@ -85,11 +71,12 @@
                   {{ chartTitle }}
                   <Icon name="x:paste-clipboard" @click="handleCopiar"
                     class="text-[#0A44C6] w-10 h-10 cursor-pointer hover:text-[#0C55F8]" />
-                      <!-- Toast de copiado -->
-                  </h3>
+                  <!-- Toast de copiado -->
+                </h3>
 
                 <!-- Botones Enviados/Recibidos -->
-                <div class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
+                <div
+                  class="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-[#F0F5FF] w-full sm:w-auto">
                   <button @click="handleEnviados" :class="getButtonClasses('enviados')">
                     <Icon name="x:arrow-tr-circle" class="w-6 h-6 sm:w-7 sm:h-7" />
                     Enviados
@@ -107,29 +94,14 @@
                 <!-- Toggle Ver todas las cifras -->
                 <div class="absolute left-2 top-2 flex items-center cursor-pointer z-10" @click="toggleManual">
                   <div class="flex items-center justify-center">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="18" 
-                      height="19" 
-                      viewBox="0 0 18 19" 
-                      fill="none"
-                      class="transition-all duration-200"
-                    >
-                      <path 
-                        d="M2 1.38855H16C16.8284 1.38855 17.5 2.06012 17.5 2.88855V16.8885C17.5 17.717 16.8284 18.3885 16 18.3885H2C1.17157 18.3885 0.5 17.717 0.5 16.8885V2.88855C0.5 2.06012 1.17157 1.38855 2 1.38855Z" 
-                        :fill="mostrarValores ? '#0C55F8' : 'white'" 
-                        :stroke="mostrarValores ? '#0C55F8' : '#A9B6C9'"
-                        class="transition-all duration-200"
-                      />
-                      <path 
-                        v-if="mostrarValores"
-                        d="M5 9.5l2.5 2.5 5.5-5.5" 
-                        stroke="white" 
-                        stroke-width="1.5" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round"
-                        fill="none"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="19" viewBox="0 0 18 19" fill="none"
+                      class="transition-all duration-200">
+                      <path
+                        d="M2 1.38855H16C16.8284 1.38855 17.5 2.06012 17.5 2.88855V16.8885C17.5 17.717 16.8284 18.3885 16 18.3885H2C1.17157 18.3885 0.5 17.717 0.5 16.8885V2.88855C0.5 2.06012 1.17157 1.38855 2 1.38855Z"
+                        :fill="mostrarValores ? '#0C55F8' : 'white'" :stroke="mostrarValores ? '#0C55F8' : '#A9B6C9'"
+                        class="transition-all duration-200" />
+                      <path v-if="mostrarValores" d="M5 9.5l2.5 2.5 5.5-5.5" stroke="white" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" fill="none" />
                     </svg>
                   </div>
                   <span class="font-normal text-[13px] ml-2 select-none">Ver todas las cifras</span>
@@ -142,11 +114,12 @@
         </XTabPanels>
       </XTabs>
     </div>
-        <Transition name="fade">
-      <div v-if="copiado" class="fixed top-4 right-4 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
+    <Transition name="fade">
+      <div v-if="copiado"
+        class="fixed top-4 right-4 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg shadow-lg z-50">
         Gráfico copiado al portapapeles
       </div>
-    </Transition>  
+    </Transition>
   </div>
 </template>
 
@@ -172,9 +145,7 @@ import { useToast } from "#imports";
 // Types
 import type { SerieTotalTransactionsRegionResponse } from "~/features/dashboard/serieTotalTransaccionsRegion.types";
 
-// ============================================================================
 // INTERFACES Y TIPOS
-// ============================================================================
 interface ChartDataSet {
   label: string;
   data: number[];
@@ -191,9 +162,7 @@ type FilterType = "amount" | "count";
 type ModeType = "sent" | "received";
 type SelectionType = "enviados" | "recibidos";
 
-// ============================================================================
 // SETUP Y CONFIGURACIÓN INICIAL
-// ============================================================================
 defineOptions({
   name: "BarVertical",
 });
@@ -210,10 +179,7 @@ ChartJS.register(
   mostrarValoresPluginSumatoria
 );
 
-// ============================================================================
 // VARIABLES REACTIVAS
-// ============================================================================
-// Estado del componente
 const activeTab = ref("0");
 const mostrarValores = ref(false);
 const loading = ref(false);
@@ -234,9 +200,7 @@ const chartRefCantidad: Ref<any> = ref(null);
 const periodo = useState<string | null>("periodo");
 const toast = useToast();
 
-// ============================================================================
 // COMPUTED PROPERTIES
-// ============================================================================
 const currentChartRef = computed(() => {
   return activeTab.value === "0" ? chartRefMonto.value : chartRefCantidad.value;
 });
@@ -249,9 +213,9 @@ const chartOptionsComputed = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   scales: {
-    x: { 
-      stacked: true, 
-      ticks: { font: { size: 10 } } 
+    x: {
+      stacked: true,
+      ticks: { font: { size: 10 } }
     },
     y: {
       stacked: true,
@@ -291,24 +255,22 @@ const chartOptionsComputed = computed(() => ({
   },
 }));
 
-// ============================================================================
 // FUNCIONES UTILITARIAS
-// ============================================================================
 function formatNumber(value: number): string {
   const suffixes = ["", "K", "M", "B", "T"];
   let newValue = value;
   let suffixIndex = 0;
-  
+
   while (Math.abs(newValue) >= 1000 && suffixIndex < suffixes.length - 1) {
     newValue /= 1000;
     suffixIndex++;
   }
-  
+
   const formatted = newValue.toLocaleString("es-BO", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
-  
+
   return formatted + suffixes[suffixIndex];
 }
 
@@ -320,7 +282,7 @@ function generateCustomLabels(chart: any) {
         (d: any) => d.label === label
       );
       if (datasetIndex === -1) return null;
-      
+
       const dataset = chart.data.datasets[datasetIndex];
       return {
         text: dataset.label,
@@ -345,20 +307,20 @@ function buildChartData(participants: any[]): ChartData {
   return {
     labels,
     datasets: [
-      { 
-        label: "Asincrono", 
-        data: getValueByCode(participants, "ASYNC"), 
-        backgroundColor: "#A6C4F6" 
+      {
+        label: "Asincrono",
+        data: getValueByCode(participants, "ASYNC"),
+        backgroundColor: "#A6C4F6"
       },
-      { 
-        label: "Express", 
-        data: getValueByCode(participants, "EXPRESS"), 
-        backgroundColor: "#6F8CCE" 
+      {
+        label: "Express",
+        data: getValueByCode(participants, "EXPRESS"),
+        backgroundColor: "#6F8CCE"
       },
-      { 
-        label: "QR", 
-        data: getValueByCode(participants, "QR"), 
-        backgroundColor: "#0C55F8" 
+      {
+        label: "QR",
+        data: getValueByCode(participants, "QR"),
+        backgroundColor: "#0C55F8"
       },
     ],
   };
@@ -373,9 +335,7 @@ function getButtonClasses(type: SelectionType): string[] {
   ];
 }
 
-// ============================================================================
 // FUNCIONES DE ACTUALIZACIÓN
-// ============================================================================
 function updateChart() {
   if (chartRefMonto.value?.chart) {
     chartRefMonto.value.chart.update();
@@ -387,33 +347,31 @@ function updateChart() {
 
 async function updateChartData(mode: ModeType) {
   if (!totalTransactionsRegionData.value) return;
-  
-  const regionsToUse = mode === "sent" 
+
+  const regionsToUse = mode === "sent"
     ? totalTransactionsRegionData.value.sent.regions
     : totalTransactionsRegionData.value.received.regions;
-    
+
   chartData.value = buildChartData(regionsToUse);
   await nextTick();
   updateChart();
 }
 
-// ============================================================================
 // HANDLERS DE EVENTOS
-// ============================================================================
 async function handleTabChange(value: string) {
   activeTab.value = value;
   await nextTick();
-  
+
   // Cambiar filtro según el tab
   const newFilter: FilterType = value === "0" ? "amount" : "count";
-  
+
   if (filtroActivo.value !== newFilter) {
     filtroActivo.value = newFilter;
     if (periodo.value) {
       await loadTotalTransactionsRegionData(periodo.value, newFilter);
     }
   }
-  
+
   await nextTick();
   updateChart();
 }
@@ -422,7 +380,7 @@ async function handleCopiar() {
   try {
     await nextTick();
     const chartRef = currentChartRef.value;
-    
+
     if (chartRef?.$el) {
       await copiarGrafico(chartRef.$el);
       console.log(`Gráfico copiado desde tab: ${activeTab.value === "0" ? "Monto" : "Cantidad"}`);
@@ -459,9 +417,7 @@ async function handleRecibidos() {
   await updateChartData("received");
 }
 
-// ============================================================================
 // FUNCIONES CARGAR DATOS DESDE EL SERVICIO 
-// ============================================================================
 async function loadTotalTransactionsRegionData(
   periodo: string,
   tipo: FilterType = filtroActivo.value
@@ -489,9 +445,7 @@ async function loadTotalTransactionsRegionData(
   }
 }
 
-// ============================================================================
 // WATCHERS
-// ============================================================================
 watch(periodo, (newVal) => {
   if (newVal) {
     loadTotalTransactionsRegionData(newVal);
@@ -503,9 +457,7 @@ watch(mostrarValores, async () => {
   updateChart();
 });
 
-// ============================================================================
 // LIFECYCLE
-// ============================================================================
 onMounted(async () => {
   if (periodo.value) {
     await loadTotalTransactionsRegionData(periodo.value);
@@ -514,10 +466,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

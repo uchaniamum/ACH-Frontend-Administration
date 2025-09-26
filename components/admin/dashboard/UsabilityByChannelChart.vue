@@ -96,9 +96,7 @@ import { XCheckBox } from "#components";
 // Types
 import type { SerieUsabilityChannelResponse } from "~/features/dashboard/serieUsabilityChannel.types";
 
-// ============================================================================
 // INTERFACES Y TIPOS
-// ============================================================================
 interface ChartDataSet {
   label: string;
   data: number[];
@@ -113,9 +111,7 @@ interface ChartData {
 type ModeType = 'sent' | 'received';
 type SelectionType = 'enviados' | 'recibidos';
 
-// ============================================================================
 // SETUP Y CONFIGURACIÓN INICIAL
-// ============================================================================
 defineOptions({
   name: "UsabilityByChannelChart"
 });
@@ -130,9 +126,7 @@ ChartJS.register(
   mostrarTooltipBurbujaPlugin
 );
 
-// ============================================================================
 // CONFIGURACIÓN DE COLORES Y UMBRALES
-// ============================================================================
 const CHART_COLORS = [
   "#0C55F8", 
   "#073395", 
@@ -165,10 +159,7 @@ const CHANNEL_NAME_MAP: Record<string, string> = {
   'AGENT': 'Agente'
 };
 
-// ============================================================================
 // VARIABLES REACTIVAS
-// ============================================================================
-// Estado del componente
 const mostrarValoresPie: Ref<boolean> = ref(false);
 const seleccionado: Ref<string | null> = ref(null);
 const loading = ref(false);
@@ -200,9 +191,7 @@ const toast = useToast();
 // Composables
 const { copiarGrafico, copiado } = useChartUtilitarios();
 
-// ============================================================================
 // COMPUTED PROPERTIES
-// ============================================================================
 const chartTitle = computed(() => {
   return usabilityData.value?.panel || 'No hay descripción disponible';
 });
@@ -226,9 +215,7 @@ const chartOptions = computed(() => ({
   },
 }));
 
-// ============================================================================
 // FUNCIONES UTILITARIAS
-// ============================================================================
 function getButtonClasses(type: SelectionType): string[] {
   return [
     'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
@@ -297,9 +284,7 @@ function buildChartData(items: any[], mode: ModeType): ChartData {
   };
 }
 
-// ============================================================================
 // FUNCIONES DE ACTUALIZACIÓN
-// ============================================================================
 function updateChart() {
   if (grafico.value?.chart) {
     grafico.value.chart.options.plugins.mostrarValoresPie = mostrarValoresPie.value;
@@ -317,9 +302,7 @@ function updateChartData(mode: ModeType) {
   chartData.value = buildChartData(items, mode);
 }
 
-// ============================================================================
 // HANDLERS DE EVENTOS
-// ============================================================================
 function handleCopiar(): void {
   if (graficoContenido.value) {
     copiarGrafico(graficoContenido.value);
@@ -341,9 +324,7 @@ function handleRecibidos(): void {
   updateChartData('received');
 }
 
-// ============================================================================
 // FUNCIONES DE DATOS
-// ============================================================================
 async function loadUsabilityChannelData(periodo: string) {
   try {
     console.log(`Cargando datos de usabilidad: Período=${periodo}`);
@@ -371,18 +352,14 @@ async function loadUsabilityChannelData(periodo: string) {
   }
 }
 
-// ============================================================================
 // WATCHERS
-// ============================================================================
 watch(periodo, (newVal) => {
   if (newVal) {
     loadUsabilityChannelData(newVal);
   }
 });
 
-// ============================================================================
 // LIFECYCLE
-// ============================================================================
 onMounted(() => {
   if (periodo.value) {
     loadUsabilityChannelData(periodo.value);

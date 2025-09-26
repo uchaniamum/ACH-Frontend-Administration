@@ -248,9 +248,7 @@ const toast = useToast();
 // Composable
 const { copiado, copiarGrafico } = useChartUtilitarios();
 
-// ============================================================================
 // COMPUTED PROPERTIES
-// ============================================================================
 const currentChartRef = computed(() => {
   return activeTab.value === "0" ? chartRefMonto.value : chartRefCantidad.value;
 });
@@ -259,18 +257,14 @@ const chartTitle = computed(() => {
   return evolutionsMovementsData.value?.panel || "No hay descripción disponible";
 });
 
-// ============================================================================
 // CONFIGURACIÓN DE COLORES
-// ============================================================================
 const TRANSACTION_COLORS = {
   QR: "#0C55F8",
   EXPRESS: "#6F8CCE", 
   ASYNC: "#A6C4F6"
 } as const;
 
-// ============================================================================
 // FUNCIONES UTILITARIAS
-// ============================================================================
 function formatNumber(value: number): string {
   const suffixes = ["", "K", "M", "B", "T"];
   let newValue = value;

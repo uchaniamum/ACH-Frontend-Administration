@@ -100,9 +100,7 @@ import { XCheckBox } from "#components";
 // Types
 import type { SerieUsabilityTransferResponse } from "~/features/dashboard/serieUsabilityTransfer.types";
 
-// ============================================================================
 // INTERFACES Y TIPOS
-// ============================================================================
 interface ChartDataSet {
   label: string;
   data: number[];
@@ -117,9 +115,7 @@ interface ChartData {
 type ModeType = 'sent' | 'received';
 type SelectionType = 'enviados' | 'recibidos';
 
-// ============================================================================
 // SETUP Y CONFIGURACIÓN INICIAL
-// ============================================================================
 defineOptions({
   name: "PieUsabilidadTransferencia"
 });
@@ -133,9 +129,7 @@ ChartJS.register(
   mostrarTooltipBurbujaPlugin
 );
 
-// ============================================================================
 // CONFIGURACIÓN DE COLORES Y MAPEOS
-// ============================================================================
 const CHART_COLORS = [
   "#0C55F8", 
   "#021132", 
@@ -164,10 +158,8 @@ const TRANSACTION_NAME_MAP: Record<string, string> = {
   'RECURRING': 'Recurrente'
 };
 
-// ============================================================================
+
 // VARIABLES REACTIVAS
-// ============================================================================
-// Estado del componente
 const mostrarValoresPie = ref(false);
 const seleccionado = ref<string | null>(null);
 const loading = ref(false);
@@ -199,9 +191,7 @@ const toast = useToast();
 // Composables
 const { copiarGrafico, copiado } = useChartUtilitarios();
 
-// ============================================================================
 // COMPUTED PROPERTIES
-// ============================================================================
 const chartTitle = computed(() => {
   return usabilityTransferData.value?.panel || 'No hay descripción disponible';
 });
@@ -223,9 +213,7 @@ const chartOptions = computed(() => ({
   },
 }));
 
-// ============================================================================
 // FUNCIONES UTILITARIAS
-// ============================================================================
 function getButtonClasses(type: SelectionType): string[] {
   return [
     'flex items-center gap-2 px-3 py-2 flex-1 sm:flex-none min-w-[100px] rounded-md text-sm cursor-pointer transition-colors',
@@ -294,9 +282,7 @@ function buildChartData(items: any[], mode: ModeType): ChartData {
   };
 }
 
-// ============================================================================
 // FUNCIONES DE ACTUALIZACIÓN
-// ============================================================================
 function updateChart() {
   if (grafico.value?.chart) {
     grafico.value.chart.options.plugins.mostrarValoresPie = mostrarValoresPie.value;
@@ -314,9 +300,7 @@ function updateChartData(mode: ModeType) {
   chartData.value = buildChartData(items, mode);
 }
 
-// ============================================================================
 // HANDLERS DE EVENTOS
-// ============================================================================
 function handleCopiar(): void {
   if (graficoContenido.value) {
     copiarGrafico(graficoContenido.value);
@@ -338,9 +322,7 @@ function handleRecibidos(): void {
   updateChartData('received');
 }
 
-// ============================================================================
 // FUNCIONES DE DATOS
-// ============================================================================
 async function loadUsabilityTransferData(periodo: string) {
   try {
     console.log(`Cargando datos de usabilidad de transferencia: Período=${periodo}`);
@@ -369,18 +351,14 @@ async function loadUsabilityTransferData(periodo: string) {
   }
 }
 
-// ============================================================================
 // WATCHERS
-// ============================================================================
 watch(periodo, (newVal) => {
   if (newVal) {
     loadUsabilityTransferData(newVal);
   }
 });
 
-// ============================================================================
 // LIFECYCLE
-// ============================================================================
 onMounted(async () => {
   if (periodo.value) {
     await loadUsabilityTransferData(periodo.value);
