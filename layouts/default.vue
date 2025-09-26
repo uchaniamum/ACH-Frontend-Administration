@@ -1,5 +1,5 @@
 <template>
-    <div class="px-80 pt-20 gap-20">
+    <div class="px-80 pt-20 gap-20 pb-20">
         <XMenuBar :model="menuItems">
             <template #item="{ item, props, hasSubmenu }">
                 <template v-if="item.items">
@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import menuConfigACH from '~/router/menuRoutes';
+import menuConfigACH from '~/navigation/menuRoutes';
 import type { MenuBarAdminItem } from '../types/admin/menu.types';
 
 const route = useRoute();

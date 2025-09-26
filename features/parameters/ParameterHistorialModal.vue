@@ -4,9 +4,9 @@
             v-model:visible="modalParameter" 
             modal
             header="Ver historial"
-            :style="{ width: '840px' }" 
+            :style="{ width: '740px' }" 
         >
-            <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-8">
                 <!-- Información del parámetro -->
                 <XCard class="border border-gray-200">
                     <template #header>
@@ -21,30 +21,25 @@
                 </XCard>
 
                 <!-- Historial de cambios -->
-                <div class="flex flex-col gap-4">                    
-                    <div v-if="loadingDetails" class="text-center py-8">
-                        <ProgressSpinner />
-                        <p class="text-gray-600 mt-2">Cargando historial...</p>
-                    </div>
-
-                    <div v-else-if="parameterHistorials && parameterHistorials.parameters && parameterHistorials.parameters.length > 0">
+                <div class="flex flex-col gap-8">   
+                    <div v-if="parameterHistorials && parameterHistorials.parameters && parameterHistorials.parameters.length > 0">
                         <DataTable 
                             :value="parameterHistorials.parameters" 
                             :rowHover="true"
                         >
-                            <Column field="updatedAt" header="Fecha de modificación" sortable style="min-width: 180px;">
+                            <Column field="updatedAt" header="Fecha de edición" style="min-width: 180px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ formatDate(data.updatedAt) }}
                                 </template>
                             </Column>
 
-                            <Column field="updatedByUser" header="Usuario" sortable style="min-width: 200px;">
+                            <Column field="updatedByUser" header="Usuario" style="min-width: 200px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.updatedByUser || 'N/A' }}
                                 </template>
                             </Column>
 
-                            <Column field="value" header="Valor" style="min-width: 120px;">
+                            <Column field="value" header="Valor" style="min-width: 120px;" class="text-left">
                                 <template #body="{ data }">
                                     {{ data.value || 'N/A' }}
                                 </template>
@@ -55,6 +50,20 @@
                     <div v-else class="text-center py-8 border border-gray-200 rounded-lg bg-gray-50">
                         <p class="text-gray-500">No hay historial de cambios para este parámetro</p>
                     </div>
+
+                    <div class="flex justify-center">
+                        <Paginator 
+                            v-model:first="first"
+                            v-model:rows="rows"
+                            :rowsPerPageOptions="[5, 10, 25, 50, 100]"
+                            template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                        >
+                            <template #start="slotProps">
+                                Página: {{ slotProps.state.page + 1 }}, Filas: 
+                            </template>
+                        </Paginator>
+                    </div>
+                    
                 </div>
             </div>
         </XDialog>
@@ -89,6 +98,9 @@ const emit = defineEmits<Emits>()
 const modalParameter = defineModel<boolean>({ default: false })
 const loadingDetails = ref(false)
 const selectedChange = ref<ParameterDetailHisto | null>(null)
+
+const first = ref(0)
+const rows = ref(10)
 
 // Tipo para la respuesta del historial
 interface ParameterHistoricalData {
