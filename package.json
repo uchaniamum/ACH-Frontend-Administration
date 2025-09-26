@@ -21,15 +21,18 @@
     "@vueuse/nuxt": "^13.5.0",
     "@vueuse/router": "^13.5.0",
     "chart.js": "^4.5.0",
+    "dayjs": "^1.11.18",
+    "downloadjs": "^1.4.7",
     "eslint": "^9.25.1",
     "html2canvas": "^1.4.1",
     "libphonenumber-js": "^1.12.9",
+    "postcss-import": "^16.1.0",
     "primelocale": "^2.1.2",
     "prismjs": "^1.30.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-primeui": "^0.6.1",
-    "postcss-import": "^16.1.0",
-    "vee-validate": "^4.15.0"
+    "vee-validate": "^4.15.0",
+    "vue-chartjs": "^5.3.2"
   },
   "devDependencies": {
     "@types/downloadjs": "^1.4.6",

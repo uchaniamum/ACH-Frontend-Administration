@@ -119,9 +119,6 @@ const openConfirmModalSave = (formData: ScheduleFormData): void => {
             title: isEditMode.value ? 'Editar horario extraordinario' : 'Nuevo horario extraordinario',
             icon: 'x:warning-circle',
             iconColor: 'text-yellow-500',
-
-            confirmLabel: 'Programar',
-
             confirmLabel:  isEditMode.value ? 'Guardar' : 'Programar',
             cancelLabel:'Cancelar',
 

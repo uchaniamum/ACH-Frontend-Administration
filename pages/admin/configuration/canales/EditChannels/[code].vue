@@ -75,14 +75,6 @@
     
       <Toast position="top-right" />
 
-    <ChannelsModalConfirm
-      v-model="confirmModalVisible"
-      :current-selection="selectedRouteData"
-      :previous-selection="previousRouteData"
-      @confirm="handleConfirmChange"
-      @cancel="handleCloseCertificateModal"
-    />
-
     <ChannelsModalCertificate
       v-model="visibleDialogCertificate"
       :channel-code="channelData?.code"
@@ -118,7 +110,6 @@ import { ref, computed, watch } from 'vue'
 import { useToast } from 'primevue/usetoast';
 import { channelsService } from '~/services/channelsService';
 import type { ChannelsResponse } from '~/features/channels/type';
-import ChannelsModalConfirm, { type RouteSelection } from '~/features/channels/ChannelsModalConfirm.vue';
 import ChannelsModalCertificate from '~/features/channels/ChannelsModalCertificate.vue';
 
 const route = useRoute();
@@ -146,7 +137,7 @@ const processedRoutes = computed(() => {
   return channelData.value.routes
 })
 
-const selectedRouteData = computed<RouteSelection | undefined>(() => {
+const selectedRouteData = computed<Record<string, string>>(() => {
   if (!channelData.value || !selectedRouteAlias.value) return undefined
   const found = channelData.value.routes?.find(r => r.alias === selectedRouteAlias.value)
   return found
@@ -158,7 +149,7 @@ const selectedRouteData = computed<RouteSelection | undefined>(() => {
     : undefined
 })
 
-const previousRouteData = computed<RouteSelection | undefined>(() => {
+const previousRouteData = computed<Record<string, string>>(() => {
   if (!channelData.value || !originalSelectedRoute.value) return undefined
   const found = channelData.value.routes?.find(r => r.alias === originalSelectedRoute.value)
   return found
