@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import menuConfigACH from '~/navigation/menuRoutes';
+import menuConfigACH from '~/router/menuRoutes';
 import type { MenuBarAdminItem } from '../types/admin/menu.types';
 
 const route = useRoute();

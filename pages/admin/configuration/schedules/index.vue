@@ -79,11 +79,11 @@
                             <template #body="{ data }">
                                 <span v-if="data.isInbound" class="flex gap-6">
                                     <Icon name="x:arrow-tr" class="text-sky-500 text-[12px] font-bold"/>
-                                    <span class="text-gray-700">{{ data.description }}</span>
+                                    <span class="text-gray-700">Asíncrono</span>
                                 </span>
                                 <span v-else class="flex gap-6">
                                     <Icon name="x:arrow-bl" class="text-orange-500 text-[12px] font-semibold"/>
-                                    <span class="text-gray-700">{{ data.description }}</span>
+                                    <span class="text-gray-700">Asíncrono</span>
                                 </span>
                             </template>
                         </Column>
@@ -150,21 +150,14 @@
                             </template>
                         </Column>
                     </DataTable>
-                    <div class="flex justify-center">
-                        <Paginator 
-                            v-if="filteredSchedule.length > 0"
-                            v-model:first="paginationSchedulesFirst"
-                            v-model:rows="paginationSchedulesRows"
-                            :totalRecords="filteredSchedule.length"
-                            :rowsPerPageOptions="[10, 25, 50, 100]"
-                            template="RowsPerPageDropdown  FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                        >
-                            <template #start="slotProps">
-                                Página: {{ slotProps.state.page + 1 }}, Filas: 
-                            </template>
-                        </Paginator>
-                    </div>
-                    
+
+                    <Paginator 
+                        v-if="filteredSchedule.length > 0"
+                        v-model:first="paginationSchedulesFirst"
+                        v-model:rows="paginationSchedulesRows"
+                        :totalRecords="filteredSchedule.length"
+                        :rowsPerPageOptions="[10, 25, 50, 100]"
+                    />
                 </div>
             </div>
         </div>
@@ -216,7 +209,6 @@ import ScheduleRegularModal from '~/features/schedules/ScheduleRegularModal.vue'
 import SchedulesModal from '~/features/schedules/SchedulesModal.vue';
 import type { ScheduleResponseList, Schedule, ScheduleFormData, ScheduleWeek } from '~/features/schedules/type';
 import type { ModalMode, ServiceError } from '~/features/users/types';
-import { getBreadcrumbItems } from '~/navigation/breadcrumbConfig';
 import { scheduleService } from '~/services/scheduleService';
 
 // Composables 
@@ -504,7 +496,6 @@ const handleRegularScheduleSubmit = (schedule: Schedule) => {
             base64JustificationFile: ''
         }
     };
-    loadSchedule()
 }
 
 // Funciones para manejar los toasts

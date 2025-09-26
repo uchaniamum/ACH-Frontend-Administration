@@ -14,7 +14,6 @@
             @cancel="handleCancel"
         />
     </XDialog>
-
     <Toast position="top-right">
         <template #message="{ message }">
             <Icon 
@@ -115,7 +114,7 @@ const loadFullUserDetails = async (code: string): Promise<void> => {
             }
         }
     } finally {
-        loadingDetails.value = false //
+        loadingDetails.value = false // ✅ Ahora sí tiene sentido
     }
 }
 
