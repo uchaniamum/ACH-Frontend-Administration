@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col gap-16">
     <XSnackBar variant="warn" v-if="!modelValue" >
-      <h5 class="font-semibold">Usuario inactivo</h5>
-      <p>El usuario no podrá ejecutar ninguna acción en el sistema.</p>
+        <h5 class="font-semibold text-gray-1000">Usuario inactivo</h5>
+        <span>El usuario no podrá ejecutar ninguna acción en el sistema.</span>
     </XSnackBar>
 
     <!-- Campo del switch -->
-    <div class="col-span-2 border border-gray-400 rounded-[6px] p-6 flex justify-between">
+    <div class="col-span-2 border border-gray-400 rounded-[6px] p-6 flex flex-row gap-12">
       <div class="flex flex-col gap-2">
-        <p class="font-medium">{{ props.label }}</p>
+        <p class="font-medium text-gray-1000">{{ props.label }}</p>
         <p>{{ props.description }}</p>
       </div>
       <div class="flex flex-row gap-4 justify-end items-center">

@@ -84,6 +84,7 @@
                     class="!w-[130px]" 
                     type="submit"
                     :loading="loading"
+                    :disabled="!hasFormChanged || !isFormiValidUser"
                 />
             </div>
         </div>
@@ -113,7 +114,18 @@ const {
     loadRoleOptions 
 } = useOptions()
 
+const originalFormData = ref({
+    code: '',
+    fullname: '',
+    email: '',
+    alias: '',
+    rol: '',
+    numberPhone: '',
+    countryCode: '',
+    isActive: true
+})
 
+const formData = ref({ ...originalFormData.value })
 
 const requiredRule = (value: unknown): ValidationRuleResult => {
     return value !== null && value !== undefined && value !== '' 
@@ -133,18 +145,6 @@ const emailRule = (value: unknown): ValidationRuleResult => {
     : 'Debe ingresar un correo electrónico válido'
 }
 
-
-const formData = ref({
-    code: '',
-    fullname: '',
-    email: '',
-    alias: '',
-    rol: '',
-    numberPhone: '',
-    countryCode: '',
-    isActive: true
-})
-
 // Determinar si es un número móvil basado en el código de país y el primer dígito
 const determineIsMobile = (countryCode: string, phoneNumber: string): boolean => {
     // Si el código de país es +591 (Bolivia)
@@ -154,15 +154,36 @@ const determineIsMobile = (countryCode: string, phoneNumber: string): boolean =>
         // Si comienza con 6 o 7, es móvil
         return firstDigit === '6' || firstDigit === '7'
     }
-
     return true
 }
 
+const hasFormChanged = computed(() =>{
+    if(!props.isEdit) return true
+
+    return(
+        formData.value.code != originalFormData.value.code ||
+        formData.value.fullname != originalFormData.value.fullname ||
+        formData.value.email !== originalFormData.value.email ||
+        formData.value.alias !== originalFormData.value.alias ||
+        formData.value.rol !== originalFormData.value.rol ||
+        formData.value.numberPhone !== originalFormData.value.numberPhone ||
+        formData.value.isActive !== originalFormData.value.isActive
+    )
+})
+
+const isFormiValidUser = computed(() =>{
+    return(formData.value.code.trim() !== '' ||
+            formData.value.fullname.trim() !== '' ||
+            formData.value.email.trim() !== '' ||
+            formData.value.alias.trim() !== '' ||
+            formData.value.rol.trim() !== ''
+    )
+})
 // Watcher para los datos del usuario
 watch(() => props.userData, (newData) => {
     console.log('Hola: ',newData.isActive)
     if (newData && Object.keys(newData).length > 0) {
-        formData.value = {
+        const newFormData = {
             code: newData.code || '',
             fullname: newData.fullname || '',
             email: newData.email || '',
@@ -172,8 +193,13 @@ watch(() => props.userData, (newData) => {
             rol: newData.rol || newData.roleCode || '',
             isActive: newData.isActive ?? true
         }
+        formData.value = { ...newFormData }
+
+        if(props.isEdit){
+            originalFormData.value = {...newFormData}
+        }
     } else {
-        formData.value = {
+        const defaultData = {
             code: '',
             fullname: '',
             email: '',
@@ -181,8 +207,11 @@ watch(() => props.userData, (newData) => {
             rol: '',
             numberPhone: '',
             countryCode: '+591',
-            isActive: true,
+            isActive: true
         }
+        
+        formData.value = { ...defaultData }
+        originalFormData.value = { ...defaultData }
     }
 }, { immediate: true, deep: true })
 
@@ -205,7 +234,6 @@ const onSubmit = () => {
     }
 
     console.log('Lo que se manda: ', apiPayload);
-    //console.log('datos',apiPayload);
     emits('submit', apiPayload)
 }
 

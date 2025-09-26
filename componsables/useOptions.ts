@@ -28,7 +28,8 @@ export function useOptions() {
             error.value = null
 
             const roles = await optionsService.getUserRoles()
-            roleOptions.value = optionsService.mapRolesToSelectOptions(roles);
+            roleOptions.value = optionsService.mapRolesToSelectOptions(roles)
+
         } catch (err) {
             const serviceError = err as ServiceError
             error.value = serviceError.message || 'Error al cargar los roles'

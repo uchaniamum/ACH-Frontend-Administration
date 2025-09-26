@@ -163,7 +163,6 @@ const activeScheduleExceptions = computed(() => {
                         exception.status === 'active' ||
                         exception.status === 'ACTIVE' ||
                         true;
-        
         return isActive;
     });
 });
@@ -261,47 +260,6 @@ const loadFullScheduleDetails = async (code: string): Promise<void> => {
         loadingDetails.value = false
     }
 }
-
-// const formatDate = (date: string | Date | null | undefined): string => {
-//     if (!date) return 'No disponible'
-    
-//     try {
-//         const dateObj = typeof date === 'string' ? new Date(date) : date
-//         return dateObj.toLocaleDateString('es-ES', {
-//             year: 'numeric',
-//             month: 'long',
-//             day: 'numeric'
-//         })
-//     } catch (error) {
-//         return `Fecha inválida ${error}`
-//     }
-// }
-
-// const formatTime = (time: string | Date | null | undefined): string => {
-//     if (!time) return 'No disponible'
-    
-//     try {
-//         if (typeof time === 'string') {
-//             if (time.includes(':')) {
-//                 return time.substring(0, 5) // Retorna solo HH:MM
-//             }
-//             const dateObj = new Date(time)
-//             return dateObj.toLocaleTimeString('es-ES', {
-//                 hour: '2-digit',
-//                 minute: '2-digit',
-//                 hour12: false
-//             })
-//         } else {
-//             return time.toLocaleTimeString('es-ES', {
-//                 hour: '2-digit',
-//                 minute: '2-digit',
-//                 hour12: false
-//             })
-//         }
-//     } catch (error) {
-//         return 'Hora inválida'
-//     }
-// }
 
 
 const handleEditSchuleException = (exception: ScheduleExceptions, index: number) => {

@@ -156,7 +156,7 @@
                                 />
                             </template> -->
                         </Column>
-                        <Column header="Acciones" class="w-[133px]">
+                        <Column header="Acciones" class="min-w-[133px] text-left">
                             <template #body="{ data }">
                                 <div class="flex gap-2">
                                     <XButton 
@@ -200,12 +200,6 @@
             :mode="modalStateUser.mode"
             :userData="modalStateUser.userData"
             @save="handleUserSaved"
-        />
-
-        <UserModalReset
-            v-model="modalStateRevert.showModal"
-            :userData="modalStateRevert.userData"
-            @save="handlePasswordReset"
         />
 
         <ConfirmDialogWrapper
@@ -265,15 +259,6 @@ const modalStateUser = ref<{
 }>({
     modalUser: false,
     mode: 'create',
-    userData: undefined
-})
-
-// State para el modal de reseteo de contraseña
-const modalStateRevert = ref<{
-    showModal: boolean,
-    userData?: UserModalData,
-}>({
-    showModal: false,
     userData: undefined
 })
 
@@ -341,10 +326,6 @@ const openEditModal = (userData: UserModalData): void => {
 
 const handleUserSaved = (): void => {
     loadUsers()
-}
-
-const handlePasswordReset = (userData?: UserModalData): void => {
-    console.log('Contraseña reseteada para:', userData)
 }
 
 // Lifecycle

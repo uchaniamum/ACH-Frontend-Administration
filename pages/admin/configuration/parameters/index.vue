@@ -15,7 +15,7 @@
                             <InputText 
                                 v-model="searchTermParameter"
                                 placeholder="Buscar" 
-                                class="!w-[250px]"
+                                class="!min-w-[250px] text-left"
                             />
                             <XInputIcon icon="search"/>
                         </XIconField>
